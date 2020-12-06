@@ -1,40 +1,49 @@
-### Required
+### Required ### 
 /run/initialize
 /DetSys/world/material Vacuum
 
-### Choose Apparatus To Build
-/DetSys/app/addDiceDetector null
+### Choose Apparatus To Build ###
+/DetSys/app/addDiceDetector 2 
 
-/DetSys/gun/position 0.0 0.0 0.0 mm
-#/DetSys/gun/coneMinAngle 10.0 deg
-#/DetSys/gun/coneMaxAngle 60.0 deg
-
-### Required
+### Select Graphics Manager ###
 /vis/open OGL
 
-### Choose Drawing Style
-/vis/viewer/set/style surface ### Optional - You will not be able to see inside, use the GUI to hide parts.
-#/vis/viewer/set/style wireframe ### Optional - Draw only wireframe so you can see through
+### Choose Drawing Style ###
+/vis/viewer/set/style surface
+#/vis/viewer/set/style wireframe
 
-### Required
+### Required ### 
 /vis/drawVolume 
 
-### Some optimised viewer position settings for seeing the target area
-/vis/viewer/set/viewpointThetaPhi 115 0 deg
-#/vis/viewer/zoomTo 4
-#/vis/viewer/pan -250.0 -30.0 mm
+### Camera setting ###
+/vis/viewer/set/targetPoint 0 0 0 mm
+/vis/viewer/set/viewpointThetaPhi 120 45 deg 
+#/vis/viewer/set/viewpointVector 1 1 -1  ### Same fuction as viewpointThetaPhi
+/vis/viewer/zoomTo 1
 
-### Optional - To visualise the (effect of) magnetic field
-#/vis/scene/add/magneticField 20 ### Doesnt seem to work at the same time as tracks.
+### /vis/viewer/addCutawayPlane 0 0 0 mm 1 0 0 # Useful for viewing inside tight geometries
 
-### Optional - Actually make events and see tracks
-/vis/scene/endOfEventAction accumulate #View all electron trajectories in visualisation
-/vis/scene/add/trajectories smooth #Optional - To visualise the whole flight of the particles in a simulation
+### To visualise the magnetic field ###
+### Doesnt seem with tracks. ###
+#/vis/scene/add/magneticField 20
+
+### Particle Tracks Options ###
+/vis/scene/endOfEventAction accumulate
+/vis/scene/add/trajectories smooth
 /DetSys/phys/SetStepper 1 # CRUCIAL to see electron paths in magnetic field 
-/DetSys/world/StepLimit 10 mm # As there are few interactions in the field region 
+/DetSys/world/StepLimit 10 mm # As there are few interactions in vacuum
 
+### Set Particle Generator ### 
+/DetSys/gun/position 0.0 0.0 0.0 mm
 /DetSys/gun/particle e-
 /DetSys/gun/efficiencyEnergy 500 keV
-/DetSys/gun/SetBeta 0.05
-/DetSys/gun/SetLifetime 3 ns
+
+### Set Particle Generator Extras ### 
+#/DetSys/gun/direction 0 1 1
+#/DetSys/gun/coneMinAngle 10.0 deg
+#/DetSys/gun/coneMaxAngle 60.0 deg
+#/DetSys/gun/BeamSpot 1 mm
+#/DetSys/gun/SetBeta 0.05
+#/DetSys/gun/SetLifetime 1 ns
+
 /run/beamOn 20 ### Keep number low

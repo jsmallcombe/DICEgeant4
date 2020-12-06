@@ -44,9 +44,11 @@ target_link_libraries(DICE10 ${Geant4_LIBRARIES})
 set(DICE10_SCRIPTS
     vis.mac
     dice.mac
-    print.mac
+    remote_vis.mac
+    jpeg.mac
     DiceSort.C
   )
+  
 
 foreach(_script ${DICE10_SCRIPTS})
   configure_file(

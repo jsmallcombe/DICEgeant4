@@ -1,0 +1,26 @@
+### Required ### 
+/run/initialize
+/DetSys/world/material Vacuum
+
+### Choose Apparatus To Build ###
+/DetSys/app/addDiceDetector 2 
+
+### Select Graphics Manager ###
+/vis/open RayTracer
+
+### Choose Drawing Style ###
+/vis/viewer/set/style surface
+#/vis/viewer/set/style wireframe
+
+### Required ### 
+/vis/drawVolume
+
+### Camera setting ###
+/vis/viewer/set/targetPoint 0 0 0 mm
+/vis/viewer/set/viewpointThetaPhi 120 45 deg 
+#/vis/viewer/set/viewpointVector 1 1 -1  ### Same fuction as viewpointThetaPhi
+/vis/viewer/zoomTo 1
+
+### /vis/viewer/addCutawayPlane 0 0 0 mm 1 0 0 # Useful for viewing inside tight geometries
+
+/vis/viewer/flush

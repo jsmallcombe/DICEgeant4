@@ -240,7 +240,7 @@ void DetectorConstruction::SetProperties() {
 
 
 void DetectorConstruction::SetPropertiesRecursive(G4LogicalVolume* vol) {
-    for(int i = 0; i < vol->GetNoDaughters(); ++i) {
+    for(unsigned int i = 0; i < (unsigned)vol->GetNoDaughters(); ++i) {
 		if(!HasProperties(vol->GetDaughter(i)) && CheckVolumeName(vol->GetDaughter(i)->GetName())) {
 			fPropertiesMap[vol->GetDaughter(i)] = ParseVolumeName(vol->GetDaughter(i)->GetName());
 		}
@@ -262,7 +262,7 @@ void DetectorConstruction::Print() {
 
 void DetectorConstruction::PrintRecursive(G4LogicalVolume* vol){
     
-    for(int i = 0; i < vol->GetNoDaughters(); ++i) {
+    for(unsigned int i = 0; i < (unsigned)vol->GetNoDaughters(); ++i) {
 		std::cout<<i<<": "<<vol->GetDaughter(i)<<" - "<<vol->GetDaughter(i)->GetName();
 		if(HasProperties(vol->GetDaughter(i))) {
 			auto prop = GetProperties(vol->GetDaughter(i));

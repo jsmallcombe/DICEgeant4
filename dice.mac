@@ -1,23 +1,21 @@
-### Required
+### Required ###
 /run/initialize
 /DetSys/world/material Vacuum
 
-### Choose Apparatus To Build
+### Choose Apparatus To Build ### 
 /DetSys/app/addDiceDetector null
 
-### Set Generator 
+### Set Particle Generator ### 
 /DetSys/gun/position 0.0 0.0 0.0 mm
 /DetSys/gun/particle e-
 /DetSys/gun/efficiencyEnergy 500 keV
 
-#/DetSys/gun/direction
-#/DetSys/gun/coneMaxAngle
-#/DetSys/gun/coneMinAngle
+### Set Particle Generator Extras ### 
+#/DetSys/gun/direction 0 1 1
+#/DetSys/gun/coneMinAngle 10.0 deg
+#/DetSys/gun/coneMaxAngle 60.0 deg
 #/DetSys/gun/BeamSpot 1 mm
 #/DetSys/gun/SetBeta 0.05
 #/DetSys/gun/SetLifetime 1 ns
 
 /run/beamOn 10000
-
-
-

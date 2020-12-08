@@ -78,24 +78,8 @@ int main(int argc, char** argv)
 
 	 if(argc != 1) {
 		 std::string arg1(argv[1]);
-		 std::cout<<std::endl<<argv[1];
-		 std::cout<<std::endl<<argv[1];
-		 std::cout<<std::endl<<argv[1];
-		 std::cout<<std::endl<<argv[1];
-		 std::cout<<std::endl<<arg1;
-		 std::cout<<std::endl<<arg1;
-		 std::cout<<std::endl<<arg1;
-		 std::cout<<std::endl<<arg1;
-		 std::cout<<std::endl<<(arg1=="-l");
-		 std::cout<<std::endl<<(arg1=="-l");
-		 std::cout<<std::endl<<(arg1=="-l");
-		 std::cout<<std::endl<<(arg1=="-l");
 		 if(arg1=="-l"){
 			// local interactive mode : define visualization and UI terminal
-		 std::cout<<std::endl<<"WORK FUCKER";
-		 std::cout<<std::endl<<"WORK FUCKER";
-		 std::cout<<std::endl<<"WORK FUCKER";
-		 std::cout<<std::endl<<"WORK FUCKER";
 			G4UIExecutive* ui = new G4UIExecutive(argc, argv);
 			UImanager->ApplyCommand("/control/execute vis.mac");
 			ui->SessionStart();

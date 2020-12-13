@@ -35,26 +35,12 @@
 #ifndef APPARATUSDICE_HH
 #define APPARATUSDICE_HH
 
+// Forward declarations of classes which arent explicitly included here for some geanty reason, but which will be linked by any library which uses this class
 class G4VSolid;
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 class G4Material;
 class DetectorMessenger;
-
-// define custom colours for visualisation
-#define SN_COL 1.0, 1.0, 1.0
-#define CU_COL 1.0, 1.0, 0.0
-#define PEEK_COL 0.5, 0.5, 0.0
-#define KAPTON_COL 0.2, 0.7, 0.1
-#define PB_COL 0.6, 0.1, 0.1
-#define NDFEB_COL 0.7,0.3,0.3
-#define DELRIN_COL 0.0, 0.0, 1.0
-#ifndef AL_COL
-#define AL_COL 0.5, 0.5, 0.5
-#endif
-
-#define TARGET_CHAMBER_COL 0.15,0.15,0.15
-#define ELECTROBOX_COL 0.15,0.15,0.15
 
 class ApparatusDICE
 {
@@ -136,6 +122,8 @@ private:
 	//////////////////////////////////////////////////////
 
 	// methods
+	void BuildPlaceBasicTest(G4LogicalVolume*);
+	
 	void BuildPlaceShoeBox(G4LogicalVolume*);
 	void CreateShoeBoxField();
 	void BuildShoeBoxYoke();

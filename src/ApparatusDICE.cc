@@ -97,12 +97,13 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	fSTDetLength= 150*CLHEP::mm;
 
     // Recoil Shadow
-	
 	fRSOffset= 10*CLHEP::mm;
 	fRSBlock0= 10*CLHEP::mm;
 	fRSDetR= 15*CLHEP::mm;
 	fRSInnerR= 10*CLHEP::mm;
-
+	
+	// Basic Test Detectors
+	
 	
 } // end ApparatusDICE
 
@@ -118,6 +119,7 @@ ApparatusDICE::~ApparatusDICE()
 // build and place components        //
 ///////////////////////////////////////
 
+// Main build function called by DetectorConstruction.cc
 void ApparatusDICE::Build(G4LogicalVolume* expHallLog,G4String Options)
 {	
 	std::stringstream ss;
@@ -129,8 +131,8 @@ void ApparatusDICE::Build(G4LogicalVolume* expHallLog,G4String Options)
 		case 1: BuildPlaceShoeBox(expHallLog); break;
 		case 2: BuildPlaceHelios(expHallLog); break;
 		case 3: BuildPlaceSuperTube(expHallLog); break;
-		default: BuildPlaceRecoilShadow(expHallLog);
-		// code block
+		case 4: BuildPlaceRecoilShadow(expHallLog); break;
+		default: BuildPlaceBasicTest(expHallLog);
 	}
 	
 } 
@@ -138,6 +140,32 @@ void ApparatusDICE::Build(G4LogicalVolume* expHallLog,G4String Options)
 ////////////////////////////////////////////////////
 // methods used to build and place the components:
 ////////////////////////////////////////////////////
+
+
+void ApparatusDICE::BuildPlaceBasicTest(G4LogicalVolume* expHallLog){
+	
+	// Define a G4Material to load and store the information about a certain material that we will assign to an object later
+	// In this case we load properties for variable fWaferMaterial, which was set at the initilisation of the ApparatusDICE class
+    G4Material* material = G4Material::GetMaterial(fWaferMaterial);
+	
+	// Create a G4Box, a "Solid" type object, defines geometry but does not have material properies or exist inside this simulated world. Only a geometric blueprint.
+	// Inputs: name, 3 half lengths of the cuboid 
+	G4Box* fDetectorSolid = new G4Box("fDetectorSolid", 15*mm, 15*mm, 2*mm);
+
+	// Create a G4LogicalVolume a "logical", combines a "solid" with material properies and other options (not used here) describing how it should be treated during the simulation. Still only a blueprint, does not exist in the simulated world
+	// Inputs : Solid (pointer), Material, name, 3 options not used here (0,0,0)
+	G4LogicalVolume* fDetectorLogical = new G4LogicalVolume(fDetectorSolid, material, "fDetectorLogical", 0, 0, 0);
+	
+	// Create a G4PVPlacement, a type of "physical" which means placing a copy of our logical blueprints inside another logical volume. When a logical volume is placed inside the "world volume" that volume (and any contained within it) exist in the simulated world
+	// Note : The actual instance of the object is not used further in this function, we only need it to be created. It now exists in memory and at the moment of creation information was sent to it's "mother volume".
+	// Inputs : Rotation (pointer), Rotation (local), Material (pointer), name, mothervolume, 2 options not used here (false,0)
+	// Mother volume is the "logical" within which this physical should occur, for instance we can but segments inside a detector
+	// All physicals with name "SiSegmentPhys#_#" where # are number will be treated as detecors for the purposes of output, where the numbers # are used to specify the volumes
+	// The exact definition of the special names can befound in DetectorConstruction::ParseVolumeName(G4String volumeName) of DetectorConstruction.cc
+	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(), fDetectorLogical, "SiSegmentPhys0_0",  expHallLog, false, 0);
+	
+}
+
 
 void ApparatusDICE::BuildPlaceShoeBox(G4LogicalVolume* expHallLog){
 	
@@ -535,3 +563,5 @@ void ApparatusDICE::BuildRecoilShadowUnit(){
 	}
 	
 }
+
+

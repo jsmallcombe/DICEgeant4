@@ -1,9 +1,12 @@
-### Required ###
+#### Required ###
 /run/initialize
 /DetSys/world/material Vacuum
 
 ### Choose Apparatus To Build ### 
 /DetSys/app/addDiceDetector null
+
+## Record the initial beam data ###
+# /DetSys/det/RecordGun 1
 
 ### Set Particle Generator ### 
 /DetSys/gun/position 0.0 0.0 0.0 mm

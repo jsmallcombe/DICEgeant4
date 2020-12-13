@@ -3,7 +3,7 @@
 /DetSys/world/material Vacuum
 
 ### Choose Apparatus To Build ###
-/DetSys/app/addDiceDetector 2 
+/DetSys/app/addDiceDetector 0
 
 ### Select Graphics Manager ###
 /vis/open OGL

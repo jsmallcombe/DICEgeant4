@@ -97,7 +97,6 @@ DetectorConstruction::DetectorConstruction() :
 
 	//  builtDetectors = false;
 
-
 	fMatWorldName = "G4_AIR";
 
 	// Field Box

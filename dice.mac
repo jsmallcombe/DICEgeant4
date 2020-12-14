@@ -3,7 +3,7 @@
 /DetSys/world/material Vacuum
 
 ### Choose Apparatus To Build ### 
-/DetSys/app/addDiceDetector null
+/DetSys/app/addDiceDetector 0
 
 ## Record the initial beam data ###
 # /DetSys/det/RecordGun 1
@@ -14,7 +14,7 @@
 /DetSys/gun/efficiencyEnergy 500 keV
 
 ### Set Particle Generator Extras ### 
-#/DetSys/gun/direction 0 1 1
+#/DetSys/gun/direction 0 0 1
 #/DetSys/gun/coneMinAngle 10.0 deg
 #/DetSys/gun/coneMaxAngle 60.0 deg
 #/DetSys/gun/BeamSpot 1 mm

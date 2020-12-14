@@ -68,29 +68,19 @@ private:
 	G4UIdirectory*             fDetSysDir;
 	G4UIcmdWithAString*        fWorldMaterialCmd;
 	G4UIcmdWith3VectorAndUnit* fWorldDimensionsCmd;
-	G4UIcmdWithABool*          fWorldVisCmd;
-	G4UIcmdWith3VectorAndUnit* fWorldMagneticFieldCmd;
 	G4UIcmdWithADoubleAndUnit* fWorldStepLimit;
 	G4UIcmdWithoutParameter*   fUpdateCmd;
-
-	//field box
-	G4UIcmdWithAString*        fFieldBoxMaterialCmd;
-	G4UIcmdWith3VectorAndUnit* fFieldBoxDimensionsCmd;
-	G4UIcmdWith3VectorAndUnit* fFieldBoxPositionCmd;
-	G4UIcmdWith3VectorAndUnit* fFieldBoxMagneticFieldCmd;
 
 	//field for DICE
 	G4UIcmdWithAString*        fTabMagneticFieldCmd; ///19/7
 
-	G4UIcmdWithAString*        fAddApparatusDiceDetectorCmd;
-
-	G4UIcmdWithAString*         fAddBoxMatCmd;
-	G4UIcmdWithADoubleAndUnit*  fAddBoxThicknessCmd;
-	G4UIcmdWith3VectorAndUnit*  fAddBoxInnerDimensionsCmd;
-	G4UIcmdWith3Vector*         fAddBoxColourCmd;
-	G4UIcmdWithoutParameter*    fAddBoxCmd;
-
 	G4UIcmdWithABool*           fRecordGunCmd;
+	
+	G4UIcmdWithAString*        fAddApparatusDiceDetectorCmd;
+	G4UIcmdWithADoubleAndUnit* fApparatusDiceFieldCmd;
+	G4UIcmdWithADoubleAndUnit* fApparatusDiceLengthCmd;
+	G4UIcmdWithAnInteger*	   fApparatusDiceIntCmd;
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -75,33 +75,13 @@ public:
 	DetectorConstruction();
 	~DetectorConstruction();
 
-	G4int GriffinDetectorsMap(G4int i) { if(i < 0 || i > 15) return -1; return fGriffinDetectorsMap[i]; }
-
 	void PassEfficiencyPosition( G4ThreeVector num ) {fDetEffPosition = num;}
 
 	void SetWorldMaterial( G4String );
 	void SetWorldDimensions( G4ThreeVector );
-	void SetWorldVis( G4bool );
 	void SetWorldStepLimit( G4double );
 
 	void SetTabMagneticField(G4String, G4double, G4double);
-	// Grid Functions
-	void SetGridMat( G4String input )                  {fGridMat = input;};
-	void SetGridSize( G4double input )                 {fGridSize = input;};
-	void SetGridDimensions( G4ThreeVector input )      {fGridDimensions = input;};
-	void SetGridColour( G4ThreeVector input )          {fGridColour = input;};
-	void SetGridPosOffset( G4ThreeVector input )          {fGridOffset = input;};
-	void AddGrid();
-	void AddApparatusDiceDetector(G4String);
-	void AddApparatus8piVacuumChamber();
-	void AddApparatus8piVacuumChamberAuxMatShell(G4double thickness);
-	void AddApparatusGriffinStructure(G4int selector);
-
-	G4double GetWorldSizeX()           {return fWorldSizeX;};
-	G4double GetWorldSizeY()           {return fWorldSizeY;};
-	G4double GetWorldSizeZ()           {return fWorldSizeZ;};
-
-	const G4VPhysicalVolume* GetphysiWorld() {return fPhysiWorld;};
 
 	G4VPhysicalVolume* Construct();
 
@@ -117,28 +97,21 @@ public:
 
 	void Print();
 	void PrintRecursive(G4LogicalVolume* vol);
+	
+	void AddApparatusDiceDetector(G4String Options);
+	void SetDiceFieldStrength(G4double Field);
+	
+	void SetDiceLength(G4double Length);
+	void SetDiceInt(G4int N);
 
 private:
 	bool CheckVolumeName(G4String volumeName);
 	DetectorProperties ParseVolumeName(G4String volumeName);
 
-	G4int     fGriffinDetectorsMapIndex;
-	G4int     fGriffinDetectorsMap[16];
-
 	G4double  fWorldSizeX;
 	G4double  fWorldSizeY;
 	G4double  fWorldSizeZ;
-	G4bool    fWorldVis;
-	G4bool    fBuiltDetectors;
-	G4double  fGriffinFwdBackPosition;
-	G4int     fDetectorShieldSelect ;
-	G4double  fDetectorRadialDistance ;
-	G4int     fExtensionSuppressorLocation ;
-	G4int     fCustomDetectorNumber ;
-	G4int     fCustomDetectorPosition ;
-	G4int     fCustomDetectorVal ;
-	G4int     fHevimetSelector ;
-	G4bool    fUseTigressPositions;
+
     G4bool    fRecordGun;  
 
 	// Box
@@ -160,15 +133,6 @@ private:
 
 	void DefineMaterials();
 
-	G4bool        fSetFieldBoxMaterial;
-	G4bool        fSetFieldBoxDimensions;
-	G4bool        fSetFieldBoxPosition;
-	G4bool        fSetFieldBoxMagneticField;
-	G4String      fFieldBoxMaterial;
-	G4ThreeVector fFieldBoxDimensions;
-	G4ThreeVector fFieldBoxPosition;
-	G4ThreeVector fFieldBoxMagneticField;
-
 	G4String fMatWorldName;
 
 	DetectorMessenger* fDetectorMessenger;
@@ -179,6 +143,8 @@ private:
 	
 	//unordered maps which hold properties of the physical volumes created
 	std::unordered_map<G4VPhysicalVolume*, DetectorProperties> fPropertiesMap;
+	
+	
 };
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

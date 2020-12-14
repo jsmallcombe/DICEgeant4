@@ -102,10 +102,17 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	fRSDetR= 15*CLHEP::mm;
 	fRSInnerR= 10*CLHEP::mm;
 	
-	// Basic Test Detectors
+	///////////////////////////////////////////////////////
+	////// Controlled by DetectorConstruction class ///////
+	///////////////////////////////////////////////////////
 	
+	fAdjLength= 10*CLHEP::mm;
+	fAdjNumber=4;
 	
-} // end ApparatusDICE
+	///////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
+	
+} // end ApparatusDICE constructor
 
 //////////////////////////////////////////////////
 // delete ApparatusDICE
@@ -134,7 +141,6 @@ void ApparatusDICE::Build(G4LogicalVolume* expHallLog,G4String Options)
 		case 4: BuildPlaceRecoilShadow(expHallLog); break;
 		default: BuildPlaceBasicTest(expHallLog);
 	}
-	
 } 
 
 ////////////////////////////////////////////////////
@@ -162,7 +168,7 @@ void ApparatusDICE::BuildPlaceBasicTest(G4LogicalVolume* expHallLog){
 	// Mother volume is the "logical" within which this physical should occur, for instance we can but segments inside a detector
 	// All physicals with name "SiSegmentPhys#_#" where # are number will be treated as detecors for the purposes of output, where the numbers # are used to specify the volumes
 	// The exact definition of the special names can befound in DetectorConstruction::ParseVolumeName(G4String volumeName) of DetectorConstruction.cc
-	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(), fDetectorLogical, "SiSegmentPhys0_0",  expHallLog, false, 0);
+	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(0,0,02*mm), fDetectorLogical, "SiSegmentPhys0_0",  expHallLog, false, 0);
 	
 }
 

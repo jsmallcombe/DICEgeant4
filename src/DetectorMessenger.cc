@@ -75,70 +75,11 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 	fWorldDimensionsCmd->SetUnitCategory("Length");
 	fWorldDimensionsCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-	fWorldVisCmd = new G4UIcmdWithABool("/DetSys/world/vis",this);
-	fWorldVisCmd->SetGuidance("Set the visulization of the world");
-	fWorldVisCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-	fWorldMagneticFieldCmd = new G4UIcmdWith3VectorAndUnit("/DetSys/world/magneticField",this);
-	fWorldMagneticFieldCmd->SetGuidance("Set world magnetic field - x y z unit.");
-	fWorldMagneticFieldCmd->SetUnitCategory("Magnetic flux density");
-	fWorldMagneticFieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
 	fWorldStepLimit = new G4UIcmdWithADoubleAndUnit("/DetSys/world/StepLimit",this);
 	fWorldStepLimit->SetGuidance("Set user step limit for the world volume.");
 	fWorldStepLimit->SetUnitCategory("Length");
 	fWorldStepLimit->AvailableForStates(G4State_PreInit,G4State_Idle);
- 
-	fFieldBoxMaterialCmd = new G4UIcmdWithAString("/DetSys/app/fieldBoxMaterial",this);
-	fFieldBoxMaterialCmd->SetGuidance("Select material of the target.");
-	fFieldBoxMaterialCmd->SetParameterName("choice",false);
-	fFieldBoxMaterialCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-	fFieldBoxDimensionsCmd = new G4UIcmdWith3VectorAndUnit("/DetSys/app/fieldBoxDimensions",this);
-	fFieldBoxDimensionsCmd->SetGuidance("Set target dimensions - x y z unit.");
-	fFieldBoxDimensionsCmd->SetUnitCategory("Length");
-	fFieldBoxDimensionsCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-	fFieldBoxPositionCmd = new G4UIcmdWith3VectorAndUnit("/DetSys/app/fieldBoxPosition",this);
-	fFieldBoxPositionCmd->SetGuidance("Set target position - x y z unit.");
-	fFieldBoxPositionCmd->SetUnitCategory("Length");
-	fFieldBoxPositionCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-	fFieldBoxMagneticFieldCmd = new G4UIcmdWith3VectorAndUnit("/DetSys/app/fieldBoxMagneticField",this);
-	fFieldBoxMagneticFieldCmd->SetGuidance("Set magnetic field - x y z unit.");
-	fFieldBoxMagneticFieldCmd->SetUnitCategory("Magnetic flux density");
-	fFieldBoxMagneticFieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-	fTabMagneticFieldCmd = new G4UIcmdWithAString("/DetSys/world/TabMagneticField",this); ///19/7
-	fTabMagneticFieldCmd->SetGuidance("Set tabulated magnetic field.");
-	fTabMagneticFieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-	// Box Stuff
-	fAddBoxMatCmd = new G4UIcmdWithAString("/DetSys/det/boxMat",this);
-	fAddBoxMatCmd->SetGuidance("Set box material.");
-	fAddBoxMatCmd->SetParameterName("choice",false);
-	fAddBoxMatCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-	fAddBoxThicknessCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/det/boxThickness",this);
-	fAddBoxThicknessCmd->SetGuidance("Set box thickness.");
-	fAddBoxThicknessCmd->SetUnitCategory("Length");
-	fAddBoxThicknessCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-	fAddBoxInnerDimensionsCmd = new G4UIcmdWith3VectorAndUnit("/DetSys/det/boxInnerDimensions",this);
-	fAddBoxInnerDimensionsCmd->SetGuidance("Set box inner dimensions.");
-	fAddBoxInnerDimensionsCmd->SetUnitCategory("Length");
-	fAddBoxInnerDimensionsCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-	fAddBoxColourCmd = new G4UIcmdWith3Vector("/DetSys/det/boxColour",this);
-	fAddBoxColourCmd->SetGuidance("Set box colour.");
-	fAddBoxColourCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-	fAddBoxCmd = new G4UIcmdWithoutParameter("/DetSys/det/addBox",this);
-	fAddBoxCmd->SetGuidance("Add a box.");
-	fAddBoxCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-	fAddApparatusDiceDetectorCmd = new G4UIcmdWithAString("/DetSys/app/addDiceDetector",this);
-	fAddApparatusDiceDetectorCmd->SetGuidance("Add DICE geometry");
-	fAddApparatusDiceDetectorCmd->AvailableForStates(G4State_Idle);
 
 	fUpdateCmd = new G4UIcmdWithoutParameter("/DetSys/det/update",this);
 	fUpdateCmd->SetGuidance("Update geometry.");
@@ -146,41 +87,56 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 	fUpdateCmd->SetGuidance("if you changed geometrical value(s).");
 	fUpdateCmd->AvailableForStates(G4State_Idle);
 
+	fTabMagneticFieldCmd = new G4UIcmdWithAString("/DetSys/world/TabMagneticField",this); ///19/7
+	fTabMagneticFieldCmd->SetGuidance("Set tabulated magnetic field.");
+	fTabMagneticFieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+	
    	fRecordGunCmd = new G4UIcmdWithABool("/DetSys/det/RecordGun",this);
 	fRecordGunCmd->SetGuidance("Record the particle for each event in the tree");
 	fRecordGunCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
-    
+	
+	fAddApparatusDiceDetectorCmd = new G4UIcmdWithAString("/DetSys/app/addDiceDetector",this);
+	fAddApparatusDiceDetectorCmd->SetGuidance("Add DICE geometry");
+	fAddApparatusDiceDetectorCmd->AvailableForStates(G4State_Idle);
+	
+	fApparatusDiceFieldCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/app/SetDiceField",this);
+	fApparatusDiceFieldCmd->SetGuidance("Set magentic field strength of DICE.");
+	fApparatusDiceFieldCmd->SetUnitCategory("Magnetic flux density");
+	fApparatusDiceFieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+	
+	fApparatusDiceLengthCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/app/SetDiceLength",this);
+	fApparatusDiceLengthCmd->SetGuidance("Set DICE detector length.");
+	fApparatusDiceLengthCmd->SetUnitCategory("Length");
+	fApparatusDiceLengthCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+	
+	fApparatusDiceIntCmd = new G4UIcmdWithAnInteger("/DetSys/app/SetDiceN",this);
+	fApparatusDiceIntCmd->SetGuidance("Set DICE Int N");
+	fApparatusDiceIntCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DetectorMessenger::~DetectorMessenger()
 {	
+	delete fDetSysDir;
 	delete fDetDir;
 	delete fAppDir;
 	delete fWorldDir;
 	delete fWorldMaterialCmd;
 	delete fWorldDimensionsCmd;
-	delete fWorldVisCmd;
-	delete fWorldMagneticFieldCmd;
 	delete fWorldStepLimit;
-	delete fDetSysDir;
 	delete fUpdateCmd;
-
-	delete fFieldBoxMaterialCmd;
-	delete fFieldBoxDimensionsCmd;
-	delete fFieldBoxPositionCmd;
-	delete fFieldBoxMagneticFieldCmd;
-	delete fTabMagneticFieldCmd;
-	delete fAddBoxMatCmd;
-	delete fAddBoxThicknessCmd;
-	delete fAddBoxInnerDimensionsCmd;
-	delete fAddBoxColourCmd;
-	delete fAddBoxCmd;
-
-	delete fAddApparatusDiceDetectorCmd;
 	
+	delete fTabMagneticFieldCmd;
+
 	delete fRecordGunCmd;
+	
+	delete fAddApparatusDiceDetectorCmd;
+	delete fApparatusDiceFieldCmd;
+	delete fApparatusDiceLengthCmd;
+	delete fApparatusDiceIntCmd;
+	
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -193,9 +149,6 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 	}
 	if(command == fWorldDimensionsCmd) {
 		fDetector->SetWorldDimensions(fWorldDimensionsCmd->GetNew3VectorValue(newValue));
-	}
-	if(command == fWorldVisCmd) {
-		fDetector->SetWorldVis(fWorldVisCmd->GetNewBoolValue(newValue));
 	}
 	if(command == fUpdateCmd) {
 		fDetector->UpdateGeometry();
@@ -211,13 +164,26 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 		is>>PathAndTableName>>z_offset>>z_rotation;
 		fDetector->SetTabMagneticField(PathAndTableName, z_offset, z_rotation); // z in mm, angle in degree  
 	}
-	if(command == fAddApparatusDiceDetectorCmd) {
-		fDetector->AddApparatusDiceDetector(newValue);
-	}
 	
 	if(command == fRecordGunCmd) {
 		fDetector->RecordGun(fRecordGunCmd->GetNewBoolValue(newValue));
 	}
+	
+	if(command == fAddApparatusDiceDetectorCmd) {
+		fDetector->AddApparatusDiceDetector(newValue);
+	}
+	if(command == fApparatusDiceFieldCmd) {
+		fDetector->SetDiceFieldStrength(fApparatusDiceFieldCmd->GetNewDoubleValue(newValue));
+	}
+	
+	if(command == fApparatusDiceLengthCmd) {
+		fDetector->SetDiceLength(fApparatusDiceLengthCmd->GetNewDoubleValue(newValue));
+	}	
+	
+	if(command == fApparatusDiceIntCmd) {
+		fDetector->SetDiceInt(fApparatusDiceIntCmd->GetNewIntValue(newValue));
+	}	
+	
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

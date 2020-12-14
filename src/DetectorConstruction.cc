@@ -82,16 +82,6 @@ DetectorConstruction::DetectorConstruction() :
 {
 	fWorldSizeX  = fWorldSizeY = fWorldSizeZ = 10.0*m;
 
-	fBoxMat = "G4_WATER";
-	fBoxThickness = 0.0*mm;
-	fBoxInnerDimensions = G4ThreeVector(0.0*mm,0.0*mm,0.0*mm);
-	fBoxColour = G4ThreeVector(0.0,0.0,1.0);
-
-	fGridMat = "G4_WATER";
-	fGridSize = 0.0*mm;
-	fGridDimensions = G4ThreeVector(0.0*mm,0.0*mm,0.0*mm);
-	fGridColour = G4ThreeVector(1.0,0.0,0.0);
-
 	// materials
 	DefineMaterials();
 
@@ -99,22 +89,6 @@ DetectorConstruction::DetectorConstruction() :
 
 	fMatWorldName = "G4_AIR";
 
-	// Field Box
-	fSetFieldBoxMaterial= false;//think this has been removed 17/8
-	fSetFieldBoxDimensions= false;
-	fSetFieldBoxPosition= false;
-	fSetFieldBoxMagneticField= false;
-
-	// Shield Selection Default
-
-	fUseTigressPositions = false;
-
-	fDetectorShieldSelect = 1 ; // Include suppressors by default.
-	fExtensionSuppressorLocation = 0 ; // Back by default (Detector Forward)
-	fHevimetSelector = 0 ; // Chooses whether or not to include a hevimet
-
-	fCustomDetectorNumber 		= 1 ; // detNum
-	fCustomDetectorPosition  = 1 ; // posNum
 
 	// create commands for interactive definition
 
@@ -125,9 +99,8 @@ DetectorConstruction::DetectorConstruction() :
 
 	//expHallMagField = new MagneticField(); // Global field is set to zero
 	
-	 fAppDICE= new ApparatusDICE();
+	fAppDICE= new ApparatusDICE();
 
-	    
     fRecordGun = false;
 }
 
@@ -198,11 +171,6 @@ void DetectorConstruction::SetWorldDimensions(G4ThreeVector vec) {
 	UpdateGeometry(); // auto update
 }
 
-void DetectorConstruction::SetWorldVis(G4bool vis) {
-	fWorldVis = vis;
-	UpdateGeometry(); // auto update
-}
-
 void DetectorConstruction::SetWorldStepLimit(G4double step) {
 	if(fLogicWorld == nullptr) {
 		Construct();
@@ -220,10 +188,9 @@ void DetectorConstruction::UpdateGeometry() {
 	G4RunManager::GetRunManager()->DefineWorldVolume(Construct());
 }
 
-void DetectorConstruction::AddApparatusDiceDetector(G4String Options) 
-{
-	fAppDICE->Build(fLogicWorld,Options);
-}
+/////////////////////////////////////////////////////////////////////////
+/////////////////// Detector "Properties" from GRSI /////////////////////
+/////////////////////////////////////////////////////////////////////////
 
 void DetectorConstruction::SetProperties() {
 	// loop over all existing daughters of the world volume
@@ -297,3 +264,22 @@ DetectorProperties DetectorConstruction::ParseVolumeName(G4String volumeName) {
 	return result;
 }
 
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+
+
+void DetectorConstruction::AddApparatusDiceDetector(G4String Options){
+	fAppDICE->Build(fLogicWorld,Options);
+}
+
+void DetectorConstruction::SetDiceFieldStrength(G4double Field){
+	ApparatusDICE::fFieldStength=Field;
+}
+
+void DetectorConstruction::SetDiceLength(G4double Length){
+	fAppDICE->fAdjLength=Length;
+}
+void DetectorConstruction::SetDiceInt(G4int N){
+	fAppDICE->fAdjNumber=N;
+}

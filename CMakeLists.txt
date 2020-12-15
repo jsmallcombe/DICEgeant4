@@ -47,6 +47,7 @@ set(DICE10_SCRIPTS
     remote_vis.mac
     jpeg.mac
     DiceSort.C
+    SimpleDiceSort.C
   )
   
 

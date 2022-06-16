@@ -3,6 +3,7 @@
 /DetSys/world/material Vacuum
 
 ### Choose Apparatus To Build ### 
+#/DetSys/app/SetDiceField 0.1 tesla
 /DetSys/app/addDiceDetector 0
 
 ## Record the initial beam data ###

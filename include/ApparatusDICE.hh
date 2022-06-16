@@ -58,7 +58,8 @@ public:
 	
 	G4double fAdjLength;
 	G4int    fAdjNumber;
-	
+	bool fRemoveShield;
+    
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
 	
@@ -81,6 +82,7 @@ private:
 	G4double fMagnetWidth;
 	G4double fMagnetDepth;
 	G4double fMagnetThickness;
+	G4double fMagnetLining;
     
 	G4double fTargetMagnetDistance;
     
@@ -91,7 +93,8 @@ private:
 	G4int fSegY;
 	G4double fGuardRingWidth;
     
-	G4double fDetPlaceAngle;
+	G4double fDetPlaceAngle1;
+	G4double fDetPlaceAngle2;
 	G4double fDetPlaceRadius;
     
 	//////
@@ -103,6 +106,7 @@ private:
 	
 	G4double fHTargDetOffset;
 	G4double fHDetRad;
+    G4double fHDetRInner;
 	G4double fHDetLength;
 	G4int fHSegZ;
 	
@@ -122,9 +126,39 @@ private:
 
 	G4double fRSOffset;
 	G4double fRSBlock0;
+	G4double fRSBlock1;
+    
 	G4double fRSDetR;
 	G4double fRSInnerR;
 	
+    G4double fRSShieldRIn;
+    G4double fRSDetDepth;
+    G4int fRSSegZ;
+    
+    // Shield Common
+    
+    G4double fShieldOffset;
+    
+    G4VisAttributes* OneVisAtt;
+	G4VisAttributes* TwoVisAtt;
+	G4VisAttributes* ThreeVisAtt;
+
+    G4String fPhotonShieldLayerOneMaterial;
+	G4String fPhotonShieldLayerTwoMaterial;
+	G4String fPhotonShieldLayerThreeMaterial;
+    
+    G4double fPhotonShieldLength;
+	G4double fPhotonShieldLayerOneThickness;
+	G4double fPhotonShieldLayerTwoThickness ;
+	G4double fPhotonShieldLayerThreeThickness;
+	
+	
+    // RMS recoilshaddow measurments
+	G4double fRMSDetHalfLength;
+	G4double fRMSDetHalfWidth;
+	G4double fRMSDetHalfDepth;
+	G4double fRMSGuard;
+    G4int fRMSSegZ;
 	
 private:
 	//////////////////////////////////////////////////////
@@ -137,13 +171,15 @@ private:
 	void BuildPlaceShoeBox(G4LogicalVolume*);
 	void CreateShoeBoxField();
 	void BuildShoeBoxYoke();
-	void BuildRadialDetector();
+	void BuildRadialDetector(G4double);
+    static G4int ShoeDetN;
 	
 	
 	void BuildPlaceHelios(G4LogicalVolume*);
 	void CreateHeliosField();
 	void BuildHeliosYoke();
 	void BuildHeliosDetector();
+	void BuildPlaceHeliosPhotonShield(G4LogicalVolume*);
 	
 	void BuildPlaceSuperTube(G4LogicalVolume*);
 	void CreateSuperTubeField();
@@ -151,7 +187,24 @@ private:
 	void BuildSuperTubeDetector();
 	
 	void BuildPlaceRecoilShadow(G4LogicalVolume*);
-	void BuildRecoilShadowUnit();
+// 	void BuildRecoilShadowUnit();
+// 	void BuildPlaceShaddowPhotonShield(G4LogicalVolume*);
+    
+	
+	void BuildPlaceCyclone(G4LogicalVolume*);
+	void CreateCycloneField();
+	void BuildCycloneYoke();
+	
+    
+	void BuildPlacePhotonShieldTest(G4LogicalVolume*);
+    
+	void BuildPlaceHPGe(G4LogicalVolume*);
+    
+    
+	void BuildPlaceNewRecoilShaddow(G4LogicalVolume*);
+    
+	G4LogicalVolume* BuildMicronSi();
+    static G4int BuildMicronSiN;
 
 };
 #endif

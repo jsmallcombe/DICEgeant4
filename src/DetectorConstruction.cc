@@ -247,6 +247,7 @@ bool DetectorConstruction::CheckVolumeName(G4String volumeName) {
 
 DetectorProperties DetectorConstruction::ParseVolumeName(G4String volumeName) {
 	DetectorProperties result;
+    
 
 	// Dice detectors also have the number in their name
 	if(volumeName.find("SiSegmentPhys") != G4String::npos) {
@@ -282,4 +283,7 @@ void DetectorConstruction::SetDiceLength(G4double Length){
 }
 void DetectorConstruction::SetDiceInt(G4int N){
 	fAppDICE->fAdjNumber=N;
+}
+void DetectorConstruction::RemoveShield(G4bool input){
+	fAppDICE->fRemoveShield=input;
 }

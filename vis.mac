@@ -3,7 +3,7 @@
 /DetSys/world/material Vacuum
 
 ### Choose Apparatus To Build ###
-/DetSys/app/addDiceDetector 0
+/DetSys/app/addDiceDetector 7
 
 ### Select Graphics Manager ###
 /vis/open OGL
@@ -21,29 +21,50 @@
 #/vis/viewer/set/viewpointVector 1 1 -1  ### Same fuction as viewpointThetaPhi
 /vis/viewer/zoomTo 1
 
-### /vis/viewer/addCutawayPlane 0 0 0 mm 1 0 0 # Useful for viewing inside tight geometries
+#/vis/viewer/addCutawayPlane 0 0 0 mm -1 0 0 # Useful for viewing inside tight geometries
 
 ### To visualise the magnetic field ###
 ### Doesnt seem with tracks. ###
 #/vis/scene/add/magneticField 20
 
 ### Particle Tracks Options ###
-/vis/scene/endOfEventAction accumulate
 /vis/scene/add/trajectories smooth
 /DetSys/phys/SetStepper 1 # CRUCIAL to see electron paths in magnetic field 
 /DetSys/world/StepLimit 10 mm # As there are few interactions in vacuum
 
+
 ### Set Particle Generator ### 
-/DetSys/gun/position 0.0 0.0 0.0 mm
-/DetSys/gun/particle e-
-/DetSys/gun/efficiencyEnergy 500 keV
+
+### Basic ### 
+#/DetSys/gun/position 0.0 0.0 0.0 mm
+#/DetSys/gun/particle e-
+#/DetSys/gun/efficiencyEnergy 300 keV
+
+### Nucleus ### 
+/gun/particle ion
+/gun/ion 83 207 0 0.0
+#/grdm/nucleusLimits 207 207 83 82
+/DetSys/gun/efficiencyEnergy 400 MeV
 
 ### Set Particle Generator Extras ### 
 #/DetSys/gun/direction 0 1 1
 #/DetSys/gun/coneMinAngle 10.0 deg
-#/DetSys/gun/coneMaxAngle 60.0 deg
-#/DetSys/gun/BeamSpot 1 mm
+/DetSys/gun/coneMaxAngle 60.0 deg
+/DetSys/gun/BeamSpot 3 mm
 #/DetSys/gun/SetBeta 0.05
 #/DetSys/gun/SetLifetime 1 ns
 
-/run/beamOn 20 ### Keep number low
+### Run And View Events ### 
+/vis/scene/endOfEventAction accumulate
+/run/beamOn 50 ### Keep number low
+
+### Only View Sili hits ### 
+#/vis/disable
+#/DetSys/SiHits/VisStore
+#/run/beamOn 1000
+#/vis/enable
+#/vis/scene/endOfEventAction accumulate
+#/vis/viewer/flush
+#####/vis/viewer/rebuild
+##### Uses "/vis/reviewKeptEvents" and "continue" to review one at a time
+

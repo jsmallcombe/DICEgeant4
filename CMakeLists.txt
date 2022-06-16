@@ -48,6 +48,8 @@ set(DICE10_SCRIPTS
     jpeg.mac
     DiceSort.C
     SimpleDiceSort.C
+    HeliosSort.C
+    ShoeSort.C
   )
   
 

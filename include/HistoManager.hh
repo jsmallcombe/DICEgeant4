@@ -108,6 +108,9 @@ public:
 	G4double BeamTheta() { return fBeamTheta; }
 	G4double BeamPhi() { return fBeamPhi; }
 	G4ThreeVector BeamPos() {return fBeamPos; }
+	
+	bool HitsStore;
+	void StoreHits(){HitsStore=true;}
 
 private:
 // 	void MakeHistogram(G4AnalysisManager* analysisManager, G4String filename,  G4String title, G4double xmin, G4double xmax, G4int nbins);

@@ -76,26 +76,28 @@ int main(int argc, char** argv)
 	 G4VisManager* visManager = new G4VisExecutive;
 	 visManager->Initialize();
 
+//     std::string arg1(argv[1]);
+//     if(arg1=="-l"){
+     
 	 if(argc != 1) {
-		 std::string arg1(argv[1]);
-		 if(arg1=="-l"){
-			// local interactive mode : define visualization and UI terminal
-			G4UIExecutive* ui = new G4UIExecutive(argc, argv);
-			UImanager->ApplyCommand("/control/execute vis.mac");
-			ui->SessionStart();
-			delete ui;	 
-		}else{
-			// batch mode
-			G4String command = "/control/execute ";
-			G4String fileName = argv[1];
-			UImanager->ApplyCommand(command+fileName);
-		}
-	 } else { // remote interactive mode : define visualization and UI terminal
-		G4UIExecutive* ui = new G4UIExecutive(argc, argv, "tcsh");
-		UImanager->ApplyCommand("/control/execute remote_vis.mac");
-		ui->SessionStart();
-		delete ui;	 
-	 }
+        // batch mode
+        G4String command = "/control/execute ";
+        G4String fileName = argv[1];
+        UImanager->ApplyCommand(command+fileName);
+	 }else{
+        // local interactive mode : define visualization and UI terminal
+        G4UIExecutive* ui = new G4UIExecutive(argc, argv);
+        UImanager->ApplyCommand("/control/execute vis.mac");
+        ui->SessionStart();
+        delete ui;	 
+    }
+	 
+// 	 else { // remote interactive mode : define visualization and UI terminal
+// 		G4UIExecutive* ui = new G4UIExecutive(argc, argv, "tcsh");
+// 		UImanager->ApplyCommand("/control/execute remote_vis.mac");
+// 		ui->SessionStart();
+// 		delete ui;	 
+// 	 }
 	 
 	 delete visManager;
 

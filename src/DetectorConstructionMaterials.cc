@@ -66,6 +66,7 @@ void DetectorConstruction::DefineMaterials()
     man->FindOrBuildMaterial("G4_Cu");
     man->FindOrBuildMaterial("G4_SILICON_DIOXIDE");
     man->FindOrBuildMaterial("G4_AIR");
+    man->FindOrBuildMaterial("G4_C");
     G4Material* SODIUM_IODIDE   = man->FindOrBuildMaterial("G4_SODIUM_IODIDE");
     G4Material* Tl              = man->FindOrBuildMaterial("G4_Tl");
 

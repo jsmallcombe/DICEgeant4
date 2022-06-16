@@ -46,6 +46,7 @@
 #include "G4UIparameter.hh"
 #include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcmdWithABool.hh"
+#include "G4UIcmdWithoutParameter.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Gun)
@@ -94,7 +95,9 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Gun
 	fSetGunLifetimeCmd->SetUnitCategory("Time");
 	fSetGunLifetimeCmd->AvailableForStates(G4State_PreInit,G4State_Idle);   
 	
-	
+	fStoreHits = new G4UIcmdWithoutParameter("/DetSys/SiHits/VisStore",this);
+	fStoreHits->AvailableForStates(G4State_Idle);
+    
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -107,6 +110,7 @@ PrimaryGeneratorMessenger::~PrimaryGeneratorMessenger() {
 	delete fBeamSpotSigmaCmd;
 	delete fSetGunBetaCmd;
 	delete fSetGunLifetimeCmd;
+	delete fStoreHits;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -151,6 +155,12 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newVa
 	
 	if(command == fSetGunLifetimeCmd) {
 		fAction->SetGunLifetime(fSetGunLifetimeCmd->GetNewDoubleValue(newValue));
+		G4cout<<"Gun Lifetime supplied"<<G4endl;
+		return;
+	}  
+	
+	if(command == fStoreHits) {
+		fAction->StoreHits();
 		G4cout<<"Gun Lifetime supplied"<<G4endl;
 		return;
 	}  

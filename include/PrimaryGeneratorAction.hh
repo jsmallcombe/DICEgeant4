@@ -77,7 +77,8 @@ public:
     void SetBeamSpotSigma(G4double num1) { fBeamSpotSigma = num1; }
     void SetGunBeta(G4double num1) { fEffGunBetaZ = num1; }
     void SetGunLifetime(G4double num1) { fEffGunLifetime = num1; }
-
+    void StoreHits(){fHistoManager->StoreHits();}
+    
 private:
     //variables
     G4double fEffEnergy;
@@ -94,7 +95,7 @@ private:
     G4double fAngleInit;
     G4bool fConeAngleBool;
     G4double fAngleMinInit;
-    G4double fBeamSpotSigma;        
+    G4double fBeamSpotSigma;      
     
 };
 

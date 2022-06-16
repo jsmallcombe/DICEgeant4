@@ -75,6 +75,8 @@ private:
 	G4UIcmdWithAString*        fTabMagneticFieldCmd; ///19/7
 
 	G4UIcmdWithABool*           fRecordGunCmd;
+    G4UIcmdWithABool*           fRemoveShieldCmd;
+    
 	
 	G4UIcmdWithAString*        fAddApparatusDiceDetectorCmd;
 	G4UIcmdWithADoubleAndUnit* fApparatusDiceFieldCmd;

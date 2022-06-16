@@ -37,6 +37,7 @@
 #include "EventAction.hh"
 #include "Randomize.hh"
 #include "RunAction.hh"
+#include "G4EventManager.hh"
 
 #include <iostream>
 #include <fstream>
@@ -82,6 +83,13 @@ void EventAction::EndOfEventAction(const G4Event*) {
             fHistoManager->FillStepNtuple(fStepTrackerI[0][i], fStepTrackerI[1][i], fStepTrackerI[2][i], fStepTrackerI[3][i],  fStepTrackerI[4][i], fStepTrackerI[5][i], fStepTrackerI[6][i], fStepTrackerI[7][i], fStepTrackerI[8][i], fStepTrackerD[0][i]/keV, fStepTrackerD[1][i]/mm, fStepTrackerD[2][i]/mm, fStepTrackerD[3][i]/mm, fStepTrackerD[4][i]/second, fStepTrackerI[9][i]);
         }
 
+        if(fNumberOfHits>0&&fHistoManager->HitsStore){
+            
+//             G4cout<<G4endl<<"STORING EVENTS"<<G4endl;
+            G4EventManager::GetEventManager()->KeepTheCurrentEvent();
+//             evt->KeepTheEvent(true);
+        }
+        
 		ClearVariables();
 	}
 }

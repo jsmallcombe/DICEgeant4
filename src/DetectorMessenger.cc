@@ -94,6 +94,9 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
    	fRecordGunCmd = new G4UIcmdWithABool("/DetSys/det/RecordGun",this);
 	fRecordGunCmd->SetGuidance("Record the particle for each event in the tree");
 	fRecordGunCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
+    
+   	fRemoveShieldCmd = new G4UIcmdWithABool("/DetSys/det/RemoveShield",this);
+	fRemoveShieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
 	
 	fAddApparatusDiceDetectorCmd = new G4UIcmdWithAString("/DetSys/app/addDiceDetector",this);
 	fAddApparatusDiceDetectorCmd->SetGuidance("Add DICE geometry");
@@ -131,6 +134,8 @@ DetectorMessenger::~DetectorMessenger()
 	delete fTabMagneticFieldCmd;
 
 	delete fRecordGunCmd;
+    
+    delete fRemoveShieldCmd;
 	
 	delete fAddApparatusDiceDetectorCmd;
 	delete fApparatusDiceFieldCmd;
@@ -167,6 +172,10 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 	
 	if(command == fRecordGunCmd) {
 		fDetector->RecordGun(fRecordGunCmd->GetNewBoolValue(newValue));
+	}
+	
+	if(command == fRemoveShieldCmd) {
+		fDetector->RemoveShield(fRemoveShieldCmd->GetNewBoolValue(newValue));
 	}
 	
 	if(command == fAddApparatusDiceDetectorCmd) {

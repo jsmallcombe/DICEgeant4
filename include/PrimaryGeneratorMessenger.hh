@@ -49,6 +49,7 @@ class G4UIcmdWithAString;
 class G4UIcommand;
 class G4UIcmdWithAnInteger;
 class G4UIcmdWithABool;
+class G4UIcmdWithoutParameter;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -76,6 +77,7 @@ private:
     G4UIcmdWithADoubleAndUnit*     fBeamSpotSigmaCmd;
     G4UIcmdWithADouble*     	   fSetGunBetaCmd;
     G4UIcmdWithADoubleAndUnit*     fSetGunLifetimeCmd;
+    G4UIcmdWithoutParameter*       fStoreHits;
 	
 };
 

@@ -205,6 +205,8 @@ private:
     
 	G4LogicalVolume* BuildMicronSi();
     static G4int BuildMicronSiN;
+    
+	void BuildPlaceRMSFocal(G4LogicalVolume*);
 
 };
 #endif

@@ -50,6 +50,7 @@ set(DICE10_SCRIPTS
     SimpleDiceSort.C
     HeliosSort.C
     ShoeSort.C
+    RMSFocalSort.C
   )
   
 

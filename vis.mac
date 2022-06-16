@@ -3,7 +3,7 @@
 /DetSys/world/material Vacuum
 
 ### Choose Apparatus To Build ###
-/DetSys/app/addDiceDetector 7
+/DetSys/app/addDiceDetector 8
 
 ### Select Graphics Manager ###
 /vis/open OGL
@@ -36,35 +36,35 @@
 ### Set Particle Generator ### 
 
 ### Basic ### 
-#/DetSys/gun/position 0.0 0.0 0.0 mm
-#/DetSys/gun/particle e-
-#/DetSys/gun/efficiencyEnergy 300 keV
+/DetSys/gun/position 0.0 0.0 0.0 mm
+/DetSys/gun/particle e-
+/DetSys/gun/efficiencyEnergy 600 keV
 
 ### Nucleus ### 
-/gun/particle ion
-/gun/ion 83 207 0 0.0
+#/gun/particle ion
+#/gun/ion 83 207 0 0.0
 #/grdm/nucleusLimits 207 207 83 82
-/DetSys/gun/efficiencyEnergy 400 MeV
+#/DetSys/gun/efficiencyEnergy 400 MeV
 
 ### Set Particle Generator Extras ### 
 #/DetSys/gun/direction 0 1 1
 #/DetSys/gun/coneMinAngle 10.0 deg
-/DetSys/gun/coneMaxAngle 60.0 deg
-/DetSys/gun/BeamSpot 3 mm
+#/DetSys/gun/coneMaxAngle 60.0 deg
+/DetSys/gun/BeamSpot 20 mm
 #/DetSys/gun/SetBeta 0.05
 #/DetSys/gun/SetLifetime 1 ns
 
 ### Run And View Events ### 
-/vis/scene/endOfEventAction accumulate
-/run/beamOn 50 ### Keep number low
+#/vis/scene/endOfEventAction accumulate
+#/run/beamOn 50 ### Keep number low
 
 ### Only View Sili hits ### 
-#/vis/disable
-#/DetSys/SiHits/VisStore
-#/run/beamOn 1000
-#/vis/enable
-#/vis/scene/endOfEventAction accumulate
-#/vis/viewer/flush
+/vis/disable
+/DetSys/SiHits/VisStore
+/run/beamOn 10000
+/vis/enable
+/vis/scene/endOfEventAction accumulate
+/vis/viewer/flush
 #####/vis/viewer/rebuild
 ##### Uses "/vis/reviewKeptEvents" and "continue" to review one at a time
 

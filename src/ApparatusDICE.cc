@@ -178,6 +178,7 @@ void ApparatusDICE::Build(G4LogicalVolume* expHallLog,G4String Options)
 		case 5: BuildPlaceCyclone(expHallLog); break;
 		case 6: BuildPlacePhotonShieldTest(expHallLog); break;
 		case 7: BuildPlaceNewRecoilShaddow(expHallLog); break;
+		case 8: BuildPlaceRMSFocal(expHallLog); break;
         
         
 		default: BuildPlaceBasicTest(expHallLog);
@@ -1072,4 +1073,60 @@ G4LogicalVolume* ApparatusDICE::BuildMicronSi(){
 	
     BuildMicronSiN++;
     return fDetectorLog;
+}
+
+
+void ApparatusDICE::BuildPlaceRMSFocal(G4LogicalVolume* expHallLog){
+    
+    G4Box* Box1 = new G4Box("Box1", 75.633*0.5*mm, 57.306*0.5*mm, 0.1*mm); 
+	G4Material *Simaterial = G4Material::GetMaterial(fWaferMaterial);
+	G4LogicalVolume *DSSD = new G4LogicalVolume(Box1, Simaterial,"DSSD",0,0,0);
+    new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,0,0.05*mm), DSSD,"DSSDSolid", expHallLog,false,0);
+    
+    new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,0,40*mm), DSSD,"SiSegmentPhys_0_0", expHallLog,false,0);
+    
+    double R1=(sqrt(300.)/3.14159);
+    double R2=(sqrt(450.)/3.14159);
+    double R3=(sqrt(900.)/3.14159);
+    double dR=3.3;
+    
+    double T1=0.5*500*um;
+    double T2=0.5*1000*um;
+    double T3=0.5*1500*um;
+    double T4=0.5*2000*um;
+    
+//     500
+//     1000
+//     1500
+//     2000
+    
+    G4Tubs* Si_dE1 = new G4Tubs("Si_dE1", 0,R1,T2, 0,360*CLHEP::deg);
+    G4Tubs* Si_dE1out = new G4Tubs("Si_dE1out", R1+0.1*mm,R1+dR,T2, 0,360*CLHEP::deg);
+	G4LogicalVolume *Si_dE1log = new G4LogicalVolume(Si_dE1, Simaterial,"Si_dE1log",0,0,0);
+	G4LogicalVolume *Si_dE1outlog = new G4LogicalVolume(Si_dE1out, Simaterial,"Si_dE1outlog",0,0,0);
+    
+    G4Tubs* Si_dE2 = new G4Tubs("Si_dE2", 0,R1,T1, 0,360*CLHEP::deg);
+    G4Tubs* Si_dE2out = new G4Tubs("Si_dE2out", R1+0.1*mm,R1+dR,T1, 0,360*CLHEP::deg);
+	G4LogicalVolume *Si_dE2log = new G4LogicalVolume(Si_dE2, Simaterial,"Si_dE2log",0,0,0);
+	G4LogicalVolume *Si_dE2outlog = new G4LogicalVolume(Si_dE2out, Simaterial,"Si_dE2outlog",0,0,0);
+    
+    G4Tubs* Si_dE3 = new G4Tubs("Si_dE3", 0,R3,T1, 0,360*CLHEP::deg);
+    G4Tubs* Si_dE3out = new G4Tubs("Si_dE3out", R3+0.1*mm,R3+dR,T1, 0,360*CLHEP::deg);
+	G4LogicalVolume *Si_dE3log = new G4LogicalVolume(Si_dE3, Simaterial,"Si_dE3log",0,0,0);
+	G4LogicalVolume *Si_dE3outlog = new G4LogicalVolume(Si_dE3out, Simaterial,"Si_dE3outlog",0,0,0);
+    
+    G4RotationMatrix* rotateplace=new G4RotationMatrix;
+
+    
+    
+
+    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,5*mm),Si_dE1log,"SiSegmentPhys_0_1", expHallLog,false,0);
+    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,5*mm),Si_dE1outlog,"X", expHallLog,false,0);
+    
+    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,2*mm),Si_dE2log,"SiSegmentPhys_0_2", expHallLog,false,0);
+    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,2*mm),Si_dE2outlog,"X", expHallLog,false,0);
+    
+    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,18*mm),Si_dE3log,"SiSegmentPhys_0_3", expHallLog,false,0);
+    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,18*mm),Si_dE3outlog,"X", expHallLog,false,0);
+    
 }

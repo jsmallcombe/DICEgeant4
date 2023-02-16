@@ -248,7 +248,7 @@ void DetectorConstruction::DefineMaterials()
     Water->AddElement(elO, natoms=1);
     myMaterials.push_back(Water);
 
-    G4Material* Al = new G4Material(name="Aluminum", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3);
+    G4Material* Al = new G4Material(name="Aluminium", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3);
     myMaterials.push_back(Al);
 
     G4Material* W = new G4Material(name="Tungsten", z=74., a= 183.84*g/mole, density= 19.25*g/cm3);
@@ -427,5 +427,21 @@ void DetectorConstruction::DefineMaterials()
    G4Material* Smm = new G4Material(name="Samarium", z=62., a= 152.0*g/mole, density= 7.54  *g/cm3);
     myMaterials.push_back(Smm);
     
+    //Epoxy (for FR4 )
+	//from http://www.physi.uni-heidelberg.de/~adler/TRD/TRDunterlagen/RadiatonLength/tgc2.htm //???
+	G4Material* Epoxy = new G4Material("Epoxy" , 1.2*g/cm3,2);
+	Epoxy->AddElement(elH, 2);
+	Epoxy->AddElement(elC, 2);
+	//SiO2 (Quarz)
+	G4Material* SiO2 = new G4Material("SiO2",2.200*g/cm3,2);
+	SiO2->AddElement(elSi, 1);
+	SiO2->AddElement(elO , 2);
+
+	G4Material* FR4 = new G4Material("FR4" , 1.86*g/cm3,2);
+	FR4->AddMaterial(Epoxy, 0.472);
+	FR4->AddMaterial(SiO2,0.528);
+    
+    
     //G4cout << *(G4Material::GetMaterialTable()) << G4endl; //outputs material table to terminal
+    
 }

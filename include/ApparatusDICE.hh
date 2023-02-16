@@ -139,9 +139,7 @@ private:
     
     G4double fShieldOffset;
     
-    G4VisAttributes* OneVisAtt;
-	G4VisAttributes* TwoVisAtt;
-	G4VisAttributes* ThreeVisAtt;
+    G4VisAttributes *OneVisAtt,*TwoVisAtt,*ThreeVisAtt,*FourVisAtt,*FiveVisAtt,*SixVisAtt,*SevenVisAtt;
 
     G4String fPhotonShieldLayerOneMaterial;
 	G4String fPhotonShieldLayerTwoMaterial;
@@ -159,6 +157,30 @@ private:
 	G4double fRMSDetHalfDepth;
 	G4double fRMSGuard;
     G4int fRMSSegZ;
+    
+    
+    
+    
+    G4double 	fBB34PCB_HalfThickness;
+G4double 	fBB34PCB_Shelf;
+G4double 	fBB34PCB_ShelfWidth;
+G4double 	fBB34PCB_HalfWidth;
+G4double 	fBB34PCB_HalfALength;
+G4double 	fBB34PCB_Blength;
+G4double 	fBB34PCB_Angle;
+G4double 	fBB34PCB_Clength;
+	
+G4double 	fBB34Chip_HalfThickness;
+G4double 	fBB34Chip_HalfWidth;
+G4double 	fBB34Chip_HalfLength;
+G4double 	fBB34Chip_GuardWidth;
+G4int 	fBB34Chip_Nseg;
+G4double 	fBB34Chip_Dead;
+G4double 	fBB34Chip_DeadAngle;
+G4double 	fBB34Chip_Al;
+
+
+
 	
 private:
 	//////////////////////////////////////////////////////
@@ -190,7 +212,6 @@ private:
 // 	void BuildRecoilShadowUnit();
 // 	void BuildPlaceShaddowPhotonShield(G4LogicalVolume*);
     
-	
 	void BuildPlaceCyclone(G4LogicalVolume*);
 	void CreateCycloneField();
 	void BuildCycloneYoke();
@@ -200,13 +221,18 @@ private:
     
 	void BuildPlaceHPGe(G4LogicalVolume*);
     
-    
 	void BuildPlaceNewRecoilShaddow(G4LogicalVolume*);
     
 	G4LogicalVolume* BuildMicronSi();
+    G4LogicalVolume* BuildBB34();
+    
+    
     static G4int BuildMicronSiN;
     
 	void BuildPlaceRMSFocal(G4LogicalVolume*);
+    
+    
+	void BuildPlaceSimplifiedRecoilShaddow(G4LogicalVolume*);
 
 };
 #endif

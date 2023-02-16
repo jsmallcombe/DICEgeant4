@@ -98,6 +98,9 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Gun
 	fStoreHits = new G4UIcmdWithoutParameter("/DetSys/SiHits/VisStore",this);
 	fStoreHits->AvailableForStates(G4State_Idle);
     
+    fSetStoreMult = new G4UIcmdWithAnInteger("/DetSys/SiHits/StoreMultiplicity",this);
+	fSetStoreMult->AvailableForStates(G4State_Idle);
+    
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -111,6 +114,7 @@ PrimaryGeneratorMessenger::~PrimaryGeneratorMessenger() {
 	delete fSetGunBetaCmd;
 	delete fSetGunLifetimeCmd;
 	delete fStoreHits;
+	delete fSetStoreMult;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -161,7 +165,14 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newVa
 	
 	if(command == fStoreHits) {
 		fAction->StoreHits();
-		G4cout<<"Gun Lifetime supplied"<<G4endl;
+		G4cout<<"Vis Store Set"<<G4endl;
+		return;
+	}  
+	
+		
+	if(command == fSetStoreMult) {
+		fAction->SetStoreMult(fSetStoreMult->GetNewIntValue(newValue));
+		G4cout<<"Vis Store Mult Set"<<G4endl;
 		return;
 	}  
 	

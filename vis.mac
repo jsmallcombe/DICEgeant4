@@ -3,7 +3,7 @@
 /DetSys/world/material Vacuum
 
 ### Choose Apparatus To Build ###
-/DetSys/app/addDiceDetector 8
+/DetSys/app/addDiceDetector 7
 
 ### Select Graphics Manager ###
 /vis/open OGL
@@ -16,12 +16,14 @@
 /vis/drawVolume 
 
 ### Camera setting ###
-/vis/viewer/set/targetPoint 0 0 0 mm
-/vis/viewer/set/viewpointThetaPhi 120 45 deg 
+#/vis/viewer/set/targetPoint 0 0 40 mm
+#/vis/viewer/set/viewpointThetaPhi 120 45 deg 
+/vis/viewer/set/upVector 0 1 0
+/vis/viewer/set/viewpointThetaPhi -80 -25 deg
 #/vis/viewer/set/viewpointVector 1 1 -1  ### Same fuction as viewpointThetaPhi
 /vis/viewer/zoomTo 1
 
-#/vis/viewer/addCutawayPlane 0 0 0 mm -1 0 0 # Useful for viewing inside tight geometries
+/vis/viewer/addCutawayPlane 0 0 0 mm 1 0 0 # Useful for viewing inside tight geometries
 
 ### To visualise the magnetic field ###
 ### Doesnt seem with tracks. ###
@@ -38,7 +40,7 @@
 ### Basic ### 
 /DetSys/gun/position 0.0 0.0 0.0 mm
 /DetSys/gun/particle e-
-/DetSys/gun/efficiencyEnergy 600 keV
+/DetSys/gun/efficiencyEnergy 400 keV
 
 ### Nucleus ### 
 #/gun/particle ion
@@ -50,18 +52,18 @@
 #/DetSys/gun/direction 0 1 1
 #/DetSys/gun/coneMinAngle 10.0 deg
 #/DetSys/gun/coneMaxAngle 60.0 deg
-/DetSys/gun/BeamSpot 20 mm
-#/DetSys/gun/SetBeta 0.05
-#/DetSys/gun/SetLifetime 1 ns
+/DetSys/gun/BeamSpot 1 mm
+/DetSys/gun/SetBeta 0.05
+/DetSys/gun/SetLifetime 1 ns
 
 ### Run And View Events ### 
 #/vis/scene/endOfEventAction accumulate
-#/run/beamOn 50 ### Keep number low
+#/run/beamOn 100 ### Keep number low
 
 ### Only View Sili hits ### 
 /vis/disable
 /DetSys/SiHits/VisStore
-/run/beamOn 10000
+/run/beamOn 2000
 /vis/enable
 /vis/scene/endOfEventAction accumulate
 /vis/viewer/flush

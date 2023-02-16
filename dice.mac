@@ -12,13 +12,13 @@
 ### Set Particle Generator ### 
 /DetSys/gun/position 0.0 0.0 0.0 mm
 /DetSys/gun/particle e-
-/DetSys/gun/efficiencyEnergy 900 keV
+/DetSys/gun/efficiencyEnergy 400 keV
 
 ### Set Particle Generator Extras ### 
 #/DetSys/gun/direction 0 0 1
 #/DetSys/gun/coneMinAngle 10.0 deg
-/DetSys/gun/coneMaxAngle 10.0 deg
-/DetSys/gun/BeamSpot 2 mm
+/DetSys/gun/coneMaxAngle 80.0 deg
+/DetSys/gun/BeamSpot 30 mm
 #/DetSys/gun/SetBeta 0.05
 #/DetSys/gun/SetLifetime 1 ns
 

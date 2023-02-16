@@ -177,6 +177,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 			effdirection.setMag(sqrt(pow(m0+fEffEnergy,2)-m0*m0));
 			G4LorentzVector LorVec=G4LorentzVector(effdirection,m0+fEffEnergy);
 			LorVec.boostZ(fEffGunBetaZ);
+            effdirection=LorVec.getV();
 			fParticleGun->SetParticleMomentumDirection(LorVec.getV());
 			fParticleGun->SetParticleEnergy(LorVec.getT()-m0);
 			

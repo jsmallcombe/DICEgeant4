@@ -78,6 +78,7 @@ public:
     void SetGunBeta(G4double num1) { fEffGunBetaZ = num1; }
     void SetGunLifetime(G4double num1) { fEffGunLifetime = num1; }
     void StoreHits(){fHistoManager->StoreHits();}
+    void SetStoreMult(G4int num1){fHistoManager->SetStoreMult(num1);}
     
 private:
     //variables

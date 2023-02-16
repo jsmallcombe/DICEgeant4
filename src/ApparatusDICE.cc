@@ -27,6 +27,9 @@
 #include "G4VSolid.hh"
 #include "G4Trap.hh"
 
+#include "G4TwoVector.hh"
+#include "G4ExtrudedSolid.hh"
+
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
@@ -89,7 +92,6 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	fHDetLength= 300*CLHEP::mm;
 	fHSegZ=150;
 
-	
     // SuperTube
 	fSTMagnetOuterR= 20*CLHEP::mm;
 	fSTMagnetInnerR= 15*CLHEP::mm;
@@ -116,10 +118,15 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
     // Shield Common
     
     fShieldOffset = 2.*CLHEP::mm;
-    OneVisAtt = new G4VisAttributes(G4Colour(PB_COL));
-    TwoVisAtt = new G4VisAttributes(G4Colour(SN_COL));
-    ThreeVisAtt = new G4VisAttributes(G4Colour(CU_COL));
-
+    OneVisAtt = new G4VisAttributes(G4Colour(PB_COL)); // Red
+    TwoVisAtt = new G4VisAttributes(G4Colour(SN_COL)); // grey
+    ThreeVisAtt = new G4VisAttributes(G4Colour(CU_COL)); // Yellow
+    FourVisAtt = new G4VisAttributes(G4Colour(0.2,0.4,0.3)); // Dark Green
+    FiveVisAtt = new G4VisAttributes(G4Colour(196,160,0)); //yellow
+    SixVisAtt = new G4VisAttributes(G4Colour(0.51,0.42,0.06)); //yellow
+    SevenVisAtt = new G4VisAttributes(G4Colour(0.3,0.2,0.3));  //yellow 
+//     SevenVisAtt = new G4VisAttributes(G4Colour(207,173,23));  //yellow 
+    
     fPhotonShieldLayerOneMaterial = "WTa";
     fPhotonShieldLayerTwoMaterial = "Tin";
     fPhotonShieldLayerThreeMaterial = "Copper";
@@ -136,6 +143,25 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	fRMSDetHalfDepth= 1*CLHEP::mm;
     fRMSSegZ=16;
 
+    
+    // BB34 finalised
+    fBB34PCB_HalfThickness = 2.05*CLHEP::mm;
+	fBB34PCB_Shelf = 1.15*CLHEP::mm;
+	fBB34PCB_ShelfWidth = 2.1*CLHEP::mm;
+	fBB34PCB_HalfWidth = 47*CLHEP::mm;
+	fBB34PCB_HalfALength = 28*CLHEP::mm;
+	fBB34PCB_Blength = 21*CLHEP::mm;
+	fBB34PCB_Angle = 45*CLHEP::deg;
+	fBB34PCB_Clength = fBB34PCB_Blength*tan(fBB34PCB_Angle);
+	
+	fBB34Chip_HalfThickness = 0.75*CLHEP::mm;
+	fBB34Chip_HalfWidth = 43*CLHEP::mm;
+	fBB34Chip_HalfLength = 23*CLHEP::mm;
+	fBB34Chip_GuardWidth = 3*CLHEP::mm;
+	fBB34Chip_Nseg=16;
+	fBB34Chip_Dead=500*CLHEP::nm;
+	fBB34Chip_DeadAngle = 10*CLHEP::deg; /// An approximation for apparent inter-segment losses
+	fBB34Chip_Al=500*CLHEP::nm;
     
     
 	///////////////////////////////////////////////////////
@@ -179,6 +205,7 @@ void ApparatusDICE::Build(G4LogicalVolume* expHallLog,G4String Options)
 		case 6: BuildPlacePhotonShieldTest(expHallLog); break;
 		case 7: BuildPlaceNewRecoilShaddow(expHallLog); break;
 		case 8: BuildPlaceRMSFocal(expHallLog); break;
+		case 9: BuildPlaceSimplifiedRecoilShaddow(expHallLog); break;
         
         
 		default: BuildPlaceBasicTest(expHallLog);
@@ -855,7 +882,7 @@ void ApparatusDICE::BuildPlacePhotonShieldTest(G4LogicalVolume* expHallLog)
    G4Tubs* TestPipeTub = new G4Tubs("TestPipeTub", fDetSide,fDetSide+5*mm,fDetPlace+fDetSide, 0,360*CLHEP::deg);
 
 //     G4Material* TestPipeMat = G4Material::GetMaterial("G4_STAINLESS-STEEL");
-    G4Material* TestPipeMat = G4Material::GetMaterial("Aluminum");
+    G4Material* TestPipeMat = G4Material::GetMaterial("Aluminium");
 	G4LogicalVolume *TestPipeLog = new G4LogicalVolume(TestPipeTub, TestPipeMat,"TestPipeLog",0,0,0);
     new G4PVPlacement(rotate,G4ThreeVector(0,0,0), TestPipeLog,"TestPipe", expHallLog,false,0);
     
@@ -1011,14 +1038,30 @@ void ApparatusDICE::BuildPlaceNewRecoilShaddow(G4LogicalVolume* expHallLog){
 	G4Material *mMaterial = G4Material::GetMaterial(fMagnetMaterial);
 	G4LogicalVolume *ShieldTest = new G4LogicalVolume(BoxCut1, mMaterial,"ShieldTestL",0,0,0);
     
+	ShieldTest->SetVisAttributes(new G4VisAttributes(G4Colour(0.2,0.4,0.3)));
+    
     new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,0,2.5*cm), ShieldTest,"ShieldTest", expHallLog,false,0);
     
     
+    
+    fRMSDetHalfDepth=0.05*mm;
 	for(int i=0;i<4;i++){
     
         G4RotationMatrix* rotateplace = new G4RotationMatrix;
         rotateplace->rotateZ(90*i*deg);
         G4ThreeVector vecplace(0,3*cm+fRMSDetHalfDepth,4.5*cm+fRMSDetHalfLength-fRMSGuard);
+        vecplace*=(*rotateplace);
+        
+        new G4PVPlacement(rotateplace,vecplace, BuildMicronSi(),"Detector", expHallLog,false,0);
+    
+    }
+    
+    fRMSDetHalfDepth=0.5*mm;
+	for(int i=0;i<4;i++){
+    
+        G4RotationMatrix* rotateplace = new G4RotationMatrix;
+        rotateplace->rotateZ(90*i*deg);
+        G4ThreeVector vecplace(0,4*cm+fRMSDetHalfDepth,4.5*cm+fRMSDetHalfLength-fRMSGuard);
         vecplace*=(*rotateplace);
         
         new G4PVPlacement(rotateplace,vecplace, BuildMicronSi(),"Detector", expHallLog,false,0);
@@ -1054,6 +1097,8 @@ G4LogicalVolume* ApparatusDICE::BuildMicronSi(){
 	G4VSolid* siGuard = new G4SubtractionSolid("siGuard", siGuardOuter, siGuardInner,0,G4ThreeVector(0,0,0));
     G4LogicalVolume* SiGuardLog =new G4LogicalVolume(siGuard, material, "SiGuardLog", 0,0,0);
     
+	SiGuardLog->SetVisAttributes(SixVisAtt);
+    
     std::stringstream tt;
     tt<<"SiSegmentPhys_0_"<<BuildMicronSiN;
 	new G4PVPlacement(rotate,G4ThreeVector(0,0,0), SiGuardLog,tt.str(),  fDetectorLog, false, 0);
@@ -1063,6 +1108,9 @@ G4LogicalVolume* ApparatusDICE::BuildMicronSi(){
     G4Box* siDetSegment = new G4Box("siSeg",fRMSDetHalfWidth-fRMSGuard-0.01*mm, fRMSDetHalfDepth, HalfLength/fRMSSegZ -0.1*mm);
     G4LogicalVolume* fSiSegmentLog =new G4LogicalVolume(siDetSegment, material, "fSiSegmentLog", 0,0,0);
   
+	fSiSegmentLog->SetVisAttributes(FiveVisAtt);
+    
+    
 	for(int z=0;z<fRMSSegZ;z++){
         G4double zz=-HalfLength+(HalfLength*2/fRMSSegZ)*(z+0.5);
     
@@ -1071,62 +1119,287 @@ G4LogicalVolume* ApparatusDICE::BuildMicronSi(){
         new G4PVPlacement(rotate,G4ThreeVector(0,0,zz), fSiSegmentLog, temp.str(),  fDetectorLog, false, 0);
 	}
 	
+	
     BuildMicronSiN++;
     return fDetectorLog;
 }
 
 
+G4LogicalVolume* ApparatusDICE::BuildBB34(){
+	
+	std::vector<G4TwoVector> PCBPolygon(6);
+	PCBPolygon[0].set(fBB34PCB_HalfWidth,-fBB34PCB_HalfALength);
+	PCBPolygon[1].set(fBB34PCB_HalfWidth,fBB34PCB_HalfALength);
+	PCBPolygon[2].set(fBB34PCB_HalfWidth-fBB34PCB_Clength,fBB34PCB_HalfALength+fBB34PCB_Blength);
+	PCBPolygon[3].set(-fBB34PCB_HalfWidth+fBB34PCB_Clength,fBB34PCB_HalfALength+fBB34PCB_Blength);
+	PCBPolygon[4].set(-fBB34PCB_HalfWidth,fBB34PCB_HalfALength);
+	PCBPolygon[5].set(-fBB34PCB_HalfWidth,-fBB34PCB_HalfALength);
+	G4VSolid* PCBouter = new G4ExtrudedSolid("PCBouter", PCBPolygon, fBB34PCB_HalfThickness, G4TwoVector(0,0), 1, G4TwoVector(0,0), 1);
+	
+	G4RotationMatrix* rotate = new G4RotationMatrix;
+    
+	// G4VisAttributes
+	G4VisAttributes* vis_att_si = new G4VisAttributes(true,G4Colour(0.0,1.0,1.0));
+    G4Material* SiliconMat = G4Material::GetMaterial(fWaferMaterial);
+	G4Material* matWorld = G4Material::GetMaterial("Vacuum");
+	G4VisAttributes* vis_att_hid = new G4VisAttributes(false);
+    
+    // Detector mother volume
+	fDetectorLog = new G4LogicalVolume(PCBouter, matWorld, "fDetActiveLog", 0,0,0);  
+	fDetectorLog->SetVisAttributes(vis_att_hid);
+
+
+	// Make boxes
+	G4Box* Chip = new G4Box("Chip", fBB34Chip_HalfWidth, fBB34Chip_HalfLength, fBB34Chip_HalfThickness);
+	G4Box* ChipMother = new G4Box("ChipMother", fBB34Chip_HalfWidth, fBB34Chip_HalfLength, fBB34Chip_HalfThickness+fBB34Chip_Al);
+	G4Box* ChipAl = new G4Box("ChipAl", fBB34Chip_HalfWidth, fBB34Chip_HalfLength, fBB34Chip_Al*0.5);
+	G4Box* ChipPCBHole = new G4Box("ChipPCBHole", fBB34Chip_HalfWidth+0.01*mm, fBB34Chip_HalfLength+0.01*mm, fBB34PCB_HalfThickness+0.01*mm);//Oversized for clearance
+	G4Box* InnerChipHole = new G4Box("InnerChipHole", fBB34Chip_HalfWidth-fBB34PCB_ShelfWidth, fBB34Chip_HalfLength-fBB34PCB_ShelfWidth, fBB34PCB_HalfThickness*2);
+	G4Box* InnerGuardHole = new G4Box("InnerGuardHole", fBB34Chip_HalfWidth-fBB34Chip_GuardWidth, fBB34Chip_HalfLength-fBB34Chip_GuardWidth, fBB34PCB_HalfThickness*2);
+
+	G4VSolid* siGuard = new G4SubtractionSolid("siGuard", Chip, InnerGuardHole,0,G4ThreeVector(0,0,0));
+
+	// MakePlace PCB in fDetectorLog
+	G4VSolid* PCBsolidmid = new G4SubtractionSolid("PCBsolidmid", PCBouter, InnerChipHole,0,G4ThreeVector(0,0,0));
+	G4VSolid* PCBsolid = new G4SubtractionSolid("PCBsolid", PCBsolidmid, ChipPCBHole,0,G4ThreeVector(0,0,fBB34PCB_Shelf));
+    G4LogicalVolume* PCBLog = new G4LogicalVolume(PCBsolid, G4Material::GetMaterial("FR4"), "PCBLog", 0,0,0);
+	PCBLog->SetVisAttributes(new G4VisAttributes(G4Colour(0.3,0.6,0.1)));
+	new G4PVPlacement(rotate,G4ThreeVector(0,0,0),PCBLog, "PCBVol",  fDetectorLog, false, false,true);
+	
+	// Make SiMother
+    G4LogicalVolume* ChipMotherLog = new G4LogicalVolume(ChipMother, SiliconMat, "ChipMotherLog", 0,0,0);
+	ChipMotherLog->SetVisAttributes(vis_att_hid);
+
+	// MakePlace ChipMetal in ChipMotherLog
+    G4LogicalVolume* ChipMetalLog = new G4LogicalVolume(ChipAl, G4Material::GetMaterial("Aluminium"), "ChipMotherLog", 0,0,0);
+	ChipMetalLog->SetVisAttributes(vis_att_hid);
+	new G4PVPlacement(rotate,G4ThreeVector(0,0,fBB34Chip_HalfThickness+fBB34Chip_Al*0.5),ChipMetalLog, "ChipMetalVol",  ChipMotherLog, false, false,true);
+	new G4PVPlacement(rotate,G4ThreeVector(0,0,-fBB34Chip_HalfThickness-fBB34Chip_Al*0.5),ChipMetalLog, "ChipMetalVol",  ChipMotherLog, false, false,true);
+	
+	
+	// Place Guard Ring in ChipMotherLog
+    std::stringstream tt;
+    tt<<"SiSegmentPhys_0_"<<BuildMicronSiN;
+    G4LogicalVolume* SiGuardLog =new G4LogicalVolume(siGuard, SiliconMat, "SiGuardLog", 0,0,0);
+	SiGuardLog->SetVisAttributes(vis_att_si);
+	new G4PVPlacement(rotate,G4ThreeVector(0,0,0),SiGuardLog, tt.str(),  ChipMotherLog, false, false,true);
+    
+	// Place Detector Elements in ChipMotherLog  
+    
+	G4double SegHalfHeight=fBB34Chip_HalfThickness-fBB34Chip_Dead;
+	G4double SegHalfWidth=(fBB34Chip_HalfWidth-fBB34Chip_GuardWidth)/fBB34Chip_Nseg;
+	G4double SegHalfWidthTop=SegHalfWidth-SegHalfHeight*tan(fBB34Chip_DeadAngle);
+	
+	std::vector<G4TwoVector> SegPolygon(6);
+	SegPolygon[0].set(SegHalfHeight,SegHalfWidthTop);
+	SegPolygon[1].set(0,SegHalfWidth);
+	SegPolygon[2].set(-SegHalfHeight,SegHalfWidthTop);
+	SegPolygon[3].set(-SegHalfHeight,-SegHalfWidthTop);
+	SegPolygon[4].set(0,-SegHalfWidth);
+	SegPolygon[5].set(SegHalfHeight,-SegHalfWidthTop);
+
+	G4VSolid* siDetSegment = new G4ExtrudedSolid("siDetSegment", SegPolygon, fBB34Chip_HalfLength-fBB34Chip_GuardWidth-0.01*mm, G4TwoVector(0,0), 1, G4TwoVector(0,0), 1);
+    G4LogicalVolume* fSiSegmentLog =new G4LogicalVolume(siDetSegment, SiliconMat, "fSiSegmentLog", 0,0,0);
+	SiGuardLog->SetVisAttributes(vis_att_si);
+	
+	G4RotationMatrix* SegRot = new G4RotationMatrix;
+	SegRot->rotateX(90*CLHEP::deg);
+	SegRot->rotateZ(90*CLHEP::deg);
+	
+	for(int z=0;z<fBB34Chip_Nseg;z++){
+        G4double xx=SegHalfWidth*(z*2+1)-fBB34Chip_HalfWidth+fBB34Chip_GuardWidth;
+    
+        std::stringstream temp;
+        temp<<"SiSegmentPhys_"<<1+z<<"_"<<BuildMicronSiN;
+        new G4PVPlacement(SegRot,G4ThreeVector(xx,0,00), fSiSegmentLog, temp.str(),  ChipMotherLog, false, false,true);
+	}
+	
+	// Place Detector ChipMotherLog in fDetectorLog	
+	new G4PVPlacement(rotate,G4ThreeVector(0,0,((fBB34PCB_Shelf+fBB34Chip_HalfThickness)+fBB34Chip_Al)-fBB34PCB_HalfThickness+0.01*mm),ChipMotherLog, "SiliChip",  fDetectorLog, false, false,true);
+
+	
+    BuildMicronSiN++;
+    return fDetectorLog;
+}
+
+
+
 void ApparatusDICE::BuildPlaceRMSFocal(G4LogicalVolume* expHallLog){
     
-    G4Box* Box1 = new G4Box("Box1", 75.633*0.5*mm, 57.306*0.5*mm, 0.1*mm); 
-	G4Material *Simaterial = G4Material::GetMaterial(fWaferMaterial);
-	G4LogicalVolume *DSSD = new G4LogicalVolume(Box1, Simaterial,"DSSD",0,0,0);
-    new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,0,0.05*mm), DSSD,"DSSDSolid", expHallLog,false,0);
+//     G4Box* Box1 = new G4Box("Box1", 75.633*0.5*mm, 57.306*0.5*mm, 0.1*mm); 
+//     G4Box* Box1 = new G4Box("Box1", 5*0.5*mm, 40*0.5*mm, 1*mm);
+// 	G4Material *Simaterial = G4Material::GetMaterial(fWaferMaterial);
+// 	G4LogicalVolume *DSSD = new G4LogicalVolume(Box1, Simaterial,"DSSD",0,0,0);
+// //     new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,0,0.05*mm), DSSD,"DSSDSolid", expHallLog,false,0);
+//     
+//     new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,0,20*mm), DSSD,"SiSegmentPhys_0_0", expHallLog,false,0);
+//     
+//     
+//     G4Box* Box2 = new G4Box("Box1", 5*0.5*mm, 40*0.5*mm, 0.75*mm);
+// 	G4LogicalVolume *DSSD2 = new G4LogicalVolume(Box2, Simaterial,"DSSD",0,0,0);
+//     
+//     new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,0,-20*mm), DSSD2,"SiSegmentPhys_0_1", expHallLog,false,0);
     
-    new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,0,40*mm), DSSD,"SiSegmentPhys_0_0", expHallLog,false,0);
-    
-    double R1=(sqrt(300.)/3.14159);
-    double R2=(sqrt(450.)/3.14159);
-    double R3=(sqrt(900.)/3.14159);
-    double dR=3.3;
-    
-    double T1=0.5*500*um;
-    double T2=0.5*1000*um;
-    double T3=0.5*1500*um;
-    double T4=0.5*2000*um;
+//     double R1=(sqrt(300.)/3.14159);
+//     double R2=(sqrt(450.)/3.14159);
+//     double R3=(sqrt(900.)/3.14159);
+//     double dR=3.3;
+//     
+//     double T1=0.5*500*um;
+//     double T2=0.5*1000*um;
+//     double T3=0.5*1500*um;
+//     double T4=0.5*2000*um;
     
 //     500
 //     1000
 //     1500
 //     2000
     
-    G4Tubs* Si_dE1 = new G4Tubs("Si_dE1", 0,R1,T2, 0,360*CLHEP::deg);
-    G4Tubs* Si_dE1out = new G4Tubs("Si_dE1out", R1+0.1*mm,R1+dR,T2, 0,360*CLHEP::deg);
-	G4LogicalVolume *Si_dE1log = new G4LogicalVolume(Si_dE1, Simaterial,"Si_dE1log",0,0,0);
-	G4LogicalVolume *Si_dE1outlog = new G4LogicalVolume(Si_dE1out, Simaterial,"Si_dE1outlog",0,0,0);
-    
-    G4Tubs* Si_dE2 = new G4Tubs("Si_dE2", 0,R1,T1, 0,360*CLHEP::deg);
-    G4Tubs* Si_dE2out = new G4Tubs("Si_dE2out", R1+0.1*mm,R1+dR,T1, 0,360*CLHEP::deg);
-	G4LogicalVolume *Si_dE2log = new G4LogicalVolume(Si_dE2, Simaterial,"Si_dE2log",0,0,0);
-	G4LogicalVolume *Si_dE2outlog = new G4LogicalVolume(Si_dE2out, Simaterial,"Si_dE2outlog",0,0,0);
-    
-    G4Tubs* Si_dE3 = new G4Tubs("Si_dE3", 0,R3,T1, 0,360*CLHEP::deg);
-    G4Tubs* Si_dE3out = new G4Tubs("Si_dE3out", R3+0.1*mm,R3+dR,T1, 0,360*CLHEP::deg);
-	G4LogicalVolume *Si_dE3log = new G4LogicalVolume(Si_dE3, Simaterial,"Si_dE3log",0,0,0);
-	G4LogicalVolume *Si_dE3outlog = new G4LogicalVolume(Si_dE3out, Simaterial,"Si_dE3outlog",0,0,0);
-    
-    G4RotationMatrix* rotateplace=new G4RotationMatrix;
+//     G4Tubs* Si_dE1 = new G4Tubs("Si_dE1", 0,R1,T1, 0,360*CLHEP::deg);
+//     G4Tubs* Si_dE1out = new G4Tubs("Si_dE1out", R1+0.1*mm,R1+dR,T1, 0,360*CLHEP::deg);
+// 	G4LogicalVolume *Si_dE1log = new G4LogicalVolume(Si_dE1, Simaterial,"Si_dE1log",0,0,0);
+// 	G4LogicalVolume *Si_dE1outlog = new G4LogicalVolume(Si_dE1out, Simaterial,"Si_dE1outlog",0,0,0);
+//     
+//     G4Tubs* Si_dE2 = new G4Tubs("Si_dE2", 0,R1,T1, 0,360*CLHEP::deg);
+//     G4Tubs* Si_dE2out = new G4Tubs("Si_dE2out", R1+0.1*mm,R1+dR,T1, 0,360*CLHEP::deg);
+// 	G4LogicalVolume *Si_dE2log = new G4LogicalVolume(Si_dE2, Simaterial,"Si_dE2log",0,0,0);
+// 	G4LogicalVolume *Si_dE2outlog = new G4LogicalVolume(Si_dE2out, Simaterial,"Si_dE2outlog",0,0,0);
+//     
+//     G4Tubs* Si_dE3 = new G4Tubs("Si_dE3", 0,R3,T1, 0,360*CLHEP::deg);
+//     G4Tubs* Si_dE3out = new G4Tubs("Si_dE3out", R3+0.1*mm,R3+dR,T1, 0,360*CLHEP::deg);
+// 	G4LogicalVolume *Si_dE3log = new G4LogicalVolume(Si_dE3, Simaterial,"Si_dE3log",0,0,0);
+// 	G4LogicalVolume *Si_dE3outlog = new G4LogicalVolume(Si_dE3out, Simaterial,"Si_dE3outlog",0,0,0);
+//     
+//     G4RotationMatrix* rotateplace=new G4RotationMatrix;
 
     
     
 
-    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,5*mm),Si_dE1log,"SiSegmentPhys_0_1", expHallLog,false,0);
-    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,5*mm),Si_dE1outlog,"X", expHallLog,false,0);
+//     new G4PVPlacement(rotateplace,G4ThreeVector(0,0,5*mm),Si_dE1log,"SiSegmentPhys_0_1", expHallLog,false,0);
+//     new G4PVPlacement(rotateplace,G4ThreeVector(0,0,5*mm),Si_dE1outlog,"X", expHallLog,false,0);
     
-    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,2*mm),Si_dE2log,"SiSegmentPhys_0_2", expHallLog,false,0);
-    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,2*mm),Si_dE2outlog,"X", expHallLog,false,0);
+//     new G4PVPlacement(rotateplace,G4ThreeVector(0,0,2*mm),Si_dE2log,"SiSegmentPhys_0_2", expHallLog,false,0);
+//     new G4PVPlacement(rotateplace,G4ThreeVector(0,0,2*mm),Si_dE2outlog,"X", expHallLog,false,0);
+//     
+//     new G4PVPlacement(rotateplace,G4ThreeVector(0,0,18*mm),Si_dE3log,"SiSegmentPhys_0_3", expHallLog,false,0);
+//     new G4PVPlacement(rotateplace,G4ThreeVector(0,0,18*mm),Si_dE3outlog,"X", expHallLog,false,0);
     
-    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,18*mm),Si_dE3log,"SiSegmentPhys_0_3", expHallLog,false,0);
-    new G4PVPlacement(rotateplace,G4ThreeVector(0,0,18*mm),Si_dE3outlog,"X", expHallLog,false,0);
+// new G4PVPlacement(rotateplace,G4ThreeVector(0,0,15*mm),Si_dE1log,"SiSegmentPhys_0_1", expHallLog,false,0);
+// new G4PVPlacement(rotateplace,G4ThreeVector(0,0,15*mm),Si_dE1outlog,"X", expHallLog,false,0);
     
+    
+    
+    
+    	new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,0,0), BuildBB34(),"Detector",  expHallLog, false, 0);
+    
+}
+
+
+
+
+
+void ApparatusDICE::BuildPlaceSimplifiedRecoilShaddow(G4LogicalVolume* expHallLog){
+    
+    fBB34PCB_HalfThickness = 2.05*CLHEP::mm;
+	fBB34PCB_Shelf = 1.15*CLHEP::mm;
+	fBB34PCB_ShelfWidth = 2.1*CLHEP::mm;
+	fBB34PCB_HalfWidth = 47*CLHEP::mm;
+	fBB34PCB_HalfALength = 28*CLHEP::mm;
+	fBB34PCB_Blength = 21*CLHEP::mm;
+	fBB34PCB_Angle = 45*CLHEP::deg;
+	fBB34PCB_Clength = fBB34PCB_Blength*tan(fBB34PCB_Angle);
+	
+	fBB34Chip_HalfThickness = 0.75*CLHEP::mm;
+	fBB34Chip_HalfWidth = 43*CLHEP::mm;
+	fBB34Chip_HalfLength = 23*CLHEP::mm;
+	fBB34Chip_GuardWidth = 3*CLHEP::mm;
+	fBB34Chip_Nseg=16;
+	fBB34Chip_Dead=500*CLHEP::nm;
+	fBB34Chip_DeadAngle = 10*CLHEP::deg; /// An approximation for apparent inter-segment losses
+	fBB34Chip_Al=500*CLHEP::nm;
+    
+
+
+    
+    
+    // Build and place the photon shield
+    G4double Yaxisoffset=0.5*cm;
+    G4double NominalZcut=1.0*cm; //Position we cut the ramp at
+    G4double AxisToDetY=4*cm;
+    G4double Zblock=0.5*cm; //half
+    
+    G4double ScintThick=1*mm; //half
+    
+    
+  	G4Material *mMaterial = G4Material::GetMaterial(fMagnetMaterial);
+    G4Box* Box1 = new G4Box("Box1", 3*cm, 3*cm, Zblock); 
+	G4LogicalVolume *ShieldFrontL = new G4LogicalVolume(Box1, mMaterial,"ShieldFrontL",0,0,0);
+	ShieldFrontL->SetVisAttributes(FourVisAtt);
+    new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,3.0*cm+Yaxisoffset,0.5*cm), ShieldFrontL,"ShieldFront", expHallLog,false,0);  
+   
+    G4double Zdet=Zblock*2+fBB34Chip_HalfWidth; 
+    G4double Ydet=AxisToDetY;
+    
+    G4double cutdetangle=atan(AxisToDetY/(Zdet+fBB34Chip_HalfWidth-fBB34Chip_GuardWidth-NominalZcut));
+    G4double Zramp=NominalZcut+Yaxisoffset/tan(cutdetangle);
+
+    G4double rampangle=atan(Yaxisoffset/Zramp);
+    
+    G4double lengthramp=8*cm;//half
+    G4double heightramp=0.75*cm;
+    G4double widthramp=2*cm;
+    G4double ScintDep=ScintThick*2;//True not half
+    
+    G4Box* Box2 = new G4Box("Box2", widthramp, heightramp,lengthramp); 
+    
+    G4Box* CutBox = new G4Box("CutBox", widthramp*1.1, heightramp,lengthramp); 
+    
+    
+    G4double ramphypo=sqrt(lengthramp*lengthramp+heightramp*heightramp);
+    
+    G4double projectangle= atan(lengthramp/heightramp)-rampangle;
+    
+    
+    G4RotationMatrix* rotate1 = new G4RotationMatrix;
+    rotate1->rotateX(rampangle);
+  
+//     G4VSolid* Ramp1 = new G4UnionSolid("Ramp1", Box2, CutBox,rotate1,G4ThreeVector(-1*cm,ramphypo*sin(projectangle),ramphypo*cos(projectangle)));
+    G4VSolid* Ramp1 = new G4SubtractionSolid("Ramp1", Box2, CutBox,rotate1,G4ThreeVector(0,ramphypo*cos(projectangle)-heightramp,ramphypo*sin(projectangle)-lengthramp));
+    
+    G4VSolid* Ramp2 = new G4SubtractionSolid("Ramp2", Ramp1, CutBox,new G4RotationMatrix,G4ThreeVector(0,2*heightramp-ScintDep,2*heightramp/tan(rampangle)));  
+    
+	G4LogicalVolume *ShieldRampL = new G4LogicalVolume(Ramp2, mMaterial,"ShieldRampL",0,0,0);
+    ShieldRampL->SetVisAttributes(FourVisAtt);
+    new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,heightramp+Yaxisoffset,lengthramp+Zramp), ShieldRampL,"ShieldRampL", expHallLog,false,0);
+ 
+   
+        G4RotationMatrix* rotateplace = new G4RotationMatrix;
+        rotateplace->rotateX(90*deg);
+        rotateplace->rotateZ(-90*deg);
+        G4ThreeVector vecplace(0,Ydet,Zdet);
+  
+     new G4PVPlacement(rotateplace,vecplace, BuildBB34(),"Detector", expHallLog,false,0);
+
+
+    G4Material* scinmat = G4Material::GetMaterial(fWaferMaterial);
+     
+     
+    G4Box* ScintBox = new G4Box("Box1",fBB34Chip_HalfLength, ScintThick,fBB34Chip_HalfWidth ); 
+    G4LogicalVolume* fScintLog =new G4LogicalVolume(ScintBox, scinmat, "fScintLog", 0,0,0);
+    fScintLog->SetVisAttributes(SevenVisAtt);
+    
+    std::stringstream tt;
+    tt<<"SiSegmentPhys_0_"<<BuildMicronSiN;
+    BuildMicronSiN++;
+    
+	new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,Ydet+fRMSDetHalfDepth+0.5*mm+ScintThick,Zdet), fScintLog,tt.str(),  expHallLog, false, 0);
+    
+    std::stringstream TT;
+    TT<<"SiSegmentPhys_0_"<<BuildMicronSiN;
+    BuildMicronSiN++;
+    
+// 	new G4PVPlacement(rotateplace,G4ThreeVector(0,heightramp/tan(rampangle)+fRMSDetHalfLength+Zramp+1*mm,heightramp+Yaxisoffset+ScintThick-ScintDep+0.1*mm), fScintLog,TT.str(),  expHallLog, false, 0);
+    
+	new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,heightramp*2+Yaxisoffset+ScintThick-ScintDep+0.1*mm,2*heightramp/tan(rampangle)+fRMSDetHalfLength+Zramp+1*mm), fScintLog,TT.str(),  expHallLog, false, 0);
+
 }

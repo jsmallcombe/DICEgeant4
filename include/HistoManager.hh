@@ -111,6 +111,9 @@ public:
 	
 	bool HitsStore;
 	void StoreHits(){HitsStore=true;}
+	
+	int fStoreMultMin;
+	void SetStoreMult(int mult){fStoreMultMin=mult;}
 
 private:
 // 	void MakeHistogram(G4AnalysisManager* analysisManager, G4String filename,  G4String title, G4double xmin, G4double xmax, G4int nbins);

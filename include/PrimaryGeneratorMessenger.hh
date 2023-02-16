@@ -78,6 +78,7 @@ private:
     G4UIcmdWithADouble*     	   fSetGunBetaCmd;
     G4UIcmdWithADoubleAndUnit*     fSetGunLifetimeCmd;
     G4UIcmdWithoutParameter*       fStoreHits;
+    G4UIcmdWithAnInteger*          fSetStoreMult;
 	
 };
 

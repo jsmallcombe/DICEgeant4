@@ -96,20 +96,20 @@ void RMSFocalSort(const char *rootout = "dice.root", const char *rootin = "g4out
         ////////////////////////
 		
 // // 		Iterate over the matrix (could also have made sum while building event)
-// 		double Esum=0;
-// 		for(auto i : EventHolder){
-// 			for(auto j : i){
-// 				Esum+=j;
-// 			}
-// 		}
+		double Esum=0;
+		for(auto i : EventHolder){
+			for(auto j : i){
+				Esum+=j;
+			}
+		}
 		
 //         cout<<endl<<EventHolder[0][0]<<" "<<EventHolder[0][1]<<" "<<EventHolder[0][2]<<" "<<EventHolder[0][3]<<" ";
         
-        if(!(EventHolder[0][0]>0)&&EventHolder[0][2]>0)EnergySum->Fill(EventHolder[0][3]+EventHolder[0][1]+EventHolder[0][2]);
+//         if(!(EventHolder[0][0]>0)&&EventHolder[0][2]>0)EnergySum->Fill(EventHolder[0][3]+EventHolder[0][1]+EventHolder[0][2]);
 		
 // 		// Fill Histogram
 // 		if(Esum>0){
-// 			EnergySum->Fill(Esum);
+			EnergySum->Fill(Esum);
 // 		}
 // 		
 // 		// Loop to fill several histograms if there is data
@@ -131,22 +131,23 @@ void RMSFocalSort(const char *rootout = "dice.root", const char *rootin = "g4out
 	//Before saving file draw histograms to screen
 	
 	TCanvas *C1=new TCanvas();
-    C1->Divide(2);
-	C1->cd(1);
+//     C1->Divide(2);
+// 	C1->cd(1);
     
+    EnergySum->SetTitle("0.5 mm thick angled beam");
 	EnergySum->DrawCopy();
 // 	EnergySum2->DrawCopy("same");
 	// I use the DrawCopy not Draw  command, to create a copy because the histograms will disappear from memore when the file is closed and not be visable anymore
     
-	C1->cd(2);
-    gPad->Divide(2,2);
-    
-    for(int i=0;i<4;i++){
-        C1->cd(2);
-        gPad->cd(i+1);
-        gPad->Update();
-        EnergyN[i]->DrawCopy();
-    }
+// 	C1->cd(2);
+//     gPad->Divide(2,2);
+//     
+//     for(int i=0;i<4;i++){
+//         C1->cd(2);
+//         gPad->cd(i+1);
+//         gPad->Update();
+//         EnergyN[i]->DrawCopy();
+//     }
 // 	
 // 	EnergyN[1]->SetLineColor(2);
 // 	EnergyN[1]->DrawCopy("same");
@@ -166,9 +167,17 @@ void RMSFocalSort(const char *rootout = "dice.root", const char *rootin = "g4out
 // 	gStyle->SetLineScalePS(1.5);//default is 3, which looks crap
 // 	C1->Print("EnergySum.pdf");
 	
+	
+	
+	
+	
+	
+	
 	// Save and close the output file
     out.Write();
     out.Close();
 	
     delete newfile; // Delete the variable holding the input file, which also closes it
+    
+    
 }

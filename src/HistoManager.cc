@@ -38,7 +38,7 @@
 #include "Randomize.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-HistoManager::HistoManager(DetectorConstruction* detectorConstruction):HitsStore(0) {
+HistoManager::HistoManager(DetectorConstruction* detectorConstruction):HitsStore(0),fStoreMultMin(1) {
 	fFileName[0] = "g4out";
 	fFactoryOn = false;
 

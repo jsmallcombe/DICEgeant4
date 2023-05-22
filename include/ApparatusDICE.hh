@@ -56,9 +56,20 @@ public:
 	////// Controlled by DetectorConstruction class ///////
 	///////////////////////////////////////////////////////
 	
+    G4int fBuildOption;
+    
 	G4double fAdjLength;
+	G4double fAdjLengthA;
+	G4double fAdjLengthB;
+	G4double fAdjLengthC;
+	G4double fAdjLengthD;
+	G4double fAdjLengthE;
 	G4int    fAdjNumber;
 	bool fRemoveShield;
+	
+	bool fUseA,fUseB,fUseC,fUseD,fUseE;
+    
+    
     
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
@@ -150,7 +161,6 @@ private:
 	G4double fPhotonShieldLayerTwoThickness ;
 	G4double fPhotonShieldLayerThreeThickness;
 	
-	
     // RMS recoilshaddow measurments
 	G4double fRMSDetHalfLength;
 	G4double fRMSDetHalfWidth;
@@ -158,29 +168,28 @@ private:
 	G4double fRMSGuard;
     G4int fRMSSegZ;
     
+	////
     
-    
-    
-    G4double 	fBB34PCB_HalfThickness;
-G4double 	fBB34PCB_Shelf;
-G4double 	fBB34PCB_ShelfWidth;
-G4double 	fBB34PCB_HalfWidth;
-G4double 	fBB34PCB_HalfALength;
-G4double 	fBB34PCB_Blength;
-G4double 	fBB34PCB_Angle;
-G4double 	fBB34PCB_Clength;
+	G4double 	fBB34PCB_HalfThickness;
+	G4double 	fBB34PCB_Shelf;
+	G4double 	fBB34PCB_ShelfWidth;
+	G4double 	fBB34PCB_HalfWidth;
+	G4double 	fBB34PCB_HalfALength;
+	G4double 	fBB34PCB_Blength;
+	G4double 	fBB34PCB_Angle;
+	G4double 	fBB34PCB_Clength;
+
+	G4double 	fBB34Chip_HalfThickness;
+	G4double 	fBB34Chip_HalfWidth;
+	G4double 	fBB34Chip_HalfLength;
+	G4double 	fBB34Chip_GuardWidth;
+	G4int 		fBB34Chip_Nseg;
+	G4double 	fBB34Chip_Dead;
+	G4double 	fBB34Chip_DeadAngle;
+	G4double 	fBB34Chip_Al;
+
+	////
 	
-G4double 	fBB34Chip_HalfThickness;
-G4double 	fBB34Chip_HalfWidth;
-G4double 	fBB34Chip_HalfLength;
-G4double 	fBB34Chip_GuardWidth;
-G4int 	fBB34Chip_Nseg;
-G4double 	fBB34Chip_Dead;
-G4double 	fBB34Chip_DeadAngle;
-G4double 	fBB34Chip_Al;
-
-
-
 	
 private:
 	//////////////////////////////////////////////////////
@@ -233,6 +242,11 @@ private:
     
     
 	void BuildPlaceSimplifiedRecoilShaddow(G4LogicalVolume*);
+	void BuildPlaceAdjustableRecoilShaddow(G4LogicalVolume*);
+	
+	void BuildPlaceFlatOrange(G4LogicalVolume*,G4double);
+	void BuildPlaceTripleOrange(G4LogicalVolume*);
 
+	
 };
 #endif

@@ -44,13 +44,14 @@ target_link_libraries(DICE10 ${Geant4_LIBRARIES})
 set(DICE10_SCRIPTS
     vis.mac
     dice.mac
-    remote_vis.mac
-    jpeg.mac
-    DiceSort.C
-    SimpleDiceSort.C
-    HeliosSort.C
-    ShoeSort.C
-    RMSFocalSort.C
+    ExampleSortFiles/remote_vis.mac
+    ExampleSortFiles/jpeg.mac
+    ExampleSortFiles/DiceSort.C
+    ExampleSortFiles/SimpleDiceSort.C
+    ExampleSortFiles/HeliosSort.C
+    ExampleSortFiles/ShoeSort.C
+    ExampleSortFiles/RMSFocalSort.C
+    ExampleSortFiles/SimpRecShadSort.C
   )
   
 

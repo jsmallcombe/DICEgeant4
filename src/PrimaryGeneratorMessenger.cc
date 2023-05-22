@@ -80,6 +80,14 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Gun
 	fConeMinAngleCmd->SetGuidance("Set cone value for inner theta - use deg (0-90) - default is 0 if none specified");
 	fConeMinAngleCmd->SetUnitCategory("Angle");
 	fConeMinAngleCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+    
+	fPhiMinAngleCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/gun/coneMinPhi",this);
+	fPhiMinAngleCmd->SetUnitCategory("Angle");
+	fPhiMinAngleCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+	fPhiMaxAngleCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/gun/coneMaxPhi",this);
+	fPhiMaxAngleCmd->SetUnitCategory("Angle");
+	fPhiMaxAngleCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
 	fBeamSpotSigmaCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/gun/BeamSpot",this);//Beam spot sigma
 	fBeamSpotSigmaCmd->SetGuidance("Set sigma for a realistic beamspot");
@@ -100,6 +108,10 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Gun
     
     fSetStoreMult = new G4UIcmdWithAnInteger("/DetSys/SiHits/StoreMultiplicity",this);
 	fSetStoreMult->AvailableForStates(G4State_Idle);
+	
+	fSetPrettyHitsOnly = new G4UIcmdWithoutParameter("/DetSys/SiHits/PrettyOnly",this);
+	fSetPrettyHitsOnly->AvailableForStates(G4State_Idle);
+	
     
 }
 
@@ -110,11 +122,14 @@ PrimaryGeneratorMessenger::~PrimaryGeneratorMessenger() {
 	delete fEfficiencyDirectionCmd;
 	delete fConeAngleCmd;
 	delete fConeMinAngleCmd;
+	delete fPhiMinAngleCmd;
+	delete fPhiMaxAngleCmd;
 	delete fBeamSpotSigmaCmd;
 	delete fSetGunBetaCmd;
 	delete fSetGunLifetimeCmd;
 	delete fStoreHits;
 	delete fSetStoreMult;
+	delete fSetPrettyHitsOnly;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -146,6 +161,14 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newVa
 		G4cout<<"Cone Beam minimum angle supplied"<<G4endl;
 		return;
 	}
+	if(command == fPhiMinAngleCmd) {
+		fAction->SetConeMinPhi(fPhiMinAngleCmd->GetNewDoubleValue(newValue));
+		return;
+	}
+	if(command == fPhiMaxAngleCmd) {
+		fAction->SetConeMaxPhi(fPhiMaxAngleCmd->GetNewDoubleValue(newValue));
+		return;
+	}
 	if(command == fBeamSpotSigmaCmd) {
 		fAction->SetBeamSpotSigma(fBeamSpotSigmaCmd->GetNewDoubleValue(newValue));
 		G4cout<<"Beam Spot sigma supplied"<<G4endl;
@@ -168,13 +191,19 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newVa
 		G4cout<<"Vis Store Set"<<G4endl;
 		return;
 	}  
-	
 		
 	if(command == fSetStoreMult) {
 		fAction->SetStoreMult(fSetStoreMult->GetNewIntValue(newValue));
 		G4cout<<"Vis Store Mult Set"<<G4endl;
 		return;
 	}  
+	
+	if(command == fSetPrettyHitsOnly) {
+		fAction->SetPrettyHitsOnly();
+		G4cout<<"Vis Store Pretty Only Set"<<G4endl;
+		return;
+	}  
+	
 	
 }
 

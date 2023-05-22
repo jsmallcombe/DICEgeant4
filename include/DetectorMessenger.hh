@@ -82,6 +82,13 @@ private:
 	G4UIcmdWithADoubleAndUnit* fApparatusDiceFieldCmd;
 	G4UIcmdWithADoubleAndUnit* fApparatusDiceLengthCmd;
 	G4UIcmdWithAnInteger*	   fApparatusDiceIntCmd;
+	G4UIcmdWithADoubleAndUnit* fApparatusDiceArbACmd;
+	G4UIcmdWithADoubleAndUnit* fApparatusDiceArbBCmd;
+	G4UIcmdWithADoubleAndUnit* fApparatusDiceArbCCmd;
+	G4UIcmdWithADoubleAndUnit* fApparatusDiceArbDCmd;
+	G4UIcmdWithADoubleAndUnit* fApparatusDiceArbECmd;
+    
+    
 
 };
 

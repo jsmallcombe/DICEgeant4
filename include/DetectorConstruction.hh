@@ -103,8 +103,10 @@ public:
 	void AddApparatusDiceDetector(G4String Options);
 	void SetDiceFieldStrength(G4double Field);
 	
-	void SetDiceLength(G4double Length);
+	void SetDiceLength(G4int Nsel, G4double Length);
 	void SetDiceInt(G4int N);
+    
+    ApparatusDICE* GetDice();
 
 private:
 	bool CheckVolumeName(G4String volumeName);

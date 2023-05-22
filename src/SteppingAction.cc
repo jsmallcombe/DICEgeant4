@@ -104,6 +104,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep) {
 	// Get initial momentum direction & energy of particle
 	G4int trackID = theTrack->GetTrackID();
 	G4int parentID = theTrack->GetParentID();
+	
 
 	//G4StepPoint* prePoint = aStep->GetPreStepPoint();
 	G4StepPoint* postPoint = aStep->GetPostStepPoint();
@@ -122,6 +123,24 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep) {
 		if(trackSteps) {
 			fEventAction->AddStepTracker(prop, evntNb, trackID, parentID, stepNumber, particleType, processType, edep, postPos, postTime, targetZ);
 		}
+		
+		// At least this track ends in active volume, so hopefully is a full energy event
+		// This is for making pretty pictures not real simulations
+		G4int trackStatus = theTrack->GetTrackStatus();
+		if(trackStatus==fStopAndKill){
+			fEventAction->GoodTrackEnd();
+		}
+		
 	}// if(fDetector->HasProperties(volume))
+	
+	// No next volume means exit world
+	// Getting rid of these is good if you want a pretty picture
+	if(!theTrack->GetNextVolume()){
+			fEventAction->TrackExitsWorld();
+	}else{
+        if(theTrack->GetNextVolume()->GetLogicalVolume()->GetName().contains("FORBID")){
+			fEventAction->TrackExitsWorld();
+        }
+    }
 }
 

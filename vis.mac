@@ -2,8 +2,30 @@
 /run/initialize
 /DetSys/world/material Vacuum
 
-### Choose Apparatus To Build ###
-/DetSys/app/addDiceDetector 7
+### Configure Apparatus To Build ###
+
+/DetSys/app/SetDiceField 0.15 tesla
+#/DetSys/det/RemoveShield true
+
+### Orange - Target-Sheild Distance
+/DetSys/app/SetDiceArbA 10 mm
+
+### Orange - Detector Distance
+#/DetSys/app/SetDiceArbB 65 mm
+
+### Orange - Mag Inner Height Half
+#/DetSys/app/SetDiceArbC 5 mm
+
+### Orange - Mag Outer Height Half
+#/DetSys/app/SetDiceArbD 10 mm
+
+### Mag Z Extent
+#/DetSys/app/SetDiceArbE 55 mm
+
+/DetSys/app/addDiceDetector 11
+### 9 Recoil Shaddow
+### 10 Orange Triple
+### 11 Orange
 
 ### Select Graphics Manager ###
 /vis/open OGL
@@ -11,6 +33,16 @@
 ### Choose Drawing Style ###
 /vis/viewer/set/style surface
 #/vis/viewer/set/style wireframe
+
+### Overtide Drawing Style For Specified Volumes ###
+/vis/set/touchable World 0 Mag1 0
+/vis/touchable/set/forceWireframe
+/vis/set/touchable World 0 Mag2 0
+/vis/touchable/set/forceWireframe
+/vis/set/touchable World 0 Mag3 0
+/vis/touchable/set/forceWireframe
+/vis/set/touchable World 0 Mag4 0
+/vis/touchable/set/forceWireframe
 
 ### Required ### 
 /vis/drawVolume 
@@ -23,7 +55,7 @@
 #/vis/viewer/set/viewpointVector 1 1 -1  ### Same fuction as viewpointThetaPhi
 /vis/viewer/zoomTo 1
 
-/vis/viewer/addCutawayPlane 0 0 0 mm 1 0 0 # Useful for viewing inside tight geometries
+#/vis/viewer/addCutawayPlane 0 0 0 mm 1 0 0 ## Useful for viewing inside tight geometries
 
 ### To visualise the magnetic field ###
 ### Doesnt seem with tracks. ###
@@ -34,13 +66,12 @@
 /DetSys/phys/SetStepper 1 # CRUCIAL to see electron paths in magnetic field 
 /DetSys/world/StepLimit 10 mm # As there are few interactions in vacuum
 
-
 ### Set Particle Generator ### 
 
-### Basic ### 
+### Basic ### 2
 /DetSys/gun/position 0.0 0.0 0.0 mm
 /DetSys/gun/particle e-
-/DetSys/gun/efficiencyEnergy 400 keV
+/DetSys/gun/efficiencyEnergy 600 keV
 
 ### Nucleus ### 
 #/gun/particle ion
@@ -50,23 +81,26 @@
 
 ### Set Particle Generator Extras ### 
 #/DetSys/gun/direction 0 1 1
-#/DetSys/gun/coneMinAngle 10.0 deg
-#/DetSys/gun/coneMaxAngle 60.0 deg
+/DetSys/gun/coneMinAngle 10.0 deg
+/DetSys/gun/coneMaxAngle 170.0 deg
+/DetSys/gun/coneMinPhi 225.0 deg
+/DetSys/gun/coneMaxPhi 315.0 deg
 /DetSys/gun/BeamSpot 1 mm
-/DetSys/gun/SetBeta 0.05
-/DetSys/gun/SetLifetime 1 ns
+#/DetSys/gun/SetBeta 0.05
+#/DetSys/gun/SetLifetime 1 ns
+
 
 ### Run And View Events ### 
-#/vis/scene/endOfEventAction accumulate
-#/run/beamOn 100 ### Keep number low
+# /vis/scene/endOfEventAction accumulate 500
+# /run/beamOn 1000 ### Keep number low
 
 ### Only View Sili hits ### 
 /vis/disable
 /DetSys/SiHits/VisStore
-/run/beamOn 2000
+/DetSys/SiHits/PrettyOnly  ### Lie to me
+/run/beamOn 500
 /vis/enable
-/vis/scene/endOfEventAction accumulate
+/vis/scene/endOfEventAction accumulate 
 /vis/viewer/flush
 #####/vis/viewer/rebuild
 ##### Uses "/vis/reviewKeptEvents" and "continue" to review one at a time
-

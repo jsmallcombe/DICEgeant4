@@ -278,8 +278,32 @@ void DetectorConstruction::SetDiceFieldStrength(G4double Field){
 	ApparatusDICE::fFieldStength=Field;
 }
 
-void DetectorConstruction::SetDiceLength(G4double Length){
-	fAppDICE->fAdjLength=Length;
+void DetectorConstruction::SetDiceLength(G4int Nsel,G4double Length){
+    switch (Nsel) {
+    case 1:
+        fAppDICE->fAdjLengthA=Length;
+		fAppDICE->fUseA=true;
+        break;
+    case 2:
+        fAppDICE->fAdjLengthB=Length;
+		fAppDICE->fUseB=true;
+        break;
+    case 3:
+        fAppDICE->fAdjLengthC=Length;
+		fAppDICE->fUseC=true;
+        break;
+    case 4:
+        fAppDICE->fAdjLengthD=Length;
+		fAppDICE->fUseD=true;
+        break;
+    case 5:
+        fAppDICE->fAdjLengthE=Length;
+		fAppDICE->fUseE=true;
+        break;
+    default:
+        fAppDICE->fAdjLength=Length;
+    }
+    
 }
 void DetectorConstruction::SetDiceInt(G4int N){
 	fAppDICE->fAdjNumber=N;
@@ -287,3 +311,7 @@ void DetectorConstruction::SetDiceInt(G4int N){
 void DetectorConstruction::RemoveShield(G4bool input){
 	fAppDICE->fRemoveShield=input;
 }
+ApparatusDICE* DetectorConstruction::GetDice(){
+	return fAppDICE;
+}
+

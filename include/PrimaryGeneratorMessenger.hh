@@ -74,11 +74,14 @@ private:
     G4UIcmdWithADoubleAndUnit*     fConeRValueCmd;
     G4UIcmdWithADoubleAndUnit*     fConeAngleCmd;
     G4UIcmdWithADoubleAndUnit*     fConeMinAngleCmd;
+    G4UIcmdWithADoubleAndUnit*     fPhiMinAngleCmd;
+    G4UIcmdWithADoubleAndUnit*     fPhiMaxAngleCmd;
     G4UIcmdWithADoubleAndUnit*     fBeamSpotSigmaCmd;
     G4UIcmdWithADouble*     	   fSetGunBetaCmd;
     G4UIcmdWithADoubleAndUnit*     fSetGunLifetimeCmd;
     G4UIcmdWithoutParameter*       fStoreHits;
     G4UIcmdWithAnInteger*          fSetStoreMult;
+    G4UIcmdWithoutParameter*       fSetPrettyHitsOnly;
 	
 };
 

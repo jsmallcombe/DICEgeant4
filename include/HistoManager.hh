@@ -114,6 +114,9 @@ public:
 	
 	int fStoreMultMin;
 	void SetStoreMult(int mult){fStoreMultMin=mult;}
+	
+	bool PrettyHitsOnly;
+	void SetPrettyHitsOnly(){PrettyHitsOnly=true;}
 
 private:
 // 	void MakeHistogram(G4AnalysisManager* analysisManager, G4String filename,  G4String title, G4double xmin, G4double xmax, G4int nbins);

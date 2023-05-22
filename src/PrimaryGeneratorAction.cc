@@ -79,7 +79,10 @@
 	fEffParticleBool = false;
 	fEffGunBetaZ = 0;
 	fEffGunLifetime = 0;
-
+    
+    fPhiMin=0;
+    fPhiMax=2.0*CLHEP::pi;
+    
 	fBeamSpotSigma = 0.*mm;
 
 }
@@ -153,7 +156,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 				// 	      G4cout<<asin(SinTheta)<<G4endl;
 				G4double SinTheta = sqrt(1. - pow(CosTheta, 2.0));
-				G4double Phi      = (2.0*CLHEP::pi)*G4UniformRand();
+				G4double Phi      = fPhiMin+((fPhiMax-fPhiMin)*G4UniformRand());
 
 				effdirection = G4ThreeVector(SinTheta*cos(Phi), SinTheta*sin(Phi), CosTheta);
 				// G4cout<<effdirection<<G4endl;
@@ -169,7 +172,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 			//converts from Spherical polar(physics def.) to cartesian via (rsin(theta)cos(phi),rsin(theta)cos(phi),rcos(theta)) r=1,unit length
 		}
 
-		
+//         ApparatusDICE* Dice=fDetector->GetDice();
+
+
 		//after running through if-statements above we now have particle type definition, position, mom. direction, and the energy (or their initialised values)
 		
 		

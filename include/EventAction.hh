@@ -66,6 +66,12 @@ public:
 	void AddHitTracker(const DetectorProperties& properties, const G4int& eventNumber, const G4int& trackID, const G4int& parentID, const G4int& stepNumber, const G4int& particleType, const G4int& processType, const G4double& depEnergy, const G4ThreeVector& pos, const G4double& time, const G4int& trackerZ);
 	void AddStepTracker(const DetectorProperties& properties, const G4int& eventNumber, const G4int& trackID, const G4int& parentID, const G4int& stepNumber, const G4int& particleType, const G4int& processType, const G4double& depEnergy, const G4ThreeVector& pos, const G4double& time, const G4int& trackerZ);
 
+	G4bool fGoodTrackEnd;
+	void GoodTrackEnd(){fGoodTrackEnd=true;};
+	
+	G4bool fWorldExit;
+	void TrackExitsWorld(){fWorldExit=true;};
+	
 private:
 	RunAction*    fRunAction;
 	HistoManager* fHistoManager;
@@ -89,7 +95,7 @@ private:
 	G4int    fStepTrackerI[NUMSTEPVARS][MAXSTEPS];
 	G4double fStepTrackerD[NUMSTEPVARS][MAXSTEPS];
 	G4int    fNumberOfSteps;
-
+	
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

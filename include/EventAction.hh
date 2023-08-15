@@ -71,10 +71,11 @@ public:
 	
 	G4bool fWorldExit;
 	void TrackExitsWorld(){fWorldExit=true;};
-	
-private:
+    
 	RunAction*    fRunAction;
 	HistoManager* fHistoManager;
+	
+private:
 
 	G4int     fPrintModulo;
 	G4int     fEvtNb;

@@ -4,23 +4,23 @@
 
 ### Configure Apparatus To Build ###
 
-/DetSys/app/SetDiceField 0.15 tesla
+/DetSys/app/SetDiceField 0.25 tesla
 #/DetSys/det/RemoveShield true
 
-### Orange - Target-Sheild Distance
-/DetSys/app/SetDiceArbA 10 mm
+### Orange - Midpoint Shield-Midpoint Magnet Offset
+/DetSys/app/SetDiceArbA -7.50 mm
 
 ### Orange - Detector Distance
-#/DetSys/app/SetDiceArbB 65 mm
+/DetSys/app/SetDiceArbB 55 mm
 
-### Orange - Mag Inner Height Half
-#/DetSys/app/SetDiceArbC 5 mm
+### Orange - Target-ShieldMidpoint Distance
+/DetSys/app/SetDiceArbC 15 mm
 
-### Orange - Mag Outer Height Half
-#/DetSys/app/SetDiceArbD 10 mm
+### Orange - Magnet Height  (Set negative to change extent to center)
+/DetSys/app/SetDiceArbD -15 mm
 
-### Mag Z Extent
-#/DetSys/app/SetDiceArbE 55 mm
+### Mag Angel
+# /DetSys/app/SetDiceArbE 0 deg
 
 /DetSys/app/addDiceDetector 11
 ### 9 Recoil Shaddow
@@ -29,20 +29,20 @@
 
 ### Select Graphics Manager ###
 /vis/open OGL
+/vis/viewer/set/background 1 1 1 1
+# /vis/viewer/set/globalLineWidthScale 2
+
+
 
 ### Choose Drawing Style ###
 /vis/viewer/set/style surface
 #/vis/viewer/set/style wireframe
 
 ### Overtide Drawing Style For Specified Volumes ###
-/vis/set/touchable World 0 Mag1 0
+/vis/set/touchable World 0 Mag 0
 /vis/touchable/set/forceWireframe
-/vis/set/touchable World 0 Mag2 0
-/vis/touchable/set/forceWireframe
-/vis/set/touchable World 0 Mag3 0
-/vis/touchable/set/forceWireframe
-/vis/set/touchable World 0 Mag4 0
-/vis/touchable/set/forceWireframe
+/vis/touchable/set/colour 0 0 0 2
+/vis/touchable/set/lineWidth 2
 
 ### Required ### 
 /vis/drawVolume 
@@ -71,7 +71,7 @@
 ### Basic ### 2
 /DetSys/gun/position 0.0 0.0 0.0 mm
 /DetSys/gun/particle e-
-/DetSys/gun/efficiencyEnergy 600 keV
+/DetSys/gun/efficiencyEnergy 1000 keV
 
 ### Nucleus ### 
 #/gun/particle ion
@@ -85,9 +85,9 @@
 /DetSys/gun/coneMaxAngle 170.0 deg
 /DetSys/gun/coneMinPhi 225.0 deg
 /DetSys/gun/coneMaxPhi 315.0 deg
-/DetSys/gun/BeamSpot 1 mm
-#/DetSys/gun/SetBeta 0.05
-#/DetSys/gun/SetLifetime 1 ns
+/DetSys/gun/BeamSpot 2 mm
+# /DetSys/gun/SetBeta 0.05
+# /DetSys/gun/SetLifetime 1 ns
 
 
 ### Run And View Events ### 
@@ -97,7 +97,7 @@
 ### Only View Sili hits ### 
 /vis/disable
 /DetSys/SiHits/VisStore
-/DetSys/SiHits/PrettyOnly  ### Lie to me
+# /DetSys/SiHits/PrettyOnly  ### Lie to me
 /run/beamOn 500
 /vis/enable
 /vis/scene/endOfEventAction accumulate 

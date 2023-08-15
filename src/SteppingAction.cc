@@ -139,7 +139,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep) {
 			fEventAction->TrackExitsWorld();
 	}else{
         if(theTrack->GetNextVolume()->GetLogicalVolume()->GetName().contains("FORBID")){
-			fEventAction->TrackExitsWorld();
+            if(fEventAction->fHistoManager->PrettyHitsOnly)fEventAction->TrackExitsWorld();
         }
     }
 }

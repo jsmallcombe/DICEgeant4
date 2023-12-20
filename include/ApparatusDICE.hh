@@ -69,106 +69,17 @@ public:
 	
 	bool fUseA,fUseB,fUseC,fUseD,fUseE;
     
-    
-    
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
 	
 private:
-    G4LogicalVolume* fFieldVolume; 
  	G4LogicalVolume* fDetectorLog;
- 	G4LogicalVolume* fMagnetLog;
-	
-	G4VPhysicalVolume* fDicePhys;
     
 	G4String fMagnetMaterial; 
 	G4String fBlockerMaterial; 
 	G4String fWaferMaterial; 
-	
-	bool fFieldOn;
-	
-	/////
 
-	G4double fMagnetHeight;
-	G4double fMagnetWidth;
-	G4double fMagnetDepth;
-	G4double fMagnetThickness;
-	G4double fMagnetLining;
-    
-	G4double fTargetMagnetDistance;
-    
-	G4double fDetectorThickness;
-	G4double fDetectorWidth;
-	G4double fDetectorHeight;
-	G4int fSegX;
-	G4int fSegY;
-	G4double fGuardRingWidth;
-    
-	G4double fDetPlaceAngle1;
-	G4double fDetPlaceAngle2;
-	G4double fDetPlaceRadius;
-    
-	//////
-	
-	G4double fHMagnetOuterR;
-	G4double fHMagnetInnerR;
-	G4double fHMagnetDepth;
-	G4double fHMagTargetOffset;
-	
-	G4double fHTargDetOffset;
-	G4double fHDetRad;
-    G4double fHDetRInner;
-	G4double fHDetLength;
-	G4int fHSegZ;
-	
-	////
-	
-	G4double fSTMagnetOuterR;
-	G4double fSTMagnetInnerR;
-	G4double fSTMagnetDepth;
-	G4double fSTMagTargetOffset;
-	
-	G4double fSTDetOffset;
-	G4double fSTDetInnerR;
-	G4double fSTDetOuterR;
-	G4double fSTDetLength;
-	
-	////
-
-	G4double fRSOffset;
-	G4double fRSBlock0;
-	G4double fRSBlock1;
-    
-	G4double fRSDetR;
-	G4double fRSInnerR;
-	
-    G4double fRSShieldRIn;
-    G4double fRSDetDepth;
-    G4int fRSSegZ;
-    
-    // Shield Common
-    
-    G4double fShieldOffset;
-    
-    G4VisAttributes *OneVisAtt,*TwoVisAtt,*ThreeVisAtt,*FourVisAtt,*FiveVisAtt,*SixVisAtt,*SevenVisAtt;
-
-    G4String fPhotonShieldLayerOneMaterial;
-	G4String fPhotonShieldLayerTwoMaterial;
-	G4String fPhotonShieldLayerThreeMaterial;
-    
-    G4double fPhotonShieldLength;
-	G4double fPhotonShieldLayerOneThickness;
-	G4double fPhotonShieldLayerTwoThickness ;
-	G4double fPhotonShieldLayerThreeThickness;
-	
-    // RMS recoilshaddow measurments
-	G4double fRMSDetHalfLength;
-	G4double fRMSDetHalfWidth;
-	G4double fRMSDetHalfDepth;
-	G4double fRMSGuard;
-    G4int fRMSSegZ;
-    
-	////
+    G4VisAttributes *OneVisAtt,*TwoVisAtt,*ThreeVisAtt,*FourVisAtt;
     
 	G4double 	fBB34PCB_HalfThickness;
 	G4double 	fBB34PCB_Shelf;
@@ -187,9 +98,6 @@ private:
 	G4double 	fBB34Chip_Dead;
 	G4double 	fBB34Chip_DeadAngle;
 	G4double 	fBB34Chip_Al;
-
-	////
-	
 	
 private:
 	//////////////////////////////////////////////////////
@@ -199,53 +107,11 @@ private:
 	// methods
 	void BuildPlaceBasicTest(G4LogicalVolume*);
 	
-	void BuildPlaceShoeBox(G4LogicalVolume*);
-	void CreateShoeBoxField();
-	void BuildShoeBoxYoke();
-	void BuildRadialDetector(G4double);
-    static G4int ShoeDetN;
-	
-	
-	void BuildPlaceHelios(G4LogicalVolume*);
-	void CreateHeliosField();
-	void BuildHeliosYoke();
-	void BuildHeliosDetector();
-	void BuildPlaceHeliosPhotonShield(G4LogicalVolume*);
-	
-	void BuildPlaceSuperTube(G4LogicalVolume*);
-	void CreateSuperTubeField();
-    void BuildSuperTubeYoke();
-	void BuildSuperTubeDetector();
-	
-	void BuildPlaceRecoilShadow(G4LogicalVolume*);
-// 	void BuildRecoilShadowUnit();
-// 	void BuildPlaceShaddowPhotonShield(G4LogicalVolume*);
-    
-	void BuildPlaceCyclone(G4LogicalVolume*);
-	void CreateCycloneField();
-	void BuildCycloneYoke();
-	
-    
-	void BuildPlacePhotonShieldTest(G4LogicalVolume*);
-    
-	void BuildPlaceHPGe(G4LogicalVolume*);
-    
-	void BuildPlaceNewRecoilShaddow(G4LogicalVolume*);
-    
-	G4LogicalVolume* BuildMicronSi();
     G4LogicalVolume* BuildBB34();
-    
     
     static G4int BuildMicronSiN;
     
-	void BuildPlaceRMSFocal(G4LogicalVolume*);
-    
-    
-	void BuildPlaceSimplifiedRecoilShaddow(G4LogicalVolume*);
-	void BuildPlaceAdjustableRecoilShaddow(G4LogicalVolume*);
-	
 	void BuildPlaceFlatOrange(G4LogicalVolume*,G4double);
-	void BuildPlaceTripleOrange(G4LogicalVolume*);
 
 	
 };

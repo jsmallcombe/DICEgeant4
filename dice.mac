@@ -3,22 +3,34 @@
 /DetSys/world/material Vacuum
 
 ### Choose Apparatus To Build ### 
-#/DetSys/app/SetDiceField 0.1 tesla
-/DetSys/app/addDiceDetector 8
+/DetSys/app/SetDiceField 0.25 tesla
+#/DetSys/det/RemoveShield true
+/DetSys/app/SetDiceArbA -7.50 mm
+/DetSys/app/SetDiceArbB 55 mm
+/DetSys/app/SetDiceArbC 15 mm
+/DetSys/app/SetDiceArbD -15 mm
+# /DetSys/app/SetDiceArbE 0 deg
+/DetSys/app/addDiceDetector 1
 
 ## Record the initial beam data ###
-# /DetSys/det/RecordGun 1
+/DetSys/det/RecordGun 1
 
 ### Set Particle Generator ### 
 /DetSys/gun/position 0.0 0.0 0.0 mm
+
 /DetSys/gun/particle e-
 /DetSys/gun/efficiencyEnergy 400 keV
+
+### Nucleus ### 
+#/gun/particle ion
+#/gun/ion 83 207 0 0.0
+#/grdm/nucleusLimits 207 207 83 82
 
 ### Set Particle Generator Extras ### 
 #/DetSys/gun/direction 0 0 1
 #/DetSys/gun/coneMinAngle 10.0 deg
-/DetSys/gun/coneMaxAngle 80.0 deg
-/DetSys/gun/BeamSpot 30 mm
+#/DetSys/gun/coneMaxAngle 80.0 deg
+/DetSys/gun/BeamSpot 2 mm
 #/DetSys/gun/SetBeta 0.05
 #/DetSys/gun/SetLifetime 1 ns
 

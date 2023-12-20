@@ -1,9 +1,9 @@
-void SimpRecShadSort(const char *rootout = "diceshad.root", const char *rootin = "g4out.root") {
+void QuickFlatOrange(const char *rootout = "flatorange.root", const char *rootin = "g4out.root") {
 	
 	//// Random number generator to add electronic noise on to "perfect" geant4 detectors ///
 	TRandom r;
 	r.SetSeed();
-	double noisefactor=1;
+	double noisefactor=2;
 	// These factors should be tuned to data when possible 
 
 	
@@ -19,19 +19,11 @@ void SimpRecShadSort(const char *rootout = "diceshad.root", const char *rootin =
 	out.cd();//cd into output file so histograms created in memory are associated with that file at creation rather than being manually saved there later.
 
     TH1F* Esumraw=new TH1F("Esumraw","Esumraw",2000,0,2000);
-    TH1F* Esumvt1=new TH1F("Esumvt1","Esumvt1",2000,0,2000);
-    TH1F* Esumvt2=new TH1F("Esumvt2","Esumvt2",2000,0,2000);
-    TH1F* Esumvt3=new TH1F("Esumvt3","Esumvt3",2000,0,2000);
-    
-    
     TH2F* Eraw=new TH2F("Eraw","Eraw",2000,0,2000,16,0,16);
-    TH2F* Ev1=new TH2F("Ev1","Ev1",2000,0,2000,16,0,16);
-    TH2F* Ev2=new TH2F("Ev2","Ev2",2000,0,2000,16,0,16);
-    TH2F* Ev3=new TH2F("Ev3","Ev3",2000,0,2000,16,0,16);
-
-
+    TH1F* Eveto=new TH1F("Eveto","Eveto",2000,0,2000);
+    TH1F* Esumveto=new TH1F("Esumveto","Esumveto",2000,0,2000);
+    
 	gROOT->cd();//cd back into main session memory 
-	
 	
 	// The TTree newtree is the big list of energies and detector segments we need to load from
 	// First we get the length of the list and output it
@@ -71,6 +63,7 @@ void SimpRecShadSort(const char *rootout = "diceshad.root", const char *rootin =
 		if(EventID==CurrentEvent){
 			EndOfEvent=false;
             double e=depEnergy+r.Gaus(0,noisefactor);
+//             double e=depEnergy;
 			
             if(cryNumber==1&&e>100){
                 VETO1=true;
@@ -98,23 +91,15 @@ void SimpRecShadSort(const char *rootout = "diceshad.root", const char *rootin =
         ////  Now we have collected a complete event and can analyse the event
         ////////////////////////
 		
+        bool goodevent=!(VETO1||VETO2);
         Esumraw->Fill(Esum);
-        if(!VETO1)Esumvt1->Fill(Esum);
-        if(!VETO2)Esumvt2->Fill(Esum);
-        if(!VETO2&&!VETO1)Esumvt3->Fill(Esum);
+        if(goodevent)Esumveto->Fill(Esum);
         
-        if(Mult==1){
-            for(unsigned int i=0;i<EventHolder.size();i++){
-            
-                double e=EventHolder[i];
-                
-                if(e>30){
-                    Eraw->Fill(e,i);
-                    if(!VETO1)Ev1->Fill(e,i);
-                    if(!VETO2)Ev2->Fill(e,i);
-                    if(!VETO2&&!VETO1)Ev3->Fill(e,i);
-                    
-                }
+        for(unsigned int i=0;i<EventHolder.size();i++){
+            double e=EventHolder[i];
+            if(e>30){
+                Eraw->Fill(e,i);
+                if(goodevent)Eveto->Fill(e);
             }
         }
             
@@ -124,7 +109,6 @@ void SimpRecShadSort(const char *rootout = "diceshad.root", const char *rootin =
 // 		}
 		
         std::fill(EventHolder.begin(), EventHolder.end(), 0);
-		
 		
 		VETO1=false;
         VETO2=false;

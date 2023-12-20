@@ -16,22 +16,20 @@
 ### Orange - Target-ShieldMidpoint Distance
 /DetSys/app/SetDiceArbC 15 mm
 
-### Orange - Magnet Height  (Set negative to change extent to center)
+### Orange - Magnet Height  (Set negative to set overlap with shield)
 /DetSys/app/SetDiceArbD -15 mm
 
 ### Mag Angel
 # /DetSys/app/SetDiceArbE 0 deg
 
-/DetSys/app/addDiceDetector 11
-### 9 Recoil Shaddow
-### 10 Orange Triple
-### 11 Orange
+/DetSys/app/addDiceDetector 1
+### 1 Orange
+### 2 Orange Triple
 
 ### Select Graphics Manager ###
 /vis/open OGL
 /vis/viewer/set/background 1 1 1 1
 # /vis/viewer/set/globalLineWidthScale 2
-
 
 
 ### Choose Drawing Style ###
@@ -97,7 +95,8 @@
 ### Only View Sili hits ### 
 /vis/disable
 /DetSys/SiHits/VisStore
-# /DetSys/SiHits/PrettyOnly  ### Lie to me
+# /DetSys/SiHits/PrettyOnly  ### Lie's and only shows clean events that dont scatter
+# /DetSys/SiHits/StoreMultiplicity 2 ### Only store higher multiplicity events
 /run/beamOn 500
 /vis/enable
 /vis/scene/endOfEventAction accumulate 

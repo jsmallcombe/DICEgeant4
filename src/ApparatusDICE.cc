@@ -53,12 +53,15 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 {
 	// Materials
 	fBlockerMaterial = "G4_C"; 
-	fMagnetMaterial = "Iron"; 
+	fMagnetMaterial = "NdFeB"; 
 	fWaferMaterial   = "Silicon";
+	fShieldMaterial   = "WTa";
+// 	fShieldMaterial   = "Hevimetal";
+	fscintMaterial   = "EJ212";
 
     fRemoveShield=false;
+    fAddBlocker=false;
 
-    
     OneVisAtt = new G4VisAttributes(G4Colour(PB_COL)); // Red
     TwoVisAtt = new G4VisAttributes(G4Colour(SN_COL)); // grey
     ThreeVisAtt = new G4VisAttributes(G4Colour(CU_COL)); // Yellow
@@ -269,6 +272,11 @@ G4LogicalVolume* ApparatusDICE::BuildBB34(){
 }
 
 void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zbar){
+	G4Material* BlockerMat = G4Material::GetMaterial(fBlockerMaterial);
+	G4Material *mMaterial = G4Material::GetMaterial(fMagnetMaterial);
+    G4Material* ScintMat = G4Material::GetMaterial(fscintMaterial);
+	
+	
 	G4RotationMatrix rotZbar;
     rotZbar.rotateZ(-Zbar);	
 
@@ -297,6 +305,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4double 	Orange_ShieldFrontHalfWidth=Orange_ShieldTanAngle*(Orange_BeamShieldSep+SafetyGap);
 	G4double 	Orange_ShieldMidDepth=Orange_ShieldMidBeamSep-Orange_BeamShieldSep;
 	G4double 	Orange_ShieldMidHalfWidth=Orange_ShieldFrontHalfWidth+Orange_ShieldTanAngle*(Orange_ShieldMidDepth);
+	G4double 	Orange_ShieldBottomDepth=Orange_ShieldMidHalfWidth;
 
     G4double MStart=Orange_MagGapMin;
     if(StartMagAtShield){MStart=Orange_ShieldMidHalfWidth;}
@@ -312,7 +321,6 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     
 	// Place basic shield detector
 
-	G4Material *mMaterial = G4Material::GetMaterial(fMagnetMaterial);
     G4LogicalVolume *ShieldBoxL=0;
     G4VSolid* ShieldBox=0;
     std::vector<G4TwoVector> OrangeShieldPoly(5);
@@ -320,7 +328,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	if(!fRemoveShield){
         OrangeShieldPoly[0].set(Orange_ShieldFrontHalfWidth,Orange_ShieldMidDepth);
         OrangeShieldPoly[1].set(Orange_ShieldMidHalfWidth,0);
-        OrangeShieldPoly[2].set(0,-Orange_ShieldMidHalfWidth);
+        OrangeShieldPoly[2].set(0,-Orange_ShieldBottomDepth);
         OrangeShieldPoly[3].set(-Orange_ShieldMidHalfWidth,0);
         OrangeShieldPoly[4].set(-Orange_ShieldFrontHalfWidth,Orange_ShieldMidDepth);
         
@@ -331,6 +339,16 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 		rotate1->rotateY(90*deg);
 		ShieldBoxL->SetVisAttributes(OneVisAtt);
 		new G4PVPlacement(rotate1,rotZbar*G4ThreeVector(0,-Orange_ShieldMidBeamSep,0), ShieldBoxL,"Shield", expHallLog,false,0); 
+		
+		if(fAddBlocker){
+			G4double HalfBlockGap=0.5*(Orange_BeamDetY-(Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep+4*mm));
+			G4Box* ElectronBlockerBox = new G4Box("ElectronBlockerBox",fBB34Chip_HalfLength,HalfBlockGap,1*mm);
+			G4LogicalVolume *ElectronBlockerLog = new G4LogicalVolume(ElectronBlockerBox, BlockerMat,"ElectronBlockerLog",0,0,0);
+			ElectronBlockerLog->SetVisAttributes(ThreeVisAtt);
+			G4RotationMatrix* rotateblock = new G4RotationMatrix;
+			rotateblock->rotateZ(Zbar);
+			new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-HalfBlockGap-Orange_ShieldBottomDepth-Orange_ShieldMidBeamSep,0), ElectronBlockerLog,"BB34Detector", expHallLog,false,0);
+		}
 	}
 	
 	// Place BB34 detector
@@ -345,9 +363,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     
     G4double ScintThick=1*mm; //half
     G4double ScintD=20*mm; //half
-    G4Material* SiliconMat = G4Material::GetMaterial(fWaferMaterial);
     G4Box* ScintBox = new G4Box("ScintBox", ScintD, ScintThick, ScintD); 
-    G4LogicalVolume *ScintL = new G4LogicalVolume(ScintBox, SiliconMat,"ScintL",0,0,0);
+    G4LogicalVolume *ScintL = new G4LogicalVolume(ScintBox, ScintMat,"ScintL",0,0,0);
 	ScintL->SetVisAttributes(ThreeVisAtt);
     
     G4double scintgap=(ScintThick+fBB34PCB_HalfThickness)*1.1;

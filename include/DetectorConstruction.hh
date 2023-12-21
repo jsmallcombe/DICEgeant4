@@ -99,6 +99,7 @@ public:
 	void PrintRecursive(G4LogicalVolume* vol);
 	
 	void RemoveShield( G4bool input );
+	void AddBlocker( G4bool input );
     
 	void AddApparatusDiceDetector(G4String Options);
 	void SetDiceFieldStrength(G4double Field);
@@ -118,6 +119,7 @@ private:
 
     G4bool    fRecordGun;  
     G4bool    fRemoveShield;
+    G4bool    fAddBlocker;
 
 	// Box
 	G4String           fBoxMat;

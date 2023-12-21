@@ -66,6 +66,7 @@ public:
 	G4double fAdjLengthE;
 	G4int    fAdjNumber;
 	bool fRemoveShield;
+	bool fAddBlocker;
 	
 	bool fUseA,fUseB,fUseC,fUseD,fUseE;
     
@@ -76,8 +77,10 @@ private:
  	G4LogicalVolume* fDetectorLog;
     
 	G4String fMagnetMaterial; 
+	G4String fShieldMaterial; 
 	G4String fBlockerMaterial; 
 	G4String fWaferMaterial; 
+	G4String fscintMaterial; 
 
     G4VisAttributes *OneVisAtt,*TwoVisAtt,*ThreeVisAtt,*FourVisAtt;
     

@@ -311,6 +311,9 @@ void DetectorConstruction::SetDiceInt(G4int N){
 void DetectorConstruction::RemoveShield(G4bool input){
 	fAppDICE->fRemoveShield=input;
 }
+void DetectorConstruction::AddBlocker(G4bool input){
+	fAppDICE->fAddBlocker=input;
+}
 ApparatusDICE* DetectorConstruction::GetDice(){
 	return fAppDICE;
 }

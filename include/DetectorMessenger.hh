@@ -76,6 +76,7 @@ private:
 
 	G4UIcmdWithABool*           fRecordGunCmd;
     G4UIcmdWithABool*           fRemoveShieldCmd;
+    G4UIcmdWithABool*           fAddBlockerCmd;
     
 	
 	G4UIcmdWithAString*        fAddApparatusDiceDetectorCmd;

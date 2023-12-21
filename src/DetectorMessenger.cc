@@ -97,6 +97,9 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
     
    	fRemoveShieldCmd = new G4UIcmdWithABool("/DetSys/det/RemoveShield",this);
 	fRemoveShieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
+    
+   	fAddBlockerCmd = new G4UIcmdWithABool("/DetSys/det/AddBlocker",this);
+	fAddBlockerCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
 	
 	fAddApparatusDiceDetectorCmd = new G4UIcmdWithAString("/DetSys/app/addDiceDetector",this);
 	fAddApparatusDiceDetectorCmd->SetGuidance("Add DICE geometry");
@@ -161,6 +164,7 @@ DetectorMessenger::~DetectorMessenger()
 	delete fRecordGunCmd;
     
     delete fRemoveShieldCmd;
+    delete fAddBlockerCmd;
 	
 	delete fAddApparatusDiceDetectorCmd;
 	delete fApparatusDiceFieldCmd;
@@ -206,6 +210,10 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 	
 	if(command == fRemoveShieldCmd) {
 		fDetector->RemoveShield(fRemoveShieldCmd->GetNewBoolValue(newValue));
+	}
+	
+	if(command == fAddBlockerCmd) {
+		fDetector->AddBlocker(fAddBlockerCmd->GetNewBoolValue(newValue));
 	}
 	
 	if(command == fAddApparatusDiceDetectorCmd) {

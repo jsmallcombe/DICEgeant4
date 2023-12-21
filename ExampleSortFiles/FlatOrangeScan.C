@@ -1,5 +1,13 @@
-void FlatOrangeScan(double Ein=400,double SimmN=1000000,const char *rootout = "flatorange.root", const char *rootin = "g4out.root") {
+void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", const char *rootin = "g4out.root") {
 	
+    double THETALIMDEG=12;//The limit on allowed theta std in a segment
+    
+    if(rootout.size()<1){
+        stringstream ss;
+        ss<<"flatorange"<< setw(4) << setfill('0')<<Ein<<".root";
+        rootout=ss.str();
+    }
+    
 	//// Random number generator to add electronic noise on to "perfect" geant4 detectors ///
 	TRandom r;
 	r.SetSeed();
@@ -15,26 +23,45 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,const char *rootout = "f
     if(newtree==nullptr)return;
 
 	// Create the output file and create the histograms we will fill
-	TFile out(rootout,"RECREATE");
+	TFile out(rootout.c_str(),"RECREATE");
 	out.cd();//cd into output file so histograms created in memory are associated with that file at creation rather than being manually saved there later.
 
-    TH1F* E_RawSum=new TH1F("E_RawSum","E_RawSum",2000,0,2000);
-    TH2F* E_RawSplit=new TH2F("E_RawSplit","E_RawSplit",2000,0,2000,20,50,2050);
-    TH2F* E_RawSumChan=new TH2F("E_RawSumChan","E_RawSumChan",2000,0,2000,16,0,16);
+    TH1F* E_RawSum=new TH1F("E_RawSum","RawHitEnergy;Electron Energy (keV);Counts",2000,0,2000);
+    TH2F* E_RawSplit=new TH2F("E_RawSplit","RawHitsVsEmissionEnergy;Hit Energy (keV);Emission Energy (keV);Counts",2000,0,2000,20,50,2050);
+    TH2F* E_RawSumChan=new TH2F("E_RawSumChan","RawHitEnergyChan;Electron Energy (keV);Hit Segment;Counts",2000,0,2000,16,0,16);
     
-    TH1F* E_AddbackSum=new TH1F("E_AddbackSum","E_AddbackSum",2000,0,2000);
-    TH1F* E_AddbackVetoSum=new TH1F("E_AddbackVetoSum","E_AddbackVetoSum",2000,0,2000);
+    TH1F* E_AddbackSum=new TH1F("E_AddbackSum","AddbackEnergy;Electron Energy (keV);Counts",2000,0,2000);
+    TH1F* E_AddbackVetoSum=new TH1F("E_AddbackVetoSum","AddbackVetoEnergy;Electron Energy (keV);Counts",2000,0,2000);
     
-    TH1F* E_GoodSum=new TH1F("E_GoodSum","E_GoodSum",2000,0,2000);
+    TH1F* E_GoodSum=new TH1F("E_GoodSum","EmissionEqualAddbackSelected;Electron Energy (keV);Counts",2000,0,2000);
     
-    TH2F* E_Theta=new TH2F("E_Theta","E_Theta",180,0,3.14159,20,50,2050);
+    TH2F* E_GoodChan=new TH2F("E_GoodChan","FullEnergyVsSeg;Electron Energy (keV);Hit Segment;Counts",20,50,2050,16,0,16);
     
-    TH1F* Efficiency=new TH1F("Efficiency","Efficiency",20,50,2050);
-    TH1F* PeakTotal=new TH1F("PeakTotal","PeakTotal",20,50,2050);
+    TH2F* E_GoodChanThetaLim=new TH2F("E_GoodChanThetaLim","FullEnergyVsSegThetaLimited;Electron Energy (keV);Hit Segment;Counts",20,50,2050,16,0,16);
     
-    TH3F* AngleESeg=new TH3F("AngleESeg","AngleESeg",360,0,3.14159,20,50,2050,16,0,16);
+    TH1F* Efficiency=new TH1F("Efficiency","Efficiency;Emission Energy (keV);Full Energy Detection Efficiency (%)",20,50,2050);
+    TH1F* EfficiencyCut=new TH1F("EfficiencyCut","EfficiencyThetaCut;Emission Energy (keV);Full Energy Detection Efficiency (%)",20,50,2050);
+    TH1F* PeakTotal=new TH1F("PeakTotal","PeakToTotal;Emission Energy (keV);Detection PeakToTotal",20,50,2050);
     
-    TH2F* AngleESegGrid=new TH2F("AngleESegGrid","AngleESegGrid",180*4,0,TMath::Pi()*4,15*4,50,6050);
+	out.mkdir("Angles");
+	out.cd("Angles");
+    TH3F* AngleESeg=new TH3F("AngleESeg","EmissionAngleEnergyHitSegment;Emission Angle Theta #theta [Rad.];Emission Energy (keV);Hit Segment",360,0,3.14159,20,50,2050,16,0,16);
+    TH2F* AngleESegGrid=new TH2F("AngleESegGrid","AngleESegGrid;Angle #theta [Rad.];Emission Energy (keV)",180*4,0,TMath::Pi()*4,15*4,50,6050);
+    
+        TH2F* SigmaEseg=new TH2F("SigmaEseg","ThetaSigmaESeg;Emission Energy (keV);Segment;S.t.d. Theta (deg.)",20,50,2050,16,0,16);
+    
+    
+        TH2F* E_Theta=new TH2F("E_Theta","EmissionEnergyVsAngle;Emission Angle Theta #theta [Rad.];Emission Energy (keV)",180,0,3.14159,20,50,2050);
+    
+        TH2F *GridAngle[16];
+        for(int i=0;i<16;i++){
+            stringstream ss;ss<<"SegmentAngle"<< setw(2) << setfill('0')<<i;
+            GridAngle[i] = new TH2F(ss.str().c_str(),(ss.str()+";Emission Angle Theta #theta [Rad.];Electron Energy (keV)").c_str(),360,0,3.14159,20,50,2050);
+        }
+        
+        stringstream ss;ss<<"AngleSeg_"<< setw(4) << setfill('0')<<Ein<<"keV";
+        TH2F* AngleSeg = new TH2F(ss.str().c_str(),(ss.str()+";Emission Angle Theta #theta [Rad.];Hit Segment").c_str(),360,0,3.14159,16,0,16);
+    
     
 	gROOT->cd();//cd back into main session memory 
 	
@@ -66,6 +93,7 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,const char *rootout = "f
     bool VETO1=false;
     bool VETO2=false;
     double Eaddback=0;
+    double Theta=0;
     double Mult=0;
 
 	// A loop over every line of the input data in sequence
@@ -97,6 +125,7 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,const char *rootout = "f
                 }
                 Mult++;
             }
+            Theta=primaryTheta;
             
 		}else{
 			CurrentEvent=EventID;
@@ -112,7 +141,21 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,const char *rootout = "f
         ////  Now we have collected a complete event and can analyse the event
         ////////////////////////
 		
+        double Esumtmp=0;
+        double Seg=0;
+        for(unsigned int i=0;i<EventHolder.size();i++){
+            double e=EventHolder[i];
+            if(e>30){
+                Esumtmp+=e;
+                Seg+=e*i;
+            }else if(Esumtmp>0){ // So only segments neigbouring will be summed;
+                break;
+            }
+        }
+        if(abs(Esumtmp-Eaddback)>5)Eaddback=0;
+        
 		if(Eaddback>30) {
+        Seg/=Eaddback;
         E_AddbackSum->Fill(Eaddback);
         if(!(VETO1||VETO2)){
         E_AddbackVetoSum->Fill(Eaddback);
@@ -120,23 +163,20 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,const char *rootout = "f
         
             E_GoodSum->Fill(Eaddback);
             
-            double Seg=0;
-            for(unsigned int i=0;i<EventHolder.size();i++){
-                double e=EventHolder[i];
-                if(e>30){
-                    Seg+=e*i;
-                }
-            }
-            Seg/=Eaddback;
+            E_GoodChan->Fill(Ein,Seg);
+            E_GoodChanThetaLim->Fill(Ein,Seg);
             
-            E_Theta->Fill(primaryTheta,Ein);
+            E_Theta->Fill(Theta,Ein);
         
-            AngleESeg->Fill(primaryTheta,Ein,Seg);
+            AngleESeg->Fill(Theta,Ein,Seg);
+            
+            if(abs(round(Seg))<16)GridAngle[(int)abs(round(Seg))]->Fill(Theta,Ein);
+            
+            AngleSeg->Fill(Theta,Seg);
             
             int X=(int)round(Seg)%4;
             int Y=Seg/4;
-            
-            AngleESegGrid->Fill(TMath::Pi()*Y+primaryTheta,X*1500+Ein);
+            AngleESegGrid->Fill(TMath::Pi()*Y+Theta,X*1500+Ein);
         
         }}}    
         /////  Reset things ready for next event
@@ -149,13 +189,26 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,const char *rootout = "f
 		VETO1=false;
         VETO2=false;
         Eaddback=0;
+        Theta=0;
         Mult=0;
     
 	}
 	
+	
 	Efficiency->Fill(Ein,100*E_GoodSum->Integral()/SimmN);
     PeakTotal->Fill(Ein,E_GoodSum->Integral()/E_AddbackVetoSum->Integral());
-	
+    
+    for(int b=1;b<17;b++){
+        double widthsig=(AngleSeg->ProjectionX("_px",b,b)->GetStdDev())*180.0/TMath::Pi();
+        if(widthsig<0)widthsig=0;
+        SigmaEseg->SetBinContent(SigmaEseg->FindBin(Ein,b-1),widthsig);
+        if(widthsig>THETALIMDEG)E_GoodChanThetaLim->SetBinContent(E_GoodChanThetaLim->FindBin(Ein,b-1),0);
+    }
+    
+    // Simple Integral because the E_GoodChanThetaLim histogram is actually mostly empty, relying on hadd afterwards to fill
+    EfficiencyCut->Fill(Ein,100*E_GoodChanThetaLim->Integral()/SimmN);
+    
+    
 	// Save and close the output file
     out.Write();
     out.Close();	

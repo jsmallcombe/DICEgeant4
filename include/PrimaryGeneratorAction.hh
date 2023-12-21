@@ -73,9 +73,9 @@ public:
     
     void SetEfficiencyParticle(G4String val) { fEffParticle = val; fEffParticleBool = true; }
     void SetConeMaxAngle(G4double num1) { fAngleInit = num1; fConeAngleBool = true; fEffDirectionBool = true; }
-    void SetConeMinAngle(G4double num1) { fAngleMinInit = num1; }
-    void SetConeMinPhi(G4double num1) { fPhiMin = num1; }
-    void SetConeMaxPhi(G4double num1) { fPhiMax = num1; }
+    void SetConeMinAngle(G4double num1) { fAngleMinInit = num1;  fConeAngleBool = true; fEffDirectionBool = true;}
+    void SetConeMinPhi(G4double num1) { fPhiMin = num1; fConeAngleBool = true; fEffDirectionBool = true; }
+    void SetConeMaxPhi(G4double num1) { fPhiMax = num1; fConeAngleBool = true; fEffDirectionBool = true; }
     void SetBeamSpotSigma(G4double num1) { fBeamSpotSigma = num1; }
     void SetGunBeta(G4double num1) { fEffGunBetaZ = num1; }
     void SetGunLifetime(G4double num1) { fEffGunLifetime = num1; }
@@ -98,8 +98,8 @@ private:
 	G4double fEffGunBetaZ;	
 	G4double fEffGunLifetime;	
     
-    G4double fAngleInit;
     G4bool fConeAngleBool;
+    G4double fAngleInit;
     G4double fAngleMinInit;
     G4double fPhiMin;
     G4double fPhiMax;

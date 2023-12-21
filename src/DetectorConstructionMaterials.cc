@@ -50,26 +50,10 @@ void DetectorConstruction::DefineMaterials()
     // use G4-NIST materials data base
     //
     G4NistManager* man = G4NistManager::Instance();
-    man->FindOrBuildMaterial("G4_Galactic");
-    man->FindOrBuildMaterial("G4_Pb");
-    man->FindOrBuildMaterial("G4_lAr");
     man->FindOrBuildMaterial("G4_STAINLESS-STEEL");
-
-
-    man->FindOrBuildMaterial("G4_Al");
-    man->FindOrBuildMaterial("G4_POLYETHYLENE");
-    man->FindOrBuildMaterial("G4_RUBBER_NEOPRENE");
-    man->FindOrBuildMaterial("G4_ALUMINUM_OXIDE");
-    man->FindOrBuildMaterial("G4_BGO");
-    man->FindOrBuildMaterial("G4_CESIUM_IODIDE");
-    man->FindOrBuildMaterial("G4_Ge");
-    man->FindOrBuildMaterial("G4_Cu");
-    man->FindOrBuildMaterial("G4_SILICON_DIOXIDE");
     man->FindOrBuildMaterial("G4_AIR");
     man->FindOrBuildMaterial("G4_C");
-    G4Material* SODIUM_IODIDE   = man->FindOrBuildMaterial("G4_SODIUM_IODIDE");
-    G4Material* Tl              = man->FindOrBuildMaterial("G4_Tl");
-
+    
     G4double a, z, density, temperature, pressure;
     G4String name, symbol;
     G4int    nelements, ncomponents, natoms;
@@ -157,66 +141,13 @@ void DetectorConstruction::DefineMaterials()
     G4Element* elPd = new G4Element(name="Palladium", symbol="Pd", z=46., a=106.42    *g/mole);
     myElements.push_back(elPd);
     
-    // Materials
-    //  density     = universe_mean_density; //from PhysicalConstants.h
-    //  pressure    = 1.e-19*pascal;
-    //  temperature = 0.1*kelvin;
-    //  G4Material* Galactic = new G4Material(name="Galactic", z=1., a=1.01*g/mole, density, kStateGas,temperature,pressure);
-    //  myMaterials.push_back(Galactic);
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     G4Material* Air = new G4Material(name="Air", density=1.29*mg/cm3, nelements=2);
     Air->AddElement(elN, .7);
     Air->AddElement(elO, .3);
     myMaterials.push_back(Air);
 
-    //  G4Material* TechVacuum = new G4Material( "TechVacuum", density=1.e-5*g/cm3, 1, kStateGas, temperature=STP_Temperature, pressure=2.e-2*bar );
-    //  TechVacuum->AddMaterial( Air, 1. );
-    //  myMaterials.push_back(TechVacuum);
-
-    //  G4Material* Vacuum = new G4Material(name="Vacuum", z=1., a= 1.01*g/mole, density= universe_mean_density, kStateGas, temperature = 0.1*kelvin, pressure=1.0e-19*pascal);
-    //  myMaterials.push_back(Vacuum); // "Galatic" Vacuum
-
-    //universe_mean_density = 1.e-25*g/cm3;
-
-    density     = 1.e-24*g/cm3;
-    G4Material* VacuumDensityYoctogramPerCm3 = new G4Material(name="VacuumDensityYoctogramPerCm3", z=1., a=1.01*g/mole, density);
-    myMaterials.push_back(VacuumDensityYoctogramPerCm3);
-
-    density     = 1.e-9*g/cm3;
-    G4Material* VacuumDensityNanogramPerCm3 = new G4Material(name="VacuumDensityNanogramPerCm3", z=1., a=1.01*g/mole, density);
-    myMaterials.push_back(VacuumDensityNanogramPerCm3);
-
-    density     = 10.e-9*g/cm3;
-    G4Material* VacuumDensity10nanogramPerCm3 = new G4Material(name="VacuumDensity10nanogramPerCm3", z=1., a=1.01*g/mole, density);
-    myMaterials.push_back(VacuumDensity10nanogramPerCm3);
-
-    density     = 100.e-9*g/cm3;
-    G4Material* VacuumDensity100nanogramPerCm3 = new G4Material(name="VacuumDensity100nanogramPerCm3", z=1., a=1.01*g/mole, density);
-    myMaterials.push_back(VacuumDensity100nanogramPerCm3);
-
-    density     = 1.e-6*g/cm3;
-    G4Material* VacuumDensityMicrogramPerCm3 = new G4Material(name="VacuumDensityMicrogramPerCm3", z=1., a=1.01*g/mole, density);
-    myMaterials.push_back(VacuumDensityMicrogramPerCm3);
-
-    density     = 1.e-3*g/cm3;
-    G4Material* VacuumDensityMilligramPerCm3 = new G4Material(name="VacuumDensityMilligramPerCm3", z=1., a=1.01*g/mole, density);
-    myMaterials.push_back(VacuumDensityMilligramPerCm3);
-
-    density     = 1.e-2*g/cm3;
-    G4Material* VacuumDensityCentigramPerCm3 = new G4Material(name="VacuumDensityCentigramPerCm3", z=1., a=1.01*g/mole, density);
-    myMaterials.push_back(VacuumDensityCentigramPerCm3);
-
-    density     = 1.e-1*g/cm3;
-    G4Material* VacuumDensityDecigramPerCm3 = new G4Material(name="VacuumDensityDecigramPerCm3", z=1., a=1.01*g/mole, density);
-    myMaterials.push_back(VacuumDensityDecigramPerCm3);
-
-    density     = 1.0*g/cm3;
-    G4Material* VacuumDensityGramPerCm3 = new G4Material(name="VacuumDensityGramPerCm3", z=1., a=1.01*g/mole, density);
-    myMaterials.push_back(VacuumDensityGramPerCm3);
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // From http://geant4.cern.ch/support/source/geant4/examples/advanced/purgingMagnet/src/PurgMagDetectorConstruction.cc
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Laboratory vacuum: Dry air (average composition)
     density = 1.7836*mg/cm3 ;       // STP
     G4Material* Argon = new G4Material(name="Argon", density, ncomponents=1);
@@ -241,6 +172,7 @@ void DetectorConstruction::DefineMaterials()
     Vacuum->AddMaterial( Nitrogen, fractionmass = 0.7557 ) ;
     Vacuum->AddMaterial( Oxygen, fractionmass = 0.2315 ) ;
     Vacuum->AddMaterial( Argon,fractionmass = 0.0128 ) ;
+    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     G4Material* Water = new G4Material(name="Water", density=1000*kg/m3, nelements=2);
@@ -253,11 +185,9 @@ void DetectorConstruction::DefineMaterials()
 
     G4Material* W = new G4Material(name="Tungsten", z=74., a= 183.84*g/mole, density= 19.25*g/cm3);
     myMaterials.push_back(W);
-
-//	G4Material* Cu = new G4Material("Copper" , 29., 63.550*g/mole, 8.96*g/cm3);
-//	mymaterials.push_back(Cu);
-
-
+    
+    G4Material* Cu = new G4Material("Copper", z=29., a = 63.546*g/mole, density = 8960*kg/m3);
+    myMaterials.push_back(Cu);
 
     G4Material* Si = new G4Material(name="Silicon", z=14., a= 28.0855*g/mole, density= 2.330  *g/cm3);
     myMaterials.push_back(Si);
@@ -299,9 +229,6 @@ void DetectorConstruction::DefineMaterials()
     G4Material* Be = new G4Material("Beryllium", z=4., a=9.012*g/mole, density=1848*kg/m3);
     myMaterials.push_back(Be);
 
-    G4Material* Cu = new G4Material("Copper", z=29., a = 63.546*g/mole, density = 8960*kg/m3);
-    myMaterials.push_back(Cu);
-
     G4Material* Zn = new G4Material("Zinc"   , 30., 65.409*g/mole, 7.14*g/cm3);
     myMaterials.push_back(Zn);
 
@@ -309,22 +236,6 @@ void DetectorConstruction::DefineMaterials()
     Brass->AddMaterial(Cu  , 70*perCent);
     Brass->AddMaterial(Zn , 30*perCent);
     myMaterials.push_back(Brass);
-
-    G4Material* BGO = new G4Material("BGO", density = 7.3*g/cm3, ncomponents=3);
-    BGO->AddElement(elBi, natoms=4);
-    BGO->AddElement(elGe, natoms=3);
-    BGO->AddElement(elO, natoms=12);
-    myMaterials.push_back(BGO);
-
-    G4Material* CsI = new G4Material("CesiumIodide", density = 4.51*g/cm3, ncomponents=2);
-    CsI->AddElement(elCs, natoms=1);
-    CsI->AddElement(elI, natoms=1);
-    myMaterials.push_back(CsI);
-
-    G4Material* BC404 = new G4Material("BC404", density = 1.032*g/cm3, ncomponents=2);
-    BC404->AddElement(elH, 52.4*perCent);
-    BC404->AddElement(elC, 47.6*perCent);
-    myMaterials.push_back(BC404);
 
     G4Material* Mylar = new G4Material("Mylar", density = 1.397*g/cm3, ncomponents=3);
     Mylar->AddElement(elC, natoms=10);
@@ -352,36 +263,6 @@ void DetectorConstruction::DefineMaterials()
     SiLi->AddElement(elLi,  0.001*perCent);
     myMaterials.push_back(SiLi);
 
-    G4Material* Plate = new G4Material("Plate", density = 55.84*g/cm3, ncomponents=3);
-    Plate->AddElement(elFe, 90.*perCent);
-    Plate->AddElement(elCr, 9. *perCent);
-    Plate->AddElement(elPb, 1. *perCent);
-    myMaterials.push_back(Plate);
-
-    G4Material* NaI = new G4Material("NaI", density = 3.67*g/cm3, ncomponents=2);
-    NaI->AddElement(elNa, natoms=1);
-    NaI->AddElement(elI,  natoms=1);
-    NaI->GetIonisation()->SetMeanExcitationEnergy(452*eV);
-    myMaterials.push_back(NaI);
-
-    G4Material* G4SODIUMIODIDEPLUSTl = new G4Material( "G4SODIUMIODIDEPLUSTl", density=3.667*g/cm3, ncomponents = 2);
-    G4SODIUMIODIDEPLUSTl->AddMaterial( SODIUM_IODIDE, 99.9*perCent );
-    G4SODIUMIODIDEPLUSTl->AddMaterial( Tl, 0.1*perCent );
-    myMaterials.push_back(G4SODIUMIODIDEPLUSTl);
-
-    // Deuterated Scintillator from Joey
-    //deuterium
-    G4Isotope* De = new G4Isotope("De", 1, 2, a = 2.02*g/mole);
-    G4Element* D = new G4Element(name="Deuterium",symbol="D",ncomponents=1);
-    D->AddIsotope(De,fractionmass=100.*perCent);
-
-    //DeuScin
-    G4Material* DeuScin = new G4Material("Deuterated Scintillator", density = 0.954*g/cm3, 3);
-    DeuScin->AddElement(elH,fractionmass=0.0625*perCent);
-    DeuScin->AddElement(elC,fractionmass=85.7326*perCent);
-    DeuScin->AddElement(D,fractionmass=14.2049*perCent);
-    myMaterials.push_back(DeuScin);
-
     G4Material* Peek = new G4Material("Peek",density = 1.26*g/cm3, ncomponents=3);
     Peek->AddElement(elC, natoms=19);
     Peek->AddElement(elH, natoms=12);
@@ -399,39 +280,19 @@ void DetectorConstruction::DefineMaterials()
     Kapton->AddElement(elN,natoms=2);
     Kapton->AddElement(elO,natoms=5);
     myMaterials.push_back(Kapton);
-
-    G4Material* Calcium = new G4Material("Calcium", z=20., a=40.078*g/mole, density = 1.55*g/cm3);
-    myMaterials.push_back(Calcium);
     
     G4Material* Acrylic = new G4Material(name="Acrylic", density=1.18*g/cm3, nelements=3);
     Acrylic->AddElement(elC, natoms=5);
     Acrylic->AddElement(elO, natoms=2);
     Acrylic->AddElement(elH, natoms=8);
     myMaterials.push_back(Acrylic);
-    
-    G4Material* Barium = new G4Material("Barium", z=56., a=137.3*g/mole, density = 3.62*g/cm3);
-    myMaterials.push_back(Barium);
-     
-    G4Material* Bismuth = new G4Material("Bismuth", z=83., a=207*g/mole, density = 9.78*g/cm3);
-    myMaterials.push_back(Bismuth);
-    
-    G4Element* elPdO = new G4Element(name="PalladiumOneTen", symbol="Pd", z=46., a=109.91   *g/mole);
-    myElements.push_back(elPdO);
-    
 
-    G4Material* myPalladium = new G4Material(name="Palladium", density=1.23*g/cm3, ncomponents=2);
-    myPalladium->AddElement(elPdO, 97.61 *perCent);
-    myPalladium->AddElement(elPd, 2.39 *perCent);
-    myMaterials.push_back(myPalladium);
-    
-   G4Material* Smm = new G4Material(name="Samarium", z=62., a= 152.0*g/mole, density= 7.54  *g/cm3);
-    myMaterials.push_back(Smm);
-    
     //Epoxy (for FR4 )
 	//from http://www.physi.uni-heidelberg.de/~adler/TRD/TRDunterlagen/RadiatonLength/tgc2.htm //???
 	G4Material* Epoxy = new G4Material("Epoxy" , 1.2*g/cm3,2);
 	Epoxy->AddElement(elH, 2);
 	Epoxy->AddElement(elC, 2);
+    
 	//SiO2 (Quarz)
 	G4Material* SiO2 = new G4Material("SiO2",2.200*g/cm3,2);
 	SiO2->AddElement(elSi, 1);
@@ -440,6 +301,16 @@ void DetectorConstruction::DefineMaterials()
 	G4Material* FR4 = new G4Material("FR4" , 1.86*g/cm3,2);
 	FR4->AddMaterial(Epoxy, 0.472);
 	FR4->AddMaterial(SiO2,0.528);
+    myMaterials.push_back(FR4);
+    
+    
+    G4Material* EJ212 = new G4Material("EJ212",density = 1.023*g/cm3, ncomponents=2);
+    EJ212->AddElement(elC,natoms=47);
+    EJ212->AddElement(elH,natoms=52);
+    myMaterials.push_back(EJ212);
+    
+    
+
     
     
     //G4cout << *(G4Material::GetMaterialTable()) << G4endl; //outputs material table to terminal

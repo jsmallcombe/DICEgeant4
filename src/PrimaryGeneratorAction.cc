@@ -80,6 +80,9 @@
 	fEffGunBetaZ = 0;
 	fEffGunLifetime = 0;
     
+
+    fAngleMinInit=0;
+    fAngleInit=CLHEP::pi;
     fPhiMin=0;
     fPhiMax=2.0*CLHEP::pi;
     

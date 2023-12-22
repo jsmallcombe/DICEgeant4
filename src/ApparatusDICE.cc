@@ -133,10 +133,6 @@ void ApparatusDICE::Build(G4LogicalVolume* expHallLog,G4String Options)
     fBuildOption=Opt;
 	
 	G4LogicalVolume* World=expHallLog;
-	if(Opt<0){
-		World=BuildISOK160Cross();	
-// 		World->SetVisAttributes(vis_att_hid);
-	}
 
 	switch(abs(Opt)) {
 		case 1: BuildPlaceFlatOrange(World,0); break;
@@ -151,7 +147,7 @@ void ApparatusDICE::Build(G4LogicalVolume* expHallLog,G4String Options)
 	
 
 	if(Opt<0){
-		new G4PVPlacement(0,G4ThreeVector(), World,"ISOK", expHallLog,false,0); 
+		new G4PVPlacement(0,G4ThreeVector(), BuildISOK160Cross(),"ISOK", World,false,0); 
 	}
 } 
 
@@ -492,6 +488,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 G4LogicalVolume* ApparatusDICE::BuildISOK160Cross(){
     G4Tubs* OuterTub = new G4Tubs("OuterTub", 0, 154*0.5*mm,150*mm, 0,360*CLHEP::deg);
     G4Tubs* InnerTub = new G4Tubs("OuterTub", 0, 150*0.5*mm,(150-4)*mm, 0,360*CLHEP::deg);
+    G4Tubs* BeamHole = new G4Tubs("OuterTub", 0, 150*0.5*mm,200*mm, 0,360*CLHEP::deg);
 	G4RotationMatrix* rotate1 = new G4RotationMatrix;
 	rotate1->rotateX(90*CLHEP::deg);
 	G4RotationMatrix* rotate2 = new G4RotationMatrix;
@@ -500,7 +497,7 @@ G4LogicalVolume* ApparatusDICE::BuildISOK160Cross(){
 	
 	G4VSolid* Out2 = new G4UnionSolid("Out2", OuterTub, OuterTub,rotate1,G4ThreeVector());	
 	G4VSolid* Out3 = new G4UnionSolid("Out3", Out2, OuterTub,rotate2,G4ThreeVector());
-	G4VSolid* Inner2 = new G4UnionSolid("Inner2", InnerTub, InnerTub,rotate1,G4ThreeVector());	
+	G4VSolid* Inner2 = new G4UnionSolid("Inner2", BeamHole, InnerTub,rotate1,G4ThreeVector());	
 	G4VSolid* Inner3 = new G4UnionSolid("Inner2", Inner2, InnerTub,rotate2,G4ThreeVector());
 	
     G4VSolid* FinSolid = new G4SubtractionSolid("FinSolid", Out3, Inner3,0,G4ThreeVector(0,0,0));

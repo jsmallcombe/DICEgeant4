@@ -50,11 +50,9 @@
 /vis/touchable/set/forceWireframe
 /vis/touchable/set/colour 0 0 0 2
 /vis/touchable/set/lineWidth 2
-/vis/set/touchable World 0 ISOK 0
-/vis/touchable/set/forceWireframe
-/vis/touchable/set/colour 0 0 0 2
-/vis/touchable/set/lineWidth 2
-
+#/vis/set/touchable World 0 ISOK 0
+#/vis/touchable/set/forceWireframe
+#/vis/touchable/set/colour 0 0 0 2
 
 ### Required ### 
 /vis/drawVolume 
@@ -68,7 +66,9 @@
 /vis/viewer/zoomTo 1
 
 #/vis/viewer/addCutawayPlane 0 0 0 mm 1 0 0 ## Useful for viewing inside tight geometries
-/vis/viewer/addCutawayPlane 0 20 0 mm 0 -1 0 ## Useful for viewing inside tight geometries
+/vis/viewer/addCutawayPlane -60 0 0 mm 1 0 0 ## Useful for viewing inside tight geometries
+#/vis/viewer/addCutawayPlane 0 20 0 mm 0 1 0 ## Useful for viewing inside tight geometries
+
 
 ### To visualise the magnetic field ###
 ### Doesnt seem with tracks. ###

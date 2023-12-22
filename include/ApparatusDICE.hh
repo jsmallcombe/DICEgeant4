@@ -83,6 +83,7 @@ private:
 	G4String fscintMaterial; 
 
     G4VisAttributes *OneVisAtt,*TwoVisAtt,*ThreeVisAtt,*FourVisAtt;
+	G4VisAttributes* vis_att_hid;
     
 	G4double 	fBB34PCB_HalfThickness;
 	G4double 	fBB34PCB_Shelf;
@@ -116,6 +117,6 @@ private:
     
 	void BuildPlaceFlatOrange(G4LogicalVolume*,G4double);
 
-	
+	G4LogicalVolume* BuildISOK160Cross();
 };
 #endif

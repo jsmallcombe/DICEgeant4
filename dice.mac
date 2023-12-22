@@ -5,12 +5,13 @@
 ### Choose Apparatus To Build ### 
 /DetSys/app/SetDiceField 0.25 tesla
 #/DetSys/det/RemoveShield true
+/DetSys/det/AddBlocker true
 /DetSys/app/SetDiceArbA -7.50 mm
 /DetSys/app/SetDiceArbB 55 mm
 /DetSys/app/SetDiceArbC 15 mm
 /DetSys/app/SetDiceArbD -15 mm
 # /DetSys/app/SetDiceArbE 0 deg
-/DetSys/app/addDiceDetector 1
+/DetSys/app/addDiceDetector -1
 
 ## Record the initial beam data ###
 /DetSys/det/RecordGun 1

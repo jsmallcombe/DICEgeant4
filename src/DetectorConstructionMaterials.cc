@@ -53,6 +53,7 @@ void DetectorConstruction::DefineMaterials()
     man->FindOrBuildMaterial("G4_STAINLESS-STEEL");
     man->FindOrBuildMaterial("G4_AIR");
     man->FindOrBuildMaterial("G4_C");
+    man->FindOrBuildMaterial("G4_BGO");
     
     G4double a, z, density, temperature, pressure;
     G4String name, symbol;

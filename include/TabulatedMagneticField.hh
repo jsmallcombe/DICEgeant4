@@ -61,5 +61,14 @@ private:
   G4bool   fInvertX;
   G4bool   fInvertY;
   G4bool   fInvertZ;
+  
+  //Mirror Field
+  G4bool MirrorX,MirrorY,MirrorZ;
+  G4bool InverseMirrorX;
+  G4bool InverseMirrorY;
+  G4bool InverseMirrorZ;
+  G4double MirrorLineX;
+  G4double MirrorLineY;
+  G4double MirrorLineZ;
 };
 #endif

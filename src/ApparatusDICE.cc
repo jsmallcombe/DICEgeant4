@@ -58,6 +58,7 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	fShieldMaterial   = "WTa";
 // 	fShieldMaterial   = "Hevimetal";
 	fscintMaterial   = "EJ212";
+// 	fscintMaterial   = "G4_BGO";
 
     fRemoveShield=false;
     fAddBlocker=false;
@@ -176,8 +177,13 @@ void ApparatusDICE::BuildPlaceBasicTest(G4LogicalVolume* expHallLog){
 	// Mother volume is the "logical" within which this physical should occur, for instance we can but segments inside a detector
 	// All physicals with name "SiSegmentPhys#_#" where # are number will be treated as detecors for the purposes of output, where the numbers # are used to specify the volumes
 	// The exact definition of the special names can befound in DetectorConstruction::ParseVolumeName(G4String volumeName) of DetectorConstruction.cc
-	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(0,0,02*mm), fDetectorLogical, "SiSegmentPhys0_0",  expHallLog, false, 0);
+	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(0,0,20*mm), fDetectorLogical, "SiSegmentPhys0_0",  expHallLog, false, 0);
 	
+	
+	G4Box* bx = new G4Box("bx", 150*mm, 150*mm, 150*mm);
+	G4LogicalVolume* lg = new G4LogicalVolume(bx, G4Material::GetMaterial("Vacuum"), "lg", 0,0,0); 
+// 	lg->SetVisAttributes(vis_att_hid); 
+	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(), lg, "wrldbx",  expHallLog, false, 0);
 }
     
 G4int ApparatusDICE::BuildMicronSiN=0;
@@ -299,8 +305,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4double 	Orange_MagAng=0*deg; // Flare angle of the magnets
 
 	G4double 	Orange_MagZ=60*mm; // Beam extent of magnets
-	G4double 	Orange_MagHalfThick=3*mm; // Perpendicular Half Thickness of the magnets 
-	G4double 	Orange_MagGapMinHalf=5*mm; // Gap between magnet halves (at side of shield)
+	G4double 	Orange_MagHalfThick=2*mm; // Perpendicular Half Thickness of the magnets 
+	G4double 	Orange_MagGapMinHalf=7.5*mm; // Gap between magnet halves (at side of shield)
 	
 	G4double 	Orange_TargetWardingY=15*mm; // Half Gap Target Ladder Needs
 	G4double 	Orange_TargetWardingZ=2*mm; // Half Gap Target Ladder Needs (Beamward)
@@ -342,8 +348,11 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     G4cout<<G4endl<<G4endl<<"Flat Orange Configuration: ";
     G4cout<<G4endl<<"Beam Shield Front Distance "<<Orange_BeamShieldSep;
     G4cout<<G4endl<<"Beam Shield Mid Distance "<<Orange_ShieldMidBeamSep;
+    G4cout<<G4endl<<"Beam Shield Widest Point (Tot)"<<Orange_ShieldMidHalfWidth*2;
+    G4cout<<G4endl<<"Total Z Mag Separation"<<MStart*2;
     G4cout<<G4endl<<"Beam Detector Distance "<<Orange_BeamDetY;
     G4cout<<G4endl<<"Total Magnet Seperation "<<Orange_ShieldHalfX*2;
+    G4cout<<G4endl;
 	
 	
 	if(Orange_MagAng<0){
@@ -463,16 +472,19 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4LogicalVolume *MagBoxL = new G4LogicalVolume(fMagBox, mMaterial,"MagBoxL_FORBID",0,0,0);
     
     for(int i=-1;i<2;i+=2){
-        G4UniformMagField* magField = new G4UniformMagField(rotZbar*G4ThreeVector(i*fFieldStength,0.,0.));
-        G4FieldManager* localFieldManager=new G4FieldManager(magField);
-        localFieldManager->CreateChordFinder(magField);
-        G4LogicalVolume* fOrangeFieldVolume = new G4LogicalVolume(fFieldBox, matWorld, "FieldBoxLog", localFieldManager, 0, 0);
-        fOrangeFieldVolume->SetVisAttributes(G4VisAttributes::Invisible); 
+		G4RotationMatrix* rotmag = new G4RotationMatrix;
+		rotmag->rotateZ(Zbar);
+		rotmag->rotateY(i*90*deg);
+		
+        if(fFieldStength>0){
+			G4UniformMagField* magField = new G4UniformMagField(rotZbar*G4ThreeVector(i*fFieldStength,0.,0.));
+			G4FieldManager* localFieldManager=new G4FieldManager(magField);
+			localFieldManager->CreateChordFinder(magField);
+			G4LogicalVolume* fOrangeFieldVolume = new G4LogicalVolume(fFieldBox, matWorld, "FieldBoxLog", localFieldManager, 0, 0);
+			fOrangeFieldVolume->SetVisAttributes(G4VisAttributes::Invisible); 
         
-        G4RotationMatrix* rotmag = new G4RotationMatrix;
-        rotmag->rotateZ(Zbar);
-        rotmag->rotateY(i*90*deg);
-        new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(0,-Orange_ShieldMidBeamSep,0),fOrangeFieldVolume,"Field",expHallLog,false,0);
+			new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(0,-Orange_ShieldMidBeamSep,0),fOrangeFieldVolume,"Field",expHallLog,false,0);
+		}
         
         for(int j=-1;j<2;j+=2){
             new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(j*MPX,-Orange_ShieldMidBeamSep,0), MagBoxL,"Mag", expHallLog,false,0); 

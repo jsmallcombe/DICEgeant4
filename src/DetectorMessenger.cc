@@ -199,8 +199,11 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 	if(command == fTabMagneticFieldCmd) {
 		G4String PathAndTableName;
 		G4double z_offset, z_rotation;
-		std::istringstream is(newValue);///string
-		is>>PathAndTableName>>z_offset>>z_rotation;
+// 		std::istringstream is(newValue);///string
+// 		is>>PathAndTableName>>z_offset>>z_rotation;
+		std::stringstream ss;
+		ss<<newValue<<" "<<0<<" "<<0<<" ";
+		ss>>PathAndTableName>>z_offset>>z_rotation;
 		fDetector->SetTabMagneticField(PathAndTableName, z_offset, z_rotation); // z in mm, angle in degree  
 	}
 	

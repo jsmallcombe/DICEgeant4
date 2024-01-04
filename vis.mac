@@ -4,7 +4,10 @@
 
 ### Configure Apparatus To Build ###
 
+### Enter a negative value in SetDiceField to set no uniform field and not build field-box. Do this before using TabMagneticField
 /DetSys/app/SetDiceField 0.25 tesla
+#/DetSys/world/TabMagneticField
+
 #/DetSys/det/RemoveShield true
 /DetSys/det/AddBlocker true
 

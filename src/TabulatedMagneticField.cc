@@ -6,8 +6,25 @@
 #include <algorithm> //for max_element
 
 TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zOffset, G4double zRotation) //called in 'nonuniformfield'
-: fZoffset(zOffset), fZrotation(zRotation), fInvertX(false), fInvertY(false), fInvertZ(false)
+: fZoffset(zOffset), fZrotation(zRotation), fInvertX(false), fInvertY(false), fInvertZ(false), MirrorX(false), MirrorY(false), MirrorZ(false),InverseMirrorX(false), InverseMirrorY(false), InverseMirrorZ(false), MirrorLineX(0), MirrorLineY(0), MirrorLineZ(0)
 {    
+	
+	MirrorX=true;
+	MirrorY=true;
+	MirrorZ=true;;
+  InverseMirrorX=true;
+  InverseMirrorY=false;
+  InverseMirrorZ=true;
+// //   InverseMirrorZ=false;
+// //   MirrorLineX=50*mm;
+// //   MirrorLineY=75*mm;
+// //   MirrorLineZ=-20*mm;
+  MirrorLineY=-20*mm;
+	
+	
+	
+	
+	// Units of the input files
 	G4double lenUnit= mm;
 	G4double fieldUnit= tesla; 
 	G4cout<<"\n-----------------------------------------------------------"
@@ -18,22 +35,19 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zO
 
 	std::ifstream file(filename); // Open the file for reading.
 
-	// Ignore first blank line
-	char buffer[256];
-	file.getline(buffer,256);
-
 	if(!file.is_open()) {
 		G4cout<<"\n\ncannot open file : "<<filename<<"\n\n" ;
 		G4cin.get();
 	}
-
-
+	
 	// Read table dimensions 
 	file>>fNx>>fNy>>fNz; // Note dodgy order //20/7 what? xyz looks fine!
 
 	G4cout<<"  [ Number of values x,y,z: " 
 		<<fNx<<" "<<fNy<<" "<<fNz<<" ] "//111*111*106 gives 1306026 rows
 		<<std::endl;
+
+	G4cout<<" ---> assumed the order:  x, y, z, Bx, By, Bz ";
 
 	// Set up storage space for table using values from above- does not initialise values
 	fXField.resize(fNx);
@@ -50,23 +64,15 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zO
 		}
 	}//three field values per point, hence three arrays needed
 
-	// Ignores other header information    
-	// The first line whose second character is '0' is considered to
-	// be the last line of the header.
-	do {
-		file.getline(buffer,256);
-	} while (buffer[1] != '0');
-
 	// Read in the data and fill arrays
 	G4double xval,yval,zval,bx,by,bz;
-	G4double permeability; // Not used in this example. (is 0 for spice)
-	for(G4int iz=0; iz<fNz; iz++) {
+	
+			for(G4int iz=0; iz<fNz; iz++) {
+	for(G4int ix=0; ix<fNx; ix++) {
 		for(G4int iy=0; iy<fNy; iy++) {
-			for(G4int ix=0; ix<fNx; ix++) {
-				file >> xval >> yval >> zval >> bx >> by >> bz >> permeability;
-				bx =bx/1000.;
-				by =by/1000.;
-				bz =bz/1000.;
+// 				file >> xval >> yval >> zval >> bx >> by >> bz;
+				file >> zval >> xval >> yval >> bz >> bx >> by;
+
 				if(ix==0 && iy==0 && iz==0) {//min is first value?? theres no sort/search 
 					fMinx = xval * lenUnit;
 					fMiny = yval * lenUnit;
@@ -76,18 +82,13 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zO
 				fYField[ix][iy][iz] = by * fieldUnit;
 				fZField[ix][iy][iz] = bz * fieldUnit;
 
-				if(bx > fMaxbx) fMaxbx = bx; // no unit as read-out in terminal
-				if(by > fMaxby) fMaxby = by;
-				if(bz > fMaxbz) fMaxbz = bz;
+				if(std::abs(bx) > std::abs(fMaxbx)) fMaxbx = bx; // no unit as read-out in terminal
+				if(std::abs(by) > std::abs(fMaxby)) fMaxby = by;
+				if(std::abs(bz) > std::abs(fMaxbz)) fMaxbz = bz;
 			}
 		}
 	}
 	file.close(); //internally stored values, so can close file
-
-	//my attempts - max field value in each column
-	G4cout<<"\t\t\tMax Bx value = "<< fMaxbx<<" Tesla."<<G4endl;
-	G4cout<<"\t\t\tMax By value = "<< fMaxby<<" Tesla."<<G4endl;
-	G4cout<<"\t\t\tMax Bz value = "<< fMaxbz<<" Tesla."<<G4endl;
 
 	fMaxx = xval * lenUnit; //now max dimension values are the last values - i.e. post-loop values
 	fMaxy = yval * lenUnit;
@@ -95,13 +96,6 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zO
 
 	G4cout<<"\n ---> ... done reading "<<std::endl;
 
-	// G4cout<<" Read values of field from file "<<filename<<std::endl; 
-	G4cout<<" ---> assumed the order:  x, y, z, Bx, By, Bz "
-		<< "\n ---> Min values x,y,z: " 
-		<< fMinx/cm<<" "<<fMiny/cm<<" "<<fMinz/cm<<" cm "
-		<< "\n ---> Max values x,y,z: " 
-		<< fMaxx/cm<<" "<<fMaxy/cm<<" "<<fMaxz/cm<<" cm "
-		<< "\n ---> The field will be offset by "<<zOffset/cm<<" cm "<<std::endl;
 
 	// Should really check that the limits are not the wrong way around.
 	if(fMaxx < fMinx) {
@@ -116,11 +110,15 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zO
 		std::swap(fMaxz,fMinz); 
 		fInvertZ = true;
 	} 
-	G4cout<<"\nAfter reordering if neccesary"  
-		<<"\n ---> Min values x,y,z: " 
-		<<fMinx/cm<<" "<<fMiny/cm<<" "<<fMinz/cm<<" cm "
-		<<" \n ---> Max values x,y,z: " 
-		<<fMaxx/cm<<" "<<fMaxy/cm<<" "<<fMaxz/cm<<" cm ";
+	
+	G4cout<< "\n ---> Min values x,y,z: " 
+	<< fMinx/cm<<" "<<fMiny/cm<<" "<<fMinz/cm<<" cm "
+	<< "\n ---> Max values x,y,z: " 
+	<< fMaxx/cm<<" "<<fMaxy/cm<<" "<<fMaxz/cm<<" cm ";
+		
+	G4cout<<"\t\t\tMax Bx value = "<< fMaxbx*fieldUnit/tesla <<" Tesla."<<G4endl;
+	G4cout<<"\t\t\tMax By value = "<< fMaxby*fieldUnit/tesla <<" Tesla."<<G4endl;
+	G4cout<<"\t\t\tMax Bz value = "<< fMaxbz*fieldUnit/tesla <<" Tesla."<<G4endl;
 
 	fDx = fMaxx - fMinx;
 	fDy = fMaxy - fMiny;
@@ -134,7 +132,7 @@ void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bf
 {
 	G4double x = point[0];
 	G4double y = point[1];
-	G4double z = point[2] + fZoffset;
+	G4double z = point[2];
 
 	//Rotation treatment Mhd : 25 Mar 2015
 	//
@@ -145,12 +143,41 @@ void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bf
 	//
 
 	// Rotate the position here : Mhd : 25 Mar 2015 
-	G4ThreeVector R(x,  y,  z); 
-	R.rotateZ(-fZrotation*deg); // rotation made in the opposite direction of the lens
-	x = R.getX();
-	y = R.getY();
-	z = R.getZ();
+// 	G4ThreeVector R(x,  y,  z); 
+// 	R.rotateZ(-fZrotation*deg); // rotation made in the opposite direction of the lens
+// 	x = R.getX();
+// 	y = R.getY();
+// 	z = R.getZ();
 
+// G4bool InverseMirrorX;
+// G4bool InverseMirrorY;	
+// G4bool InverseMirrorZ;
+// G4double MirrorLineX;
+// G4double MirrorLineY;
+// G4double MirrorLineZ;
+	G4int MirX=1,MirY=1,MirZ=1;
+	
+	if(MirrorX){
+	if(!(x>=fMinx && x<=fMaxx)){
+		x=2*MirrorLineX-x;
+		if(InverseMirrorX){MirY*=-1;MirZ*=-1;}
+		else{MirX*=-1;}
+	}}
+	if(MirrorY){
+	if(!(y>=fMiny && y<=fMaxy)){
+		y=2*MirrorLineY-y;
+		if(InverseMirrorY){MirX*=-1;MirZ*=-1;}
+		else{MirY*=-1;}
+	}}
+	if(MirrorZ){
+	if(!(z>=fMinz && z<=fMaxz)){
+		z=2*MirrorLineZ-z;
+		if(InverseMirrorZ){MirX*=-1;MirY*=-1;}
+		else{MirZ*=-1;}
+	}}
+	
+	
+	
 	// Check that the point is within the defined region 
 	if(x>=fMinx && x<=fMaxx &&
 			y>=fMiny && y<=fMaxy && 
@@ -232,9 +259,9 @@ void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bf
 		// Rotate the BField here : Mhd : 25 Mar 2015  
 		G4ThreeVector B(Bfield[0],  Bfield[1],  Bfield[2]);
 		B.rotateZ(fZrotation*deg); // rotation made in the same direction of the lens
-		Bfield[0] = B.getX();
-		Bfield[1] = B.getY();
-		Bfield[2] = B.getZ();
+		Bfield[0] = B.getX()*MirX;
+		Bfield[1] = B.getY()*MirY;
+		Bfield[2] = B.getZ()*MirZ;
 
 	} else {
 		Bfield[0] = 0.0;

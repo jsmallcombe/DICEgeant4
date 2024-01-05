@@ -5,23 +5,9 @@
 
 #include <algorithm> //for max_element
 
-TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zOffset, G4double zRotation) //called in 'nonuniformfield'
-: fZoffset(zOffset), fZrotation(zRotation), fInvertX(false), fInvertY(false), fInvertZ(false), MirrorX(false), MirrorY(false), MirrorZ(false),InverseMirrorX(false), InverseMirrorY(false), InverseMirrorZ(false), MirrorLineX(0), MirrorLineY(0), MirrorLineZ(0)
+TabulatedMagneticField::TabulatedMagneticField(const char* filename) //called in 'nonuniformfield'
+: fMaxbx(0),fMaxby(0),fMaxbz(0),fMaxM(0), fInvertXIndex(false), fInvertYIndex(false), fInvertZIndex(false), MirrorXField(false), MirrorYField(false), MirrorZField(false),MirrorFieldXInverse(false), MirrorFieldYInverse(false), MirrorFieldZInverse(false), MirrorLineX(0), MirrorLineY(0), MirrorLineZ(0)
 {    
-	
-	MirrorX=true;
-	MirrorY=true;
-	MirrorZ=true;;
-  InverseMirrorX=true;
-  InverseMirrorY=false;
-  InverseMirrorZ=true;
-// //   InverseMirrorZ=false;
-// //   MirrorLineX=50*mm;
-// //   MirrorLineY=75*mm;
-// //   MirrorLineZ=-20*mm;
-  MirrorLineY=-20*mm;
-	
-	
 	
 	
 	// Units of the input files
@@ -67,9 +53,9 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zO
 	// Read in the data and fill arrays
 	G4double xval,yval,zval,bx,by,bz;
 	
-			for(G4int iz=0; iz<fNz; iz++) {
-	for(G4int ix=0; ix<fNx; ix++) {
-		for(G4int iy=0; iy<fNy; iy++) {
+	for(G4int iz=0; iz<fNz; iz++) {
+		for(G4int ix=0; ix<fNx; ix++) {
+			for(G4int iy=0; iy<fNy; iy++) {
 // 				file >> xval >> yval >> zval >> bx >> by >> bz;
 				file >> zval >> xval >> yval >> bz >> bx >> by;
 
@@ -81,14 +67,23 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zO
 				fXField[ix][iy][iz] = bx * fieldUnit;
 				fYField[ix][iy][iz] = by * fieldUnit;
 				fZField[ix][iy][iz] = bz * fieldUnit;
+				
+				G4ThreeVector MagVec(bx,  by,  bz); 
 
 				if(std::abs(bx) > std::abs(fMaxbx)) fMaxbx = bx; // no unit as read-out in terminal
 				if(std::abs(by) > std::abs(fMaxby)) fMaxby = by;
 				if(std::abs(bz) > std::abs(fMaxbz)) fMaxbz = bz;
+				if(MagVec.mag() > fMaxM) fMaxM = MagVec.mag() ;
 			}
 		}
 	}
 	file.close(); //internally stored values, so can close file
+	
+	fMaxbx *=fieldUnit;
+	fMaxby *=fieldUnit;
+	fMaxbz *=fieldUnit;
+	fMaxM *=fieldUnit;
+				
 
 	fMaxx = xval * lenUnit; //now max dimension values are the last values - i.e. post-loop values
 	fMaxy = yval * lenUnit;
@@ -100,15 +95,15 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zO
 	// Should really check that the limits are not the wrong way around.
 	if(fMaxx < fMinx) {
 		std::swap(fMaxx,fMinx);
-		fInvertX = true;
+		fInvertXIndex = true;
 	} 
 	if(fMaxy < fMiny) {
 		std::swap(fMaxy,fMiny);
-		fInvertY = true;
+		fInvertYIndex = true;
 	} 
 	if(fMaxz < fMinz) {
 		std::swap(fMaxz,fMinz); 
-		fInvertZ = true;
+		fInvertZIndex = true;
 	} 
 	
 	G4cout<< "\n ---> Min values x,y,z: " 
@@ -116,10 +111,12 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zO
 	<< "\n ---> Max values x,y,z: " 
 	<< fMaxx/cm<<" "<<fMaxy/cm<<" "<<fMaxz/cm<<" cm ";
 		
-	G4cout<<"\t\t\tMax Bx value = "<< fMaxbx*fieldUnit/tesla <<" Tesla."<<G4endl;
-	G4cout<<"\t\t\tMax By value = "<< fMaxby*fieldUnit/tesla <<" Tesla."<<G4endl;
-	G4cout<<"\t\t\tMax Bz value = "<< fMaxbz*fieldUnit/tesla <<" Tesla."<<G4endl;
-
+	G4cout<<"\t\t\tMax Bx value = "<< fMaxbx/tesla <<" Tesla."<<G4endl;
+	G4cout<<"\t\t\tMax By value = "<< fMaxby/tesla <<" Tesla."<<G4endl;
+	G4cout<<"\t\t\tMax Bz value = "<< fMaxbz/tesla <<" Tesla."<<G4endl;
+	G4cout<<"\t\t\tMax Field value = "<< fMaxM/tesla <<" Tesla."<<G4endl;
+	
+	
 	fDx = fMaxx - fMinx;
 	fDy = fMaxy - fMiny;
 	fDz = fMaxz - fMinz;
@@ -128,6 +125,50 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename, G4double zO
 		<<"\n-----------------------------------------------------------"<<std::endl;
 }
 
+
+void TabulatedMagneticField::SetField(G4double MaxSetField){
+	G4cout<<"Changing Max Field value from "<< fMaxM/tesla <<" Tesla to"<<MaxSetField/tesla <<" Tesla."<<G4endl;
+	
+	G4double scale =MaxSetField/fMaxM;
+	fMaxM=MaxSetField;
+	
+	for(G4int iz=0; iz<fNz; iz++) {
+		for(G4int ix=0; ix<fNx; ix++) {
+			for(G4int iy=0; iy<fNy; iy++) {
+				fXField[ix][iy][iz] *= scale;
+				fYField[ix][iy][iz] *= scale;
+				fZField[ix][iy][iz] *= scale;
+			}
+		}
+	}
+	
+}
+
+void TabulatedMagneticField::SetFieldMirror(int xyz,bool antimirror){
+	switch(xyz) {
+		case 1: 
+			MirrorFieldXInverse=antimirror;
+			MirrorXField=true;
+			break;
+		case 2:
+			MirrorFieldYInverse=antimirror;
+			MirrorYField=true;
+			break;
+		case 3:
+			MirrorFieldZInverse=antimirror;
+			MirrorZField=true;
+			break;
+		default:
+			break;
+	}
+}
+
+void TabulatedMagneticField::SetFieldMirrorPoint(G4ThreeVector Mpoint){
+  		MirrorLineX=Mpoint.getX();
+		MirrorLineY=Mpoint.getY();
+		MirrorLineZ=Mpoint.getZ();
+}
+  
 void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bfield) const
 {
 	G4double x = point[0];
@@ -149,30 +190,25 @@ void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bf
 // 	y = R.getY();
 // 	z = R.getZ();
 
-// G4bool InverseMirrorX;
-// G4bool InverseMirrorY;	
-// G4bool InverseMirrorZ;
-// G4double MirrorLineX;
-// G4double MirrorLineY;
-// G4double MirrorLineZ;
+	
 	G4int MirX=1,MirY=1,MirZ=1;
 	
-	if(MirrorX){
+	if(MirrorXField){
 	if(!(x>=fMinx && x<=fMaxx)){
 		x=2*MirrorLineX-x;
-		if(InverseMirrorX){MirY*=-1;MirZ*=-1;}
+		if(MirrorFieldXInverse){MirY*=-1;MirZ*=-1;}
 		else{MirX*=-1;}
 	}}
-	if(MirrorY){
+	if(MirrorYField){
 	if(!(y>=fMiny && y<=fMaxy)){
 		y=2*MirrorLineY-y;
-		if(InverseMirrorY){MirX*=-1;MirZ*=-1;}
+		if(MirrorFieldYInverse){MirX*=-1;MirZ*=-1;}
 		else{MirY*=-1;}
 	}}
-	if(MirrorZ){
+	if(MirrorZField){
 	if(!(z>=fMinz && z<=fMaxz)){
 		z=2*MirrorLineZ-z;
-		if(InverseMirrorZ){MirX*=-1;MirY*=-1;}
+		if(MirrorFieldZInverse){MirX*=-1;MirY*=-1;}
 		else{MirZ*=-1;}
 	}}
 	
@@ -189,13 +225,13 @@ void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bf
 		G4double yfraction = (y - fMiny)/fDy; 
 		G4double zfraction = (z - fMinz)/fDz;
 
-		if(fInvertX) { 
+		if(fInvertXIndex) { 
 			xfraction = 1 - xfraction;
 		}
-		if(fInvertY) { 
+		if(fInvertYIndex) { 
 			yfraction = 1 - yfraction;
 		}
-		if(fInvertZ) { 
+		if(fInvertZIndex) { 
 			zfraction = 1 - zfraction;
 		}
 
@@ -258,7 +294,7 @@ void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bf
 
 		// Rotate the BField here : Mhd : 25 Mar 2015  
 		G4ThreeVector B(Bfield[0],  Bfield[1],  Bfield[2]);
-		B.rotateZ(fZrotation*deg); // rotation made in the same direction of the lens
+// 		B.rotateZ(fZrotation*deg); // rotation made in the same direction of the lens
 		Bfield[0] = B.getX()*MirX;
 		Bfield[1] = B.getY()*MirY;
 		Bfield[2] = B.getZ()*MirZ;

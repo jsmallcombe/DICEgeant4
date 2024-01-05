@@ -14,13 +14,15 @@ class NonUniformMagneticField
 
 public:
 
-  NonUniformMagneticField(const char* fieldName, double zOffset, double zRotation); // field read from file
+  NonUniformMagneticField(const char* fieldName); // field read from file
   ~NonUniformMagneticField() ;
       
   void SetStepperType(G4int i) { fStepperType = i; }
   void SetStepper();
   void SetMinStep(G4double step) { fMinStep = step; }
   void UpdateField();
+  G4MagneticField* GetField(){return fMagneticField;};
+
 
 protected:
 

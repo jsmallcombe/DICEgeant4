@@ -20,10 +20,10 @@
 #include "G4CashKarpRKF45.hh"
 #include "G4RKG3_Stepper.hh"
 
-NonUniformMagneticField::NonUniformMagneticField(const char* fieldName="./", G4double zOffset=0., G4double zRotation=0.) //hard code here? as no changes made??
+NonUniformMagneticField::NonUniformMagneticField(const char* fieldName="./") 
 : fChordFinder(0), fStepper(0)
 {
-	fMagneticField = new TabulatedMagneticField(fieldName, zOffset, zRotation);//sets field to that read in from the table
+	fMagneticField = new TabulatedMagneticField(fieldName);//sets field to that read in from the table
 	GetGlobalFieldManager()->CreateChordFinder(fMagneticField);
 
 	fEquation = new G4Mag_UsualEqRhs(fMagneticField); 

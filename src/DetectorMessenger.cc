@@ -91,6 +91,18 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 	fTabMagneticFieldCmd->SetGuidance("Set tabulated magnetic field.");
 	fTabMagneticFieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 	
+    fTabMagneticFieldMirrorPointCmd = new G4UIcmdWith3VectorAndUnit("/DetSys/world/SetFieldMirrorPos",this);
+	fTabMagneticFieldMirrorPointCmd->SetGuidance("Field mirror coord.");
+	fTabMagneticFieldMirrorPointCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+	
+    fTabMagneticFieldMirrorCmd = new G4UIcmdWithAnInteger("/DetSys/world/SetFieldMirror",this);
+	fTabMagneticFieldMirrorCmd->SetGuidance("Field xyz 123 mirror coords.");
+	fTabMagneticFieldMirrorCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+	
+    fTabMagneticFieldAntiMirrorCmd = new G4UIcmdWithAnInteger("/DetSys/world/SetFieldAntiMirror",this);
+	fTabMagneticFieldAntiMirrorCmd->SetGuidance("Field xyz 123 field anti mirror.");
+	fTabMagneticFieldAntiMirrorCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+	
    	fRecordGunCmd = new G4UIcmdWithABool("/DetSys/det/RecordGun",this);
 	fRecordGunCmd->SetGuidance("Record the particle for each event in the tree");
 	fRecordGunCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
@@ -160,6 +172,9 @@ DetectorMessenger::~DetectorMessenger()
 	delete fUpdateCmd;
 	
 	delete fTabMagneticFieldCmd;
+	delete fTabMagneticFieldMirrorPointCmd;
+	delete fTabMagneticFieldMirrorCmd;
+	delete fTabMagneticFieldAntiMirrorCmd;
 
 	delete fRecordGunCmd;
     
@@ -198,13 +213,21 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 
 	if(command == fTabMagneticFieldCmd) {
 		G4String PathAndTableName;
-		G4double z_offset, z_rotation;
-// 		std::istringstream is(newValue);///string
-// 		is>>PathAndTableName>>z_offset>>z_rotation;
-		std::stringstream ss;
-		ss<<newValue<<" "<<0<<" "<<0<<" ";
-		ss>>PathAndTableName>>z_offset>>z_rotation;
-		fDetector->SetTabMagneticField(PathAndTableName, z_offset, z_rotation); // z in mm, angle in degree  
+		std::istringstream is(newValue);///string
+		is>>PathAndTableName;
+		fDetector->SetTabMagneticField(PathAndTableName);
+	}
+	
+	if(command == fTabMagneticFieldMirrorPointCmd) {
+		fDetector->SetFieldMirrorPoint(fTabMagneticFieldMirrorPointCmd->GetNew3VectorValue(newValue));
+	}
+	
+	if(command == fTabMagneticFieldMirrorCmd) {
+		fDetector->SetFieldMirror(fTabMagneticFieldMirrorCmd->GetNewIntValue(newValue),false);
+	}
+	
+	if(command == fTabMagneticFieldAntiMirrorCmd) {
+		fDetector->SetFieldMirror(fTabMagneticFieldAntiMirrorCmd->GetNewIntValue(newValue),true);
 	}
 	
 	if(command == fRecordGunCmd) {

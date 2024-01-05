@@ -64,7 +64,6 @@
 #include "G4FieldManager.hh"
 #include "G4UniformMagField.hh"
 #include "G4TransportationManager.hh"
-#include "NonUniformMagneticField.hh"
 
 #include "ApparatusDICE.hh"
 
@@ -78,7 +77,8 @@ bool operator==(const DetectorProperties& lhs, const DetectorProperties& rhs)
 DetectorConstruction::DetectorConstruction() :
 	fSolidWorld(nullptr),
 	fLogicWorld(nullptr),
-	fPhysiWorld(nullptr)
+	fPhysiWorld(nullptr),
+	fGlobalField(nullptr)
 {
 	fWorldSizeX  = fWorldSizeY = fWorldSizeZ = 10.0*m;
 
@@ -178,10 +178,11 @@ void DetectorConstruction::SetWorldStepLimit(G4double step) {
 	fLogicWorld->SetUserLimits(new G4UserLimits(step));
 }
 
-void DetectorConstruction::SetTabMagneticField(G4String PathAndTableName, G4double z_offset, G4double z_rotation)
+void DetectorConstruction::SetTabMagneticField(G4String PathAndTableName)
 {
 	//const char * c = PathAndTableName.c_str();///conversion attempt using .c_str() (a string member function)
-	new NonUniformMagneticField(PathAndTableName,z_offset,z_rotation); /// addition of field for DICE
+	fAppDICE->fUniformFieldOn=false;
+	fGlobalField = new NonUniformMagneticField(PathAndTableName);
 }
 
 void DetectorConstruction::UpdateGeometry() {
@@ -276,6 +277,27 @@ void DetectorConstruction::AddApparatusDiceDetector(G4String Options){
 
 void DetectorConstruction::SetDiceFieldStrength(G4double Field){
 	ApparatusDICE::fFieldStength=Field;
+	
+	if(GetField()){
+		GetField()->SetField(Field);
+// 		UpdateField();
+	}
+}
+
+	
+
+void DetectorConstruction::SetFieldMirror(int xyz,bool antimirror){
+	if(GetField()){
+		GetField()->SetFieldMirror(xyz,antimirror);
+// 		UpdateField();
+	}
+}
+
+void DetectorConstruction::SetFieldMirrorPoint(G4ThreeVector Mpoint){
+	if(GetField()){
+		GetField()->SetFieldMirrorPoint(Mpoint);
+// 		UpdateField();
+	}
 }
 
 void DetectorConstruction::SetDiceLength(G4int Nsel,G4double Length){

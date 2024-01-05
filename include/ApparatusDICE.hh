@@ -67,6 +67,7 @@ public:
 	G4int    fAdjNumber;
 	bool fRemoveShield;
 	bool fAddBlocker;
+	bool fUniformFieldOn;
 	
 	bool fUseA,fUseB,fUseC,fUseD,fUseE;
     

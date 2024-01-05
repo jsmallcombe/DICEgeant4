@@ -42,6 +42,9 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
 #include "G4ThreeVector.hh"
+#include "G4MagneticField.hh"
+#include "NonUniformMagneticField.hh"
+#include "TabulatedMagneticField.hh"
 
 class G4Box;
 class G4LogicalVolume;
@@ -81,7 +84,7 @@ public:
 	void SetWorldDimensions( G4ThreeVector );
 	void SetWorldStepLimit( G4double );
 
-	void SetTabMagneticField(G4String, G4double, G4double);
+	void SetTabMagneticField(G4String);
 
 	G4VPhysicalVolume* Construct();
 
@@ -108,7 +111,28 @@ public:
 	void SetDiceInt(G4int N);
     
     ApparatusDICE* GetDice();
-
+	
+	
+    TabulatedMagneticField* GetField(){
+		if(fGlobalField){
+			return (TabulatedMagneticField*)fGlobalField->GetField();
+		}else{
+			G4cout<<"NO FIELD SET. CANNOT GET FIELD."<<G4endl;
+			return nullptr;
+		}
+	};
+	
+    void UpdateField(){
+		if(fGlobalField){
+			fGlobalField->UpdateField();
+		}else{
+			G4cout<<"NO FIELD SET. NOT UPDATED."<<G4endl;
+		}
+	};
+	
+	void SetFieldMirror(int,bool);
+	void SetFieldMirrorPoint(G4ThreeVector);
+	
 private:
 	bool CheckVolumeName(G4String volumeName);
 	DetectorProperties ParseVolumeName(G4String volumeName);
@@ -147,6 +171,8 @@ private:
 	G4ThreeVector fDetEffPosition;
 
 	ApparatusDICE *fAppDICE;
+	
+	NonUniformMagneticField *fGlobalField; 
 	
 	//unordered maps which hold properties of the physical volumes created
 	std::unordered_map<G4VPhysicalVolume*, DetectorProperties> fPropertiesMap;

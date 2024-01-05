@@ -72,7 +72,11 @@ private:
 	G4UIcmdWithoutParameter*   fUpdateCmd;
 
 	//field for DICE
-	G4UIcmdWithAString*        fTabMagneticFieldCmd; ///19/7
+	G4UIcmdWithAString*        fTabMagneticFieldCmd;
+	
+	G4UIcmdWith3VectorAndUnit* fTabMagneticFieldMirrorPointCmd;
+	G4UIcmdWithAnInteger* 	   fTabMagneticFieldMirrorCmd;
+	G4UIcmdWithAnInteger*	   fTabMagneticFieldAntiMirrorCmd;
 
 	G4UIcmdWithABool*           fRecordGunCmd;
     G4UIcmdWithABool*           fRemoveShieldCmd;

@@ -4,25 +4,34 @@
 
 ### Configure Apparatus To Build ###
 
-### Enter a negative value in SetDiceField to set no uniform field and not build field-box. Do this before using TabMagneticField
-/DetSys/app/SetDiceField 0.25 tesla
-#/DetSys/world/TabMagneticField
+/DetSys/world/TabMagneticField ExportTestNew.txt
+/DetSys/world/SetFieldMirrorPos 0 -22.5 0 mm
+/DetSys/world/SetFieldAntiMirror 1
+/DetSys/world/SetFieldMirror 2 
+/DetSys/world/SetFieldAntiMirror 3
 
+### If you call SetDiceField after calling TabMagneticField, the field strength of TabMagneticField will be scaled.
+#/DetSys/app/SetDiceField 0.25 tesla
+
+
+### Remove photon shield entirely
 #/DetSys/det/RemoveShield true
+
+### Add the under shield graphit electron blocker
 /DetSys/det/AddBlocker true
 
-### Orange - Midpoint Shield-Midpoint Magnet Offset
-/DetSys/app/SetDiceArbA -7.50 mm
+### Orange - Target <-> Magnet-Center Offset
+/DetSys/app/SetDiceArbA 22.5 mm
 
-### Detector Distance, target vs BB34
+### Detector Distance; Beam/Target <-> BB34
 /DetSys/app/SetDiceArbB 55 mm
 
-### Target - Distance to the shield widest point
+### Beam/Target <-> Shield-Widest-point Distance 
 /DetSys/app/SetDiceArbC 15 mm
 
-### Total vertical coverage/height of the magnet field region
-### Set negative to set overlap magnets with shield
-/DetSys/app/SetDiceArbD -15 mm
+### Total vertical "Y" coverage/height of the magnets
+### Set negative to allow magnets to overlap with shield in the "X" direction
+/DetSys/app/SetDiceArbD 20 mm
 
 ### Flare angle of the magnets
 #/DetSys/app/SetDiceArbE -15 deg

@@ -18,6 +18,7 @@
 #include "globals.hh"
 #include "G4MagneticField.hh"
 #include "G4ios.hh"
+#include "G4ThreeVector.hh"
 
 #include <fstream>
 #include <vector>
@@ -29,7 +30,12 @@ class TabulatedMagneticField
 #endif
 {
 public:
-  TabulatedMagneticField(const char* filename, G4double zOffset, G4double zRotation);
+  TabulatedMagneticField(const char* filename);
+  
+  void SetField(G4double MaxSetField);
+  void SetFieldMirror(int xyz,bool antimirror);
+  void SetFieldMirrorPoint(G4ThreeVector Mpoint);
+  
   void  GetFieldValue(const G4double Point[4], G4double* Bfield) const;
   
 private:
@@ -52,21 +58,18 @@ private:
   G4double fMaxbx;
   G4double fMaxby;
   G4double fMaxbz;
+  G4double fMaxM;
   // The physical extent of the defined region
   G4double fDx;
   G4double fDy;
   G4double fDz;
-  G4double fZoffset;
-  G4double fZrotation;
-  G4bool   fInvertX;
-  G4bool   fInvertY;
-  G4bool   fInvertZ;
+  G4bool   fInvertXIndex;
+  G4bool   fInvertYIndex;
+  G4bool   fInvertZIndex;
   
   //Mirror Field
-  G4bool MirrorX,MirrorY,MirrorZ;
-  G4bool InverseMirrorX;
-  G4bool InverseMirrorY;
-  G4bool InverseMirrorZ;
+  G4bool MirrorXField,MirrorYField,MirrorZField;
+  G4bool MirrorFieldXInverse,MirrorFieldYInverse,MirrorFieldZInverse;
   G4double MirrorLineX;
   G4double MirrorLineY;
   G4double MirrorLineZ;

@@ -110,7 +110,7 @@
 /DetSys/gun/coneMaxAngle 170.0 deg
 /DetSys/gun/coneMinPhi 210.0 deg
 /DetSys/gun/coneMaxPhi 330.0 deg
-/DetSys/gun/BeamSpot 2 mm
+/DetSys/gun/BeamSpot 1 mm
 # /DetSys/gun/SetBeta 0.05
 # /DetSys/gun/SetLifetime 1 ns
 

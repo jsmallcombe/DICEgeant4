@@ -1,10 +1,10 @@
 void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", const char *rootin = "g4out.root") {
 	
-    double THETALIMDEG=12;//The limit on allowed theta std in a segment
+    double THETALIMDEG=10;//The limit on allowed theta std in a segment
     
-    if(rootout.size()<1){
+    if(rootout.find(".root")>rootout.size()){
         stringstream ss;
-        ss<<"flatorange"<< setw(4) << setfill('0')<<Ein<<".root";
+        ss<<rootout<<"_flatorange"<< setw(4) << setfill('0')<<Ein<<".root";
         rootout=ss.str();
     }
     
@@ -38,9 +38,11 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
     TH2F* E_GoodChan=new TH2F("E_GoodChan","FullEnergyVsSeg;Electron Energy (keV);Hit Segment;Counts",20,50,2050,16,0,16);
     
     TH2F* E_GoodChanThetaLim=new TH2F("E_GoodChanThetaLim","FullEnergyVsSegThetaLimited;Electron Energy (keV);Hit Segment;Counts",20,50,2050,16,0,16);
+    TH2F* E_GoodChanThetaLimHalf=new TH2F("E_GoodChanThetaLimHalf","FullEnergyVsSegThetaLimitedHalf;Electron Energy (keV);Hit Segment;Counts",20,50,2050,16,0,16);
     
     TH1F* Efficiency=new TH1F("Efficiency","Efficiency;Emission Energy (keV);Full Energy Detection Efficiency (%)",20,50,2050);
     TH1F* EfficiencyCut=new TH1F("EfficiencyCut","EfficiencyThetaCut;Emission Energy (keV);Full Energy Detection Efficiency (%)",20,50,2050);
+    TH1F* EfficiencyCutHalf=new TH1F("EfficiencyCutHalf","EfficiencyThetaCutHalf;Emission Energy (keV);Full Energy Detection Efficiency (%)",20,50,2050);
     TH1F* PeakTotal=new TH1F("PeakTotal","PeakToTotal;Emission Energy (keV);Detection PeakToTotal",20,50,2050);
     
 	out.mkdir("Angles");
@@ -61,7 +63,9 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
         
         stringstream ss;ss<<"AngleSeg_"<< setw(4) << setfill('0')<<Ein<<"keV";
         TH2F* AngleSeg = new TH2F(ss.str().c_str(),(ss.str()+";Emission Angle Theta #theta [Rad.];Hit Segment").c_str(),360,0,3.14159,16,0,16);
-    
+	out.cd("");
+        
+    TGraph* HitMap=new TGraph();
     
 	gROOT->cd();//cd back into main session memory 
 	
@@ -74,6 +78,7 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
 	int EventID;
 	int detNumber,cryNumber;
 	double depEnergy,primaryTheta;
+	double posx,posz;
 	
 	// Define the link between the "columns" of the list and the local variables we want to read them into
 	// See HistoManager.cc for a full list
@@ -82,6 +87,8 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
 	newtree->SetBranchAddress("cryNumber",&cryNumber);
 	newtree->SetBranchAddress("depEnergy",&depEnergy);
 	newtree->SetBranchAddress("primaryTheta",&primaryTheta);
+	newtree->SetBranchAddress("posx",&posx);
+	newtree->SetBranchAddress("posz",&posz);
 
 	// As each detector within one physical event is stored as a new "line/row" in our list we have to collect them first
 	// Thes variabls to help with assembling the events
@@ -95,6 +102,9 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
     double Eaddback=0;
     double Theta=0;
     double Mult=0;
+    double TMult=0;
+    
+    double pX,pZ;
 
 	// A loop over every line of the input data in sequence
 	for(long jentry=0;jentry<nentries;jentry++){
@@ -115,22 +125,29 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
                 VETO2=true;
             }
             if(cryNumber==0&&e>30){
-                if(detNumber>0&&detNumber<17){//0 is gaurd ring
+                if(detNumber>0&&detNumber<17){//0 is guard ring
                     Eaddback+=e;
-                    detNumber--; //Shift to zero index
+                    detNumber--; // Shift to zero index
                     EventHolder[detNumber]=e;
                     E_RawSum->Fill(e);
                     E_RawSplit->Fill(e,Ein);
                     E_RawSumChan->Fill(e,detNumber);
+                    Mult++;
+                    if(Mult==1){
+                        pX=posx;
+                        pZ=posz;
+                    }
                 }
-                Mult++;
             }
             Theta=primaryTheta;
+            TMult++;
             
 		}else{
 			CurrentEvent=EventID;
 			EndOfEvent=true;
 			jentry--;
+            
+//             newtree->GetEntry(jentry);//should be needed as we already loaded everything we needed from last event
 		}
 
 		// The loop only continues beyond here if we have collected all rows of an entire event
@@ -165,6 +182,7 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
             
             E_GoodChan->Fill(Ein,Seg);
             E_GoodChanThetaLim->Fill(Ein,Seg);
+            E_GoodChanThetaLimHalf->Fill(Ein,Seg);
             
             E_Theta->Fill(Theta,Ein);
         
@@ -178,6 +196,10 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
             int Y=Seg/4;
             AngleESegGrid->Fill(TMath::Pi()*Y+Theta,X*1500+Ein);
         
+            if(HitMap->GetN()<100){
+                HitMap->SetPoint(HitMap->GetN(),pZ,pX);
+            }
+            
         }}}    
         /////  Reset things ready for next event
 // 		for(auto &i : EventHolder){
@@ -191,6 +213,7 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
         Eaddback=0;
         Theta=0;
         Mult=0;
+        TMult=0;
     
 	}
 	
@@ -203,15 +226,33 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
         if(widthsig<0)widthsig=0;
         SigmaEseg->SetBinContent(SigmaEseg->FindBin(Ein,b-1),widthsig);
         if(widthsig>THETALIMDEG)E_GoodChanThetaLim->SetBinContent(E_GoodChanThetaLim->FindBin(Ein,b-1),0);
+        if(widthsig>THETALIMDEG*0.5)E_GoodChanThetaLimHalf->SetBinContent(E_GoodChanThetaLimHalf->FindBin(Ein,b-1),0);
     }
     
     // Simple Integral because the E_GoodChanThetaLim histogram is actually mostly empty, relying on hadd afterwards to fill
     EfficiencyCut->Fill(Ein,100*E_GoodChanThetaLim->Integral()/SimmN);
+    EfficiencyCutHalf->Fill(Ein,100*E_GoodChanThetaLimHalf->Integral()/SimmN);
     
     
 	// Save and close the output file
+    
+	out.mkdir("HitMaps");
+	out.cd("HitMaps");
+//         gStyle->SetPalette(kRust);
+        double normalizedValue = (Ein - 100) / (1500 - 100);
+        int color = gStyle->GetColorPalette(int(normalizedValue * 255));
+        HitMap->SetMarkerColor(color);
+    
+        HitMap->SetMarkerStyle(8);
+//         HitMap->SetMarkerSize(0.25);
+//         HitMap->SetMarkerColor((int)(Ein/100));
+        stringstream hh;hh<<"HitMap_"<< setw(4) << setfill('0')<<Ein<<"keV";
+        HitMap->Write(ss.str().c_str());
+	out.cd("");
+    
     out.Write();
     out.Close();	
     delete newfile; // Delete the variable holding the input file, which also closes it
     
 }
+

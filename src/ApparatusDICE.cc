@@ -317,7 +317,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     G4double Orange_ScintSep=(ScintThick+fBB34PCB_HalfThickness)+2.55*mm; // Distance between midpoint off BB34 and Scint 
 	G4double CrossBlockHalfThickness=1*mm;
     
-	if(fUseA)Orange_MagMidOffset=fAdjLengthA; // Distance between center line of magnet and widest point of shield
+	if(fUseA)Orange_MagMidOffset=fAdjLengthA; // Distance between center line of magnet and target
 	if(fUseB)Orange_BeamDetY=fAdjLengthB; // Height of target vs BB34
 	if(fUseC)Orange_ShieldMidBeamSep=fAdjLengthC;// Distance to the shield widest point
 	if(fUseD)Orange_MagY=fAdjLengthD;    // Total vertical coverage/height of the magnet field region
@@ -348,11 +348,16 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     
 	G4double Orange_ShieldHalfX=((fBB34Chip_HalfLength+SafetyGap)/Orange_BeamDetY)*LowestPointOfMagnet;
 	
+	if(Orange_ShieldHalfX<=0){
+		Orange_ShieldHalfX=10;
+		G4cout<<G4endl<<"POLL SEPARATION OVERRIDDEN DUE TO MAGENT PLACEMENT ERROR";
+	}
+	
 	if(Orange_MagAng<0){
 		G4double ShrtMag=MStart+abs(Orange_MagY/tan(Orange_MagAng));
 		if(ShrtMag<=Orange_MagZ){
 			Orange_MagZ=ShrtMag-SafetyGap;
-			G4cout<<G4endl<<"MAGNETS LENGTH OVERRIDDEN DUE MAGNET ANGLE";
+			G4cout<<G4endl<<"MAGNETS LENGTH OVERRIDDEN DUE TO MAGNET ANGLE";
 		}
 	}
 	
@@ -364,12 +369,13 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     G4cout<<G4endl<<"Beam <-> Shield Distance "<<Orange_BeamShieldSep;
     G4cout<<G4endl<<"Beam <-> ShieldCenter Distance "<<Orange_ShieldMidBeamSep;
     G4cout<<G4endl<<"ShieldCenter Z length (Tot.) "<<Orange_ShieldMidHalfWidth*2;
-    G4cout<<G4endl<<"Magnet Shieldgap (Tot. Z separation of magnets) "<<MStart*2;
+    G4cout<<G4endl<<"Magnet Shield-gap (i.e. Magnet separation along yoke) "<<MStart*2;
     G4cout<<G4endl<<"Shield Thickness "<<Orange_ShieldHalfX*2;
     G4cout<<G4endl<<"Magnet Pole Separation "<<Orange_ShieldHalfX*2;
     G4cout<<G4endl<<"Beam  <-> Detector Distance "<<Orange_BeamDetY;
     G4cout<<G4endl<<"MagnetTop <-> Beam Separation "<<Orange_MagMidOffset-Orange_MagY;
     G4cout<<G4endl<<"MagnetCenterline <-> Beam Separation "<<Orange_MagMidOffset;
+    G4cout<<G4endl<<"Lowest Point Of Magnet "<<LowestPointOfMagnet;
     G4cout<<G4endl<<"Magnet Height "<<Orange_MagY*2;
     G4cout<<G4endl<<"Magnet Length "<<Orange_MagZ-MStart;
     G4cout<<G4endl<<"Magnet Z Extent "<<Orange_MagZ;

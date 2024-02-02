@@ -70,8 +70,7 @@ private:
   //Mirror Field
   G4bool MirrorXField,MirrorYField,MirrorZField;
   G4bool MirrorFieldXInverse,MirrorFieldYInverse,MirrorFieldZInverse;
-  G4double MirrorLineX;
-  G4double MirrorLineY;
-  G4double MirrorLineZ;
+  G4double MirrorLineX, MirrorLineY, MirrorLineZ;
+  G4double MirrorDeadX, MirrorDeadY, MirrorDeadZ;
 };
 #endif

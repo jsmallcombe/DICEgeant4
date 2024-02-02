@@ -6,7 +6,7 @@
 #include <algorithm> //for max_element
 
 TabulatedMagneticField::TabulatedMagneticField(const char* filename) //called in 'nonuniformfield'
-: fMaxbx(0),fMaxby(0),fMaxbz(0),fMaxM(0), fInvertXIndex(false), fInvertYIndex(false), fInvertZIndex(false), MirrorXField(false), MirrorYField(false), MirrorZField(false),MirrorFieldXInverse(false), MirrorFieldYInverse(false), MirrorFieldZInverse(false), MirrorLineX(0), MirrorLineY(0), MirrorLineZ(0)
+: fMaxbx(0),fMaxby(0),fMaxbz(0),fMaxM(0), fInvertXIndex(false), fInvertYIndex(false), fInvertZIndex(false), MirrorXField(false), MirrorYField(false), MirrorZField(false),MirrorFieldXInverse(false), MirrorFieldYInverse(false), MirrorFieldZInverse(false), MirrorLineX(0), MirrorLineY(0), MirrorLineZ(0), MirrorDeadX(0), MirrorDeadY(0), MirrorDeadZ(0)
 {    
 	
 	
@@ -167,6 +167,31 @@ void TabulatedMagneticField::SetFieldMirrorPoint(G4ThreeVector Mpoint){
   		MirrorLineX=Mpoint.getX();
 		MirrorLineY=Mpoint.getY();
 		MirrorLineZ=Mpoint.getZ();
+		
+// 		G4cout<<G4endl<<fMinx<<" "<<fMaxx<<" "<<MirrorLineX;
+// 		G4cout<<G4endl<<fMiny<<" "<<fMaxy<<" "<<MirrorLineY;
+// 		G4cout<<G4endl<<fMinz<<" "<<fMaxz<<" "<<MirrorLineZ;
+		
+		
+		MirrorDeadX=std::abs(fMinx-MirrorLineX);
+		MirrorDeadY=std::abs(fMiny-MirrorLineY);
+		MirrorDeadZ=std::abs(fMinz-MirrorLineZ);
+
+// 		G4cout<<G4endl<<"MirrorDead";
+// 		G4cout<<G4endl<<MirrorDeadX;
+// 		G4cout<<G4endl<<MirrorDeadY;
+// 		G4cout<<G4endl<<MirrorDeadZ;
+		
+		if(std::abs(fMaxx-MirrorLineX)<MirrorDeadX)MirrorDeadX=std::abs(fMaxx-MirrorLineX);
+		if(std::abs(fMaxy-MirrorLineY)<MirrorDeadY)MirrorDeadY=std::abs(fMaxy-MirrorLineY);
+		if(std::abs(fMaxz-MirrorLineZ)<MirrorDeadZ)MirrorDeadZ=std::abs(fMaxz-MirrorLineZ);
+		
+/*		
+		G4cout<<G4endl<<"MirrorDead";
+		G4cout<<G4endl<<MirrorDeadX;
+		G4cout<<G4endl<<MirrorDeadY;
+		G4cout<<G4endl<<MirrorDeadZ;*/
+		
 }
   
 void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bfield) const
@@ -191,27 +216,44 @@ void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bf
 // 	z = R.getZ();
 
 	
+	// Control if the field vector is flipped in the mirror`
 	G4int MirX=1,MirY=1,MirZ=1;
 	
-	if(MirrorXField){
-	if(!(x>=fMinx && x<=fMaxx)){
-		x=2*MirrorLineX-x;
-		if(MirrorFieldXInverse){MirY*=-1;MirZ*=-1;}
-		else{MirX*=-1;}
-	}}
+	if(MirrorXField){ // If this axis has a mirror
+		
+		if(std::abs(x-MirrorLineX)<MirrorDeadX){// If coord is in the dead region between mirror line and first point
+			if((x-MirrorLineX)>0)x=MirrorLineX+MirrorDeadX; //move it TO the first point
+			else x=MirrorLineX-MirrorDeadX;	
+		}
+			
+		if(!(x>=fMinx && x<=fMaxx)){ // Is coord NOT in main field region
+			x=2*MirrorLineX-x;// flip the coordinate in the mirror so it IS in the main region
+			if(MirrorFieldXInverse){MirY*=-1;MirZ*=-1;} //Set filed mirroring parameters 
+			else{MirX*=-1;}
+		}
+	}
 	if(MirrorYField){
-	if(!(y>=fMiny && y<=fMaxy)){
-		y=2*MirrorLineY-y;
-		if(MirrorFieldYInverse){MirX*=-1;MirZ*=-1;}
-		else{MirY*=-1;}
-	}}
+		if(std::abs(y-MirrorLineY)<MirrorDeadY){// If coord is in the dead region between mirror line and first point
+			if((y-MirrorLineY)>0)x=MirrorLineY+MirrorDeadY; //move it TO the first point
+			else y=MirrorLineY-MirrorDeadY;	
+		}
+		if(!(y>=fMiny && y<=fMaxy)){
+			y=2*MirrorLineY-y;
+			if(MirrorFieldYInverse){MirX*=-1;MirZ*=-1;}
+			else{MirY*=-1;}
+		}
+	}
 	if(MirrorZField){
-	if(!(z>=fMinz && z<=fMaxz)){
-		z=2*MirrorLineZ-z;
-		if(MirrorFieldZInverse){MirX*=-1;MirY*=-1;}
-		else{MirZ*=-1;}
-	}}
-	
+		if(std::abs(z-MirrorLineZ)<MirrorDeadZ){// If coord is in the dead region between mirror line and first point
+			if((z-MirrorLineZ)>0)x=MirrorLineZ+MirrorDeadZ; //move it TO the first point
+			else z=MirrorLineZ-MirrorDeadZ;	
+		}
+		if(!(z>=fMinz && z<=fMaxz)){
+			z=2*MirrorLineZ-z;
+			if(MirrorFieldZInverse){MirX*=-1;MirY*=-1;}
+			else{MirZ*=-1;}
+		}
+	}
 	
 	
 	// Check that the point is within the defined region 

@@ -300,6 +300,14 @@ void DetectorConstruction::SetFieldMirrorPoint(G4ThreeVector Mpoint){
 	}
 }
 
+void DetectorConstruction::SetFieldOffsetVec(G4ThreeVector Mpoint){
+	if(GetField()){
+		GetField()->SetFieldOffsetVec(Mpoint);
+// 		UpdateField();
+	}
+}
+
+
 void DetectorConstruction::SetDiceLength(G4int Nsel,G4double Length){
     switch (Nsel) {
     case 1:

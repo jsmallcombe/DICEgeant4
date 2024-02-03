@@ -132,6 +132,7 @@ public:
 	
 	void SetFieldMirror(int,bool);
 	void SetFieldMirrorPoint(G4ThreeVector);
+	void SetFieldOffsetVec(G4ThreeVector);
 	
 private:
 	bool CheckVolumeName(G4String volumeName);

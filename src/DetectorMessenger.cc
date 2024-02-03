@@ -95,6 +95,10 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 	fTabMagneticFieldMirrorPointCmd->SetGuidance("Field mirror coord.");
 	fTabMagneticFieldMirrorPointCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 	
+    fTabMagneticFieldOffsetCmd = new G4UIcmdWith3VectorAndUnit("/DetSys/world/SetFieldOffset",this);
+	fTabMagneticFieldOffsetCmd->SetGuidance("Field offset vector");
+	fTabMagneticFieldOffsetCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+	
     fTabMagneticFieldMirrorCmd = new G4UIcmdWithAnInteger("/DetSys/world/SetFieldMirror",this);
 	fTabMagneticFieldMirrorCmd->SetGuidance("Field xyz 123 mirror coords.");
 	fTabMagneticFieldMirrorCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
@@ -173,6 +177,7 @@ DetectorMessenger::~DetectorMessenger()
 	
 	delete fTabMagneticFieldCmd;
 	delete fTabMagneticFieldMirrorPointCmd;
+	delete fTabMagneticFieldOffsetCmd;
 	delete fTabMagneticFieldMirrorCmd;
 	delete fTabMagneticFieldAntiMirrorCmd;
 
@@ -220,6 +225,10 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 	
 	if(command == fTabMagneticFieldMirrorPointCmd) {
 		fDetector->SetFieldMirrorPoint(fTabMagneticFieldMirrorPointCmd->GetNew3VectorValue(newValue));
+	}
+	
+	if(command == fTabMagneticFieldOffsetCmd) {
+		fDetector->SetFieldOffsetVec(fTabMagneticFieldOffsetCmd->GetNew3VectorValue(newValue));
 	}
 	
 	if(command == fTabMagneticFieldMirrorCmd) {

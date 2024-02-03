@@ -35,6 +35,7 @@ public:
   void SetField(G4double MaxSetField);
   void SetFieldMirror(int xyz,bool antimirror);
   void SetFieldMirrorPoint(G4ThreeVector Mpoint);
+  void SetFieldOffsetVec(G4ThreeVector Mpoint);
   
   void  GetFieldValue(const G4double Point[4], G4double* Bfield) const;
   
@@ -72,5 +73,9 @@ private:
   G4bool MirrorFieldXInverse,MirrorFieldYInverse,MirrorFieldZInverse;
   G4double MirrorLineX, MirrorLineY, MirrorLineZ;
   G4double MirrorDeadX, MirrorDeadY, MirrorDeadZ;
+  
+  G4double fOffx;
+  G4double fOffy;
+  G4double fOffz;
 };
 #endif

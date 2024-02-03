@@ -75,6 +75,7 @@ private:
 	G4UIcmdWithAString*        fTabMagneticFieldCmd;
 	
 	G4UIcmdWith3VectorAndUnit* fTabMagneticFieldMirrorPointCmd;
+	G4UIcmdWith3VectorAndUnit* fTabMagneticFieldOffsetCmd;
 	G4UIcmdWithAnInteger* 	   fTabMagneticFieldMirrorCmd;
 	G4UIcmdWithAnInteger*	   fTabMagneticFieldAntiMirrorCmd;
 

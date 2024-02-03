@@ -6,9 +6,16 @@
 #include <algorithm> //for max_element
 
 TabulatedMagneticField::TabulatedMagneticField(const char* filename) //called in 'nonuniformfield'
-: fMaxbx(0),fMaxby(0),fMaxbz(0),fMaxM(0), fInvertXIndex(false), fInvertYIndex(false), fInvertZIndex(false), MirrorXField(false), MirrorYField(false), MirrorZField(false),MirrorFieldXInverse(false), MirrorFieldYInverse(false), MirrorFieldZInverse(false), MirrorLineX(0), MirrorLineY(0), MirrorLineZ(0), MirrorDeadX(0), MirrorDeadY(0), MirrorDeadZ(0)
+: fMaxbx(0),fMaxby(0),fMaxbz(0),fMaxM(0), fInvertXIndex(false), fInvertYIndex(false), fInvertZIndex(false), MirrorXField(false), MirrorYField(false), MirrorZField(false),MirrorFieldXInverse(false), MirrorFieldYInverse(false), MirrorFieldZInverse(false), MirrorLineX(0), MirrorLineY(0), MirrorLineZ(0), MirrorDeadX(0), MirrorDeadY(0), MirrorDeadZ(0), fOffx(0), fOffy(0), fOffz(0)
 {    
 	
+	//////////////////////////
+	/// Formatting of input file :
+	/// Z Y X
+	/// 20 10 10
+	/// z1 y1 x1 bz by bx
+	/// z1 y1 x2 bz by bx 
+	/// ...
 	
 	// Units of the input files
 	G4double lenUnit= mm;
@@ -26,14 +33,28 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename) //called in
 		G4cin.get();
 	}
 	
+	int nX=0,nY=1,nZ=2;
+	char n0='x',n1='y',n2='z';
+	char c;
+	file>>c;
+	if(c=='y'||c=='Y'){nY=0;n0='y';}
+	else if(c=='z'||c=='Z'){nZ=0;n0='z';}
+	file>>c;
+	if(c=='x'||c=='X'){nX=1;n1='x';}
+	else if(c=='z'||c=='Z'){nZ=1;n1='z';}
+	file>>c;
+	if(c=='x'||c=='X'){nX=2;n2='x';}
+	else if(c=='y'||c=='Y'){nY=2;n2='y';}
+	
+	int fN[3];
 	// Read table dimensions 
-	file>>fNx>>fNy>>fNz; // Note dodgy order //20/7 what? xyz looks fine!
+	file>>fN[0]>>fN[1]>>fN[2]; 
+	fNx=fN[nX];
+	fNy=fN[nY];
+	fNz=fN[nZ];
 
-	G4cout<<"  [ Number of values x,y,z: " 
-		<<fNx<<" "<<fNy<<" "<<fNz<<" ] "//111*111*106 gives 1306026 rows
-		<<std::endl;
-
-	G4cout<<" ---> assumed the order:  x, y, z, Bx, By, Bz ";
+	G4cout<<"  [ Number of values x,y,z: " <<fNx<<" "<<fNy<<" "<<fNz<<" ] ";//111*111*106 gives 1306026 rows
+	G4cout<<G4endl<<" Input order: "<<n0<<" "<<n1<<" "<<n2<<G4endl;
 
 	// Set up storage space for table using values from above- does not initialise values
 	fXField.resize(fNx);
@@ -51,19 +72,28 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename) //called in
 	}//three field values per point, hence three arrays needed
 
 	// Read in the data and fill arrays
-	G4double xval,yval,zval,bx,by,bz;
+// 	G4double xval,yval,zval;
+	G4double bx,by,bz;
+	G4double xyxval[3],bval[3],ixyz[3];
 	
-	for(G4int iz=0; iz<fNz; iz++) {
-		for(G4int ix=0; ix<fNx; ix++) {
-			for(G4int iy=0; iy<fNy; iy++) {
+	for(ixyz[0]=0; ixyz[0]<fN[0]; ixyz[0]++) {
+		for(ixyz[1]=0; ixyz[1]<fN[1]; ixyz[1]++) {
+			for(ixyz[2]=0; ixyz[2]<fN[2]; ixyz[2]++) {
 // 				file >> xval >> yval >> zval >> bx >> by >> bz;
-				file >> zval >> xval >> yval >> bz >> bx >> by;
+				file >> xyxval[0] >> xyxval[1] >> xyxval[2] >> bval[0] >> bval[1] >> bval[2];
 
+				int ix=ixyz[nX],iy=ixyz[nY],iz=ixyz[nZ];
+				
 				if(ix==0 && iy==0 && iz==0) {//min is first value?? theres no sort/search 
-					fMinx = xval * lenUnit;
-					fMiny = yval * lenUnit;
-					fMinz = zval * lenUnit;
+					fMinx = xyxval[nX] * lenUnit;
+					fMiny = xyxval[nY] * lenUnit;
+					fMinz = xyxval[nZ] * lenUnit;
 				}
+				
+				bx=bval[nX];
+				by=bval[nY];
+				bz=bval[nZ];
+				
 				fXField[ix][iy][iz] = bx * fieldUnit;
 				fYField[ix][iy][iz] = by * fieldUnit;
 				fZField[ix][iy][iz] = bz * fieldUnit;
@@ -76,22 +106,22 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename) //called in
 				if(MagVec.mag() > fMaxM) fMaxM = MagVec.mag() ;
 			}
 		}
+		
 	}
 	file.close(); //internally stored values, so can close file
+	
 	
 	fMaxbx *=fieldUnit;
 	fMaxby *=fieldUnit;
 	fMaxbz *=fieldUnit;
 	fMaxM *=fieldUnit;
-				
 
-	fMaxx = xval * lenUnit; //now max dimension values are the last values - i.e. post-loop values
-	fMaxy = yval * lenUnit;
-	fMaxz = zval * lenUnit;
+	fMaxx = xyxval[nX] * lenUnit; //now max dimension values are the last values - i.e. post-loop values
+	fMaxy = xyxval[nY] * lenUnit;
+	fMaxz = xyxval[nZ] * lenUnit;
 
-	G4cout<<"\n ---> ... done reading "<<std::endl;
-
-
+// 	G4cout<<"\n ---> ... done reading "<<std::endl;
+// 
 	// Should really check that the limits are not the wrong way around.
 	if(fMaxx < fMinx) {
 		std::swap(fMaxx,fMinx);
@@ -168,37 +198,30 @@ void TabulatedMagneticField::SetFieldMirrorPoint(G4ThreeVector Mpoint){
 		MirrorLineY=Mpoint.getY();
 		MirrorLineZ=Mpoint.getZ();
 		
-// 		G4cout<<G4endl<<fMinx<<" "<<fMaxx<<" "<<MirrorLineX;
-// 		G4cout<<G4endl<<fMiny<<" "<<fMaxy<<" "<<MirrorLineY;
-// 		G4cout<<G4endl<<fMinz<<" "<<fMaxz<<" "<<MirrorLineZ;
-		
-		
 		MirrorDeadX=std::abs(fMinx-MirrorLineX);
 		MirrorDeadY=std::abs(fMiny-MirrorLineY);
 		MirrorDeadZ=std::abs(fMinz-MirrorLineZ);
 
-// 		G4cout<<G4endl<<"MirrorDead";
-// 		G4cout<<G4endl<<MirrorDeadX;
-// 		G4cout<<G4endl<<MirrorDeadY;
-// 		G4cout<<G4endl<<MirrorDeadZ;
-		
 		if(std::abs(fMaxx-MirrorLineX)<MirrorDeadX)MirrorDeadX=std::abs(fMaxx-MirrorLineX);
 		if(std::abs(fMaxy-MirrorLineY)<MirrorDeadY)MirrorDeadY=std::abs(fMaxy-MirrorLineY);
 		if(std::abs(fMaxz-MirrorLineZ)<MirrorDeadZ)MirrorDeadZ=std::abs(fMaxz-MirrorLineZ);
-		
-/*		
-		G4cout<<G4endl<<"MirrorDead";
-		G4cout<<G4endl<<MirrorDeadX;
-		G4cout<<G4endl<<MirrorDeadY;
-		G4cout<<G4endl<<MirrorDeadZ;*/
-		
+}
+
+void TabulatedMagneticField::SetFieldOffsetVec(G4ThreeVector Mpoint){
+  		fOffx=Mpoint.getX();
+		fOffy=Mpoint.getY();
+		fOffz=Mpoint.getZ();
 }
   
 void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bfield) const
 {
-	G4double x = point[0];
-	G4double y = point[1];
-	G4double z = point[2];
+		Bfield[0] = 0.0;
+		Bfield[1] = 0.0;
+		Bfield[2] = 0.0;
+		
+	G4double x = point[0]+fOffx;
+	G4double y = point[1]+fOffy;
+	G4double z = point[2]+fOffz;
 
 	//Rotation treatment Mhd : 25 Mar 2015
 	//
@@ -293,21 +316,26 @@ void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bf
 		int yindex = static_cast<int>(ydindex);
 		int zindex = static_cast<int>(zdindex);
 
+		// There was a slight glitch with index+1 going over range when EXACTLY on the upper boundary.
+		// Not sure how it never caused issues before
+		if(xindex==fNx-1){xindex--;xlocal=1;}
+		if(yindex==fNy-1){yindex--;ylocal=1;}
+		if(zindex==fNz-1){zindex--;ylocal=1;}
 
 #ifdef DEBUG_INTERPOLATING_FIELD
-		G4cout<<"Local x,y,z: "<<xlocal<<" "<<ylocal<<" "<<zlocal<<std::endl;
-		G4cout<<"Index x,y,z: "<<xindex<<" "<<yindex<<" "<<zindex<<std::endl;
-		G4double valx0z0, mulx0z0, valx1z0, mulx1z0;
-		G4double valx0z1, mulx0z1, valx1z1, mulx1z1;
-		valx0z0= table[xindex  ][0][zindex];  mulx0z0=  (1-xlocal) * (1-zlocal);
-		valx1z0= table[xindex+1][0][zindex];  mulx1z0=   xlocal    * (1-zlocal);
-		valx0z1= table[xindex  ][0][zindex+1]; mulx0z1= (1-xlocal) * zlocal;
-		valx1z1= table[xindex+1][0][zindex+1]; mulx1z1=  xlocal    * zlocal;
+		std::cout<<"x,y,z: "<<x<<" "<<y<<" "<<z<<std::endl;
+		std::cout<<"fMinx: "<<fMinx<<" "<<fMiny<<" "<<fMinz<<std::endl;
+		std::cout<<"fDx: "<<fDx<<" "<<fDy<<" "<<fDz<<std::endl;
+		std::cout<<"Fraction: "<<xfraction<<" "<<yfraction<<" "<<zfraction<<std::endl;
+		std::cout<<"fNx: "<<fNx<<" "<<fNy<<" "<<fNz<<std::endl;
+		std::cout<<"Local x,y,z: "<<xlocal<<" "<<ylocal<<" "<<zlocal<<std::endl;
+		std::cout<<"ydindex x,y,z: "<<xdindex<<" "<<ydindex<<" "<<zdindex<<std::endl;
+		std::cout<<"Index x,y,z: "<<xindex<<" "<<yindex<<" "<<zindex<<std::endl;
 #endif
-
+		
 		// Full 3-dimensional version
 		Bfield[0] =
-			fXField[xindex  ][yindex  ][zindex  ] * (1-xlocal) * (1-ylocal) * (1-zlocal) +
+			fXField[xindex  ][yindex  ][yindex  ] * (1-xlocal) * (1-ylocal) * (1-zlocal) +
 			fXField[xindex  ][yindex  ][zindex+1] * (1-xlocal) * (1-ylocal) *    zlocal  +
 			fXField[xindex  ][yindex+1][zindex  ] * (1-xlocal) *    ylocal  * (1-zlocal) +
 			fXField[xindex  ][yindex+1][zindex+1] * (1-xlocal) *    ylocal  *    zlocal  +

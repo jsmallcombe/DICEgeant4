@@ -6,6 +6,7 @@
 
 /DetSys/world/TabMagneticField ExportTestNew.txt
 /DetSys/world/SetFieldMirrorPos 0 -22.5 0 mm
+#/DetSys/world/SetFieldOffset 0 0 0 mm
 /DetSys/world/SetFieldAntiMirror 1
 /DetSys/world/SetFieldMirror 2 
 /DetSys/world/SetFieldAntiMirror 3
@@ -84,7 +85,7 @@
 
 ### To visualise the magnetic field ###
 ### Doesnt seem with tracks. ###
-#/vis/scene/add/magneticField 20
+#/vis/scene/add/magneticField 15
 
 ### Particle Tracks Options ###
 /vis/scene/add/trajectories smooth

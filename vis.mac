@@ -3,7 +3,7 @@
 /DetSys/world/material Vacuum
 
 ### Configure Apparatus To Build ###
-
+ 
 /DetSys/world/TabMagneticField ExportTestNew.txt
 /DetSys/world/SetFieldMirrorPos 0 -22.5 0 mm
 #/DetSys/world/SetFieldOffset 0 0 0 mm

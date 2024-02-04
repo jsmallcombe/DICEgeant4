@@ -387,6 +387,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     G4VSolid* ShieldBox=0;
     std::vector<G4TwoVector> OrangeShieldPoly(5);
     
+	G4ExtrudedSolid* ShieldCutBox=nullptr;
 	if(!fRemoveShield){
         OrangeShieldPoly[0].set(Orange_ShieldFrontHalfWidth,Orange_ShieldMidDepth);
         OrangeShieldPoly[1].set(Orange_ShieldMidHalfWidth,0);
@@ -408,21 +409,44 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 		ShieldBoxL->SetVisAttributes(OneVisAtt);
 		new G4PVPlacement(rotate1,rotZbar*G4ThreeVector(0,0,0), ShieldBoxL,"Shield", expHallLog,false,0); 
 		
+		
+		for(unsigned int i=0;i<OrangeShieldPoly.size();i++)OrangeShieldPoly[i]*=1.01;
+        ShieldCutBox = new G4ExtrudedSolid("CutBox1", OrangeShieldPoly, Orange_ShieldHalfX*1.1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
+		
+		
+		//Place new under-shield block
+		
+		G4double XrayHW=Orange_ShieldMidHalfWidth;
+		if(Orange_ShieldMidHalfWidth>MStart){XrayHW=MStart;}
+		G4double XrayHH=std::abs(Orange_ShieldMidBeamSep-LowestPointOfMagnet);
+		if(Orange_ShieldBottomDepth>=XrayHH)XrayHH=Orange_ShieldBottomDepth; 
+		XrayHH/=2;
+		
+		G4Box* XrayBox = new G4Box("XrayBox",Orange_ShieldHalfX,XrayHH,XrayHW);
+		G4RotationMatrix* subtrarot = new G4RotationMatrix;
+		subtrarot->rotateY(90*deg);
+        G4SubtractionSolid* XrayShape = new G4SubtractionSolid("XrayShape", XrayBox, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH,0));
+		
+		G4LogicalVolume *XrayLog = new G4LogicalVolume(XrayShape, BlockerMat,"XrayLog",0,0,0);
+		G4RotationMatrix* rotateblock = new G4RotationMatrix;
+		rotateblock->rotateZ(Zbar);
+		new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-XrayHH-Orange_ShieldMidBeamSep,0), XrayLog,"XrayBlock", expHallLog,false,0);
+
 		// Place carbon blocker
 		
-		if(fAddBlocker){
-			G4double HalfBlockGap=0.5*(Orange_BeamDetY-(Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep+SafetyGap*1.5));
-			if(HalfBlockGap>SafetyGap*1.5){
-				G4Box* ElectronBlockerBox = new G4Box("ElectronBlockerBox",fBB34Chip_HalfLength,HalfBlockGap,CrossBlockHalfThickness);
-				G4LogicalVolume *ElectronBlockerLog = new G4LogicalVolume(ElectronBlockerBox, BlockerMat,"ElectronBlockerLog",0,0,0);
-				ElectronBlockerLog->SetVisAttributes(ThreeVisAtt);
-				G4RotationMatrix* rotateblock = new G4RotationMatrix;
-				rotateblock->rotateZ(Zbar);
-				new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-HalfBlockGap-Orange_ShieldBottomDepth-Orange_ShieldMidBeamSep,0), ElectronBlockerLog,"BB34Detector", expHallLog,false,0);
-			}else{
-				G4cout<<G4endl<<"NO ROOM FOR ELECTRON BLOCKER";
-			}
-		}
+		// NEEDS FIXING IF KEEPING THE UNDERSHIELD BLOCK
+		
+// // // 		if(fAddBlocker){
+// // // 			G4double HalfBlockGap=0.5*(Orange_BeamDetY-(Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep+SafetyGap*1.5));
+// // // 			if(HalfBlockGap>SafetyGap*1.5){
+// // // 				G4Box* ElectronBlockerBox = new G4Box("ElectronBlockerBox",fBB34Chip_HalfLength,HalfBlockGap,CrossBlockHalfThickness);
+// // // 				G4LogicalVolume *ElectronBlockerLog = new G4LogicalVolume(ElectronBlockerBox, BlockerMat,"ElectronBlockerLog",0,0,0);
+// // // 				ElectronBlockerLog->SetVisAttributes(ThreeVisAtt);
+// // // 				new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-HalfBlockGap-Orange_ShieldBottomDepth-Orange_ShieldMidBeamSep,0), ElectronBlockerLog,"BB34Detector", expHallLog,false,0);
+// // // 			}else{
+// // // 				G4cout<<G4endl<<"NO ROOM FOR ELECTRON BLOCKER";
+// // // 			}
+// // // 		}
 	}
 	
 	// Place BB34 detector
@@ -475,9 +499,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4VSolid* fMagBox = new G4ExtrudedSolid("MagBox", MagPolygon, Orange_MagHalfThick, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 
     if(!StartMagAtShield&&!fRemoveShield){
-        for(unsigned int i=0;i<OrangeShieldPoly.size();i++)OrangeShieldPoly[i]*=1.01;
-        G4ExtrudedSolid* CutBox = new G4ExtrudedSolid("CutBox1", OrangeShieldPoly, Orange_ShieldHalfX*1.1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
-        fFieldBox = new G4SubtractionSolid("FieldVolBoxCut", fFieldBox, CutBox,0,G4ThreeVector(0,0,0));
+        fFieldBox = new G4SubtractionSolid("FieldVolBoxCut", fFieldBox, ShieldCutBox,0,G4ThreeVector(0,0,0));
     }
     
 	// Place Magnetic Field Volumes 

@@ -52,13 +52,15 @@ G4double ApparatusDICE::fFieldStength = 0.065*CLHEP::tesla;
 ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 {
 	// Materials
-	fBlockerMaterial = "G4_C"; 
+	fBlockerMaterial = "Peek"; //G4_C
 	fMagnetMaterial = "NdFeB"; 
 	fWaferMaterial   = "Silicon";
 	fShieldMaterial   = "WTa";
 // 	fShieldMaterial   = "Hevimetal";
-	fscintMaterial   = "EJ212";
-// 	fscintMaterial   = "G4_BGO";
+	fScintMaterial   = "EJ212";
+// 	fScintMaterial   = "G4_BGO";
+	fXrayMaterial   = "Brass"; //Copper //Aluminium
+	fKaptonMaterial   = "Kapton";
 
     fRemoveShield=false;
     fAddBlocker=false;
@@ -69,6 +71,7 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
     TwoVisAtt = new G4VisAttributes(G4Colour(SN_COL)); // grey
     ThreeVisAtt = new G4VisAttributes(G4Colour(CU_COL)); // Yellow
     FourVisAtt = new G4VisAttributes(G4Colour(0.2,0.4,0.3)); // Dark Green
+    FiveVisAtt = new G4VisAttributes(G4Colour(0.941,0.698,0.094)); // Kapton "orangish"
 	vis_att_hid = new G4VisAttributes(false);
     
     // BB34 finalised
@@ -289,7 +292,9 @@ G4LogicalVolume* ApparatusDICE::BuildBB34(){
 void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zbar){
 	G4Material* BlockerMat = G4Material::GetMaterial(fBlockerMaterial);
 	G4Material *mMaterial = G4Material::GetMaterial(fMagnetMaterial);
-    G4Material* ScintMat = G4Material::GetMaterial(fscintMaterial);
+    G4Material* ScintMat = G4Material::GetMaterial(fScintMaterial);
+    G4Material* XrayMat = G4Material::GetMaterial(fXrayMaterial);
+    G4Material* KapMat = G4Material::GetMaterial(fKaptonMaterial);
 	
 	
 	G4RotationMatrix rotZbar;
@@ -323,6 +328,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	if(fUseD)Orange_MagY=fAdjLengthD;    // Total vertical coverage/height of the magnet field region
 	if(fUseE)Orange_MagAng=fAdjLengthE;  // Flare angle of the magnets
 	
+	G4double 	KaptonThickness=0.1*mm; // Height of target vs BB34
 	
 	// MAG HEIGHT IS DIVIDED BY TWO AFTER INPUT
     Orange_MagY*=0.5; 
@@ -414,39 +420,54 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
         ShieldCutBox = new G4ExtrudedSolid("CutBox1", OrangeShieldPoly, Orange_ShieldHalfX*1.1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
 		
 		
-		//Place new under-shield block
+		//Place new under-shield x-ray block
 		
 		G4double XrayHW=Orange_ShieldMidHalfWidth;
 		if(Orange_ShieldMidHalfWidth>MStart){XrayHW=MStart;}
+		// Z-Width only goes as far as the magnets
+		
 		G4double XrayHH=std::abs(Orange_ShieldMidBeamSep-LowestPointOfMagnet);
 		if(Orange_ShieldBottomDepth>=XrayHH)XrayHH=Orange_ShieldBottomDepth; 
 		XrayHH/=2;
+		//Goes to EITHER the bottom of the magnets OR a little under the shield.
 		
-		G4Box* XrayBox = new G4Box("XrayBox",Orange_ShieldHalfX,XrayHH,XrayHW);
+		G4VSolid* XrayBox = new G4Box("XrayBox",Orange_ShieldHalfX,XrayHH,XrayHW);
+		
+		G4VSolid* XrayCover = new G4Box("XrayBox",Orange_ShieldHalfX-0.1*mm,XrayHH,XrayHW+KaptonThickness);
+		XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, XrayBox,0,G4ThreeVector(0,KaptonThickness,0));
+		
 		G4RotationMatrix* subtrarot = new G4RotationMatrix;
-		subtrarot->rotateY(90*deg);
-        G4SubtractionSolid* XrayShape = new G4SubtractionSolid("XrayShape", XrayBox, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH,0));
+		subtrarot->rotateY(90*deg); //ShieldCutBox is the wrong way as G4ExtrudedSolid in Z-axis by default
 		
-		G4LogicalVolume *XrayLog = new G4LogicalVolume(XrayShape, BlockerMat,"XrayLog",0,0,0);
+        XrayBox = new G4SubtractionSolid("XrayShape", XrayBox, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH,0));
+		
+		G4LogicalVolume *XrayLog = new G4LogicalVolume(XrayBox, XrayMat,"XrayLog_FORBID",0,0,0);
 		G4RotationMatrix* rotateblock = new G4RotationMatrix;
 		rotateblock->rotateZ(Zbar);
 		new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-XrayHH-Orange_ShieldMidBeamSep,0), XrayLog,"XrayBlock", expHallLog,false,0);
+		
+		G4LogicalVolume *XrayCoverLog = new G4LogicalVolume(XrayCover, KapMat,"XrayCoverLog_FORBID",0,0,0);
+		XrayCoverLog->SetVisAttributes(FiveVisAtt);
+		new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-XrayHH-Orange_ShieldMidBeamSep-KaptonThickness,0), XrayCoverLog,"XrayBlockCover", expHallLog,false,0);
+		
 
 		// Place carbon blocker
 		
 		// NEEDS FIXING IF KEEPING THE UNDERSHIELD BLOCK
 		
-// // // 		if(fAddBlocker){
-// // // 			G4double HalfBlockGap=0.5*(Orange_BeamDetY-(Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep+SafetyGap*1.5));
-// // // 			if(HalfBlockGap>SafetyGap*1.5){
-// // // 				G4Box* ElectronBlockerBox = new G4Box("ElectronBlockerBox",fBB34Chip_HalfLength,HalfBlockGap,CrossBlockHalfThickness);
-// // // 				G4LogicalVolume *ElectronBlockerLog = new G4LogicalVolume(ElectronBlockerBox, BlockerMat,"ElectronBlockerLog",0,0,0);
-// // // 				ElectronBlockerLog->SetVisAttributes(ThreeVisAtt);
-// // // 				new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-HalfBlockGap-Orange_ShieldBottomDepth-Orange_ShieldMidBeamSep,0), ElectronBlockerLog,"BB34Detector", expHallLog,false,0);
-// // // 			}else{
-// // // 				G4cout<<G4endl<<"NO ROOM FOR ELECTRON BLOCKER";
-// // // 			}
-// // // 		}
+		if(fAddBlocker){
+			
+			G4double HalfBlockGap=0.5*(Orange_BeamDetY-(XrayHH*2+Orange_ShieldMidBeamSep+SafetyGap*1.5));
+
+			if(HalfBlockGap>SafetyGap*1.5){
+				G4Box* ElectronBlockerBox = new G4Box("ElectronBlockerBox",fBB34Chip_HalfLength,HalfBlockGap,CrossBlockHalfThickness);
+				G4LogicalVolume *ElectronBlockerLog = new G4LogicalVolume(ElectronBlockerBox, BlockerMat,"ElectronBlockerLog_FORBID",0,0,0);
+				ElectronBlockerLog->SetVisAttributes(ThreeVisAtt);
+				new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-HalfBlockGap-XrayHH*2-Orange_ShieldMidBeamSep-KaptonThickness,0), ElectronBlockerLog,"BB34Detector", expHallLog,false,0);
+			}else{
+				G4cout<<G4endl<<"NO ROOM FOR ELECTRON BLOCKER";
+			}
+		}
 	}
 	
 	// Place BB34 detector
@@ -497,6 +518,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 
 	G4VSolid* fFieldBox = new G4ExtrudedSolid("FieldVolBox", MagPolygon, Orange_ShieldHalfX, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 	G4VSolid* fMagBox = new G4ExtrudedSolid("MagBox", MagPolygon, Orange_MagHalfThick, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
+	G4VSolid* fMagKap = new G4ExtrudedSolid("MagKap", MagPolygon, KaptonThickness*0.5, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 
     if(!StartMagAtShield&&!fRemoveShield){
         fFieldBox = new G4SubtractionSolid("FieldVolBoxCut", fFieldBox, ShieldCutBox,0,G4ThreeVector(0,0,0));
@@ -506,9 +528,12 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	
 	G4Material* matWorld = G4Material::GetMaterial("Vacuum");
     
-	G4double 	MPX=(Orange_ShieldHalfX+Orange_MagHalfThick);
+	G4double 	MPX=(Orange_ShieldHalfX+Orange_MagHalfThick+KaptonThickness);
+	G4double 	MPXk=(Orange_ShieldHalfX+KaptonThickness*0.5);
     
 	G4LogicalVolume *MagBoxL = new G4LogicalVolume(fMagBox, mMaterial,"MagBoxL_FORBID",0,0,0);
+	G4LogicalVolume *MagKapL = new G4LogicalVolume(fMagKap, KapMat,"MagKapL_FORBID",0,0,0);
+	MagKapL->SetVisAttributes(FiveVisAtt);
     
     for(int i=-1;i<2;i+=2){
 		G4RotationMatrix* rotmag = new G4RotationMatrix;
@@ -527,6 +552,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
         
         for(int j=-1;j<2;j+=2){
             new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(j*MPX,0,0), MagBoxL,"Mag", expHallLog,false,0); 
+            new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(j*MPXk,0,0), MagKapL,"MagKap", expHallLog,false,0); 
         }
     }
 //     fOrangeFieldVolume->SetFieldManager(localFieldManager1, true);

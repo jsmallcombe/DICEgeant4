@@ -54,7 +54,6 @@ EventAction::EventAction(RunAction* run, HistoManager* hist)
 {
 	fNumberOfHits = 0;
 	fNumberOfSteps = 0;
-	fNumberOfSteps = 0;
 	fGoodTrackEnd = 0;
 	fWorldExit = 0;
 }

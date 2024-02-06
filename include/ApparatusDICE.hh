@@ -81,9 +81,11 @@ private:
 	G4String fShieldMaterial; 
 	G4String fBlockerMaterial; 
 	G4String fWaferMaterial; 
-	G4String fscintMaterial; 
+	G4String fScintMaterial; 
+	G4String fXrayMaterial; 
+	G4String fKaptonMaterial; 
 
-    G4VisAttributes *OneVisAtt,*TwoVisAtt,*ThreeVisAtt,*FourVisAtt;
+    G4VisAttributes *OneVisAtt,*TwoVisAtt,*ThreeVisAtt,*FourVisAtt,*FiveVisAtt;
 	G4VisAttributes* vis_att_hid;
     
 	G4double 	fBB34PCB_HalfThickness;

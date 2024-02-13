@@ -59,6 +59,18 @@ SteppingAction::~SteppingAction() { }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void SteppingAction::UserSteppingAction(const G4Step* aStep) {
+	
+	
+	if(fEventAction->fHistoManager->PrettyHitsOnly){
+		if (aStep->GetTrack()->GetParticleDefinition() == G4Gamma::Gamma()){
+			// When we are using our fake pretty setting, kill all gammas immediatly.
+			// avoids registering an "exit volume" when doing pairs
+			aStep->GetTrack()->SetTrackStatus(fStopAndKill);
+			return;
+		}
+	}
+		
+	
 	G4bool trackSteps   = false;
 	G4int processType   = -1;
 	G4int evntNb        = 0;
@@ -139,7 +151,10 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep) {
 			fEventAction->TrackExitsWorld();
 	}else{
         if(theTrack->GetNextVolume()->GetLogicalVolume()->GetName().contains("FORBID")){
-            if(fEventAction->fHistoManager->PrettyHitsOnly)fEventAction->TrackExitsWorld();
+            if(fEventAction->fHistoManager->PrettyHitsOnly){
+				fEventAction->TrackExitsWorld(); //This just tells our own variable that one of the tracks in the even "exited the world" i.e. did something forbidden.
+				theTrack->SetTrackStatus(fStopAndKill); //Actually kill it, because why track further
+			}
         }
     }
 }

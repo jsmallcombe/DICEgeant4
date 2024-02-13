@@ -261,6 +261,8 @@ void PhysicsList::SetStepper(G4bool step)
 	{
 		G4ProcessManager* pmanager = G4Electron::Electron()->GetProcessManager();
 		pmanager->AddDiscreteProcess(new G4StepLimiter);
+		pmanager = G4Positron::Positron()->GetProcessManager();
+		pmanager->AddDiscreteProcess(new G4StepLimiter);
 		// Electrons will now use user defined maxstep set by LogicVolume->SetUserLimits(new G4UserLimits(1.*mm));
 
 		G4cout<<"Limited electron steps"<<G4endl;

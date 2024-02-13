@@ -102,118 +102,170 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+
+	bool pairs=true;
+	
+	// Changed so that most grsi "/Detsys/gun/" commands still effect gun when using
+	// Underlying geant4 commands such as '/gun/particle ion" & "/gun/ion"
+	G4double m0=0;
+	if(fEffParticleBool) {
+		G4ParticleDefinition* effPart;
 		
-		// Changed so that most grsi "/Detsys/gun/" commands still effect gun when using
-		// Underlying geant4 commands such as '/gun/particle ion" & "/gun/ion"
-		G4double m0=0;
-		if(fEffParticleBool) {
-			G4ParticleDefinition* effPart;
-			if(fEffParticle == "electron" || fEffParticle == "e-") {
-				effPart = G4ParticleTable::GetParticleTable()->FindParticle("e-");
-			} else if(fEffParticle == "positron" || fEffParticle == "e+") {
-				effPart = G4ParticleTable::GetParticleTable()->FindParticle("e+");
-			} else if(fEffParticle == "neutron"){
-				effPart = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
-			} else {
-				effPart = G4ParticleTable::GetParticleTable()->FindParticle("gamma");
-			}
-			fParticleGun->SetParticleDefinition(effPart);
-			m0=effPart->GetPDGMass();
-		}
-
-
-		//////////
-		//ORIGIN CONTROLS 
-		//////////        
-
-		G4double x = 0.*mm;
-		G4double y = 0.*mm;
-		G4double z = 0.*mm;
-		if(fEffPositionBool){
-			x = fEffPosition.x();
-			y = fEffPosition.y();
-			z = fEffPosition.z();	
-		}
-
-		// If we want to simulate a realistic beam spot, instead of perfect pencil beam.
-		if(fBeamSpotSigma>0){
-			x = G4RandGauss::shoot(x,fBeamSpotSigma)*mm;
-			y = G4RandGauss::shoot(y,fBeamSpotSigma)*mm;
-		}
-
-		//////////
-		//DIRECTION CONTROLS (directly forced, beam, or cone)
-		//////////
-		G4double effRandCosTheta, effRandSinTheta, effRandPhi;
-		G4ThreeVector effdirection;
-		if(fEffDirectionBool) { 
-			effdirection = fEffDirection;
-
-			if(fConeAngleBool){
-				//min max input order doesnt actually matter
-				G4double cmin =cos(fAngleMinInit);
-				G4double cmax =cos(fAngleInit);
-				G4double CosTheta = G4UniformRand()*abs(cmax-cmin);
-				if(cmin<cmax)CosTheta+=cmin;
-				else CosTheta+=cmax;
-
-				// 	      G4cout<<asin(SinTheta)<<G4endl;
-				G4double SinTheta = sqrt(1. - pow(CosTheta, 2.0));
-				G4double Phi      = fPhiMin+((fPhiMax-fPhiMin)*G4UniformRand());
-
-				effdirection = G4ThreeVector(SinTheta*cos(Phi), SinTheta*sin(Phi), CosTheta);
-				// G4cout<<effdirection<<G4endl;
-
-			}	  
+		if(fEffParticle == "pp" || fEffParticle == "PP"|| fEffParticle == "Pairs"|| fEffParticle == "pairs") {
+			effPart = G4ParticleTable::GetParticleTable()->FindParticle("e-");
+			pairs=true;
+		}else if(fEffParticle == "electron" || fEffParticle == "e-") {
+			effPart = G4ParticleTable::GetParticleTable()->FindParticle("e-");
+		} else if(fEffParticle == "positron" || fEffParticle == "e+") {
+			effPart = G4ParticleTable::GetParticleTable()->FindParticle("e+");
+		} else if(fEffParticle == "neutron"){
+			effPart = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
 		} else {
-			//G4cout<<"Random "<< G4endl; //may offer the solution, an altered 2pi rando. Using 4pi for efficiency
-			// random direction if no preference provided
-			effRandCosTheta = 2.*G4UniformRand()-1.0; //cos(theta) = 2cos^2(0.5theta)-1 ??
-			effRandSinTheta = sqrt(1. - effRandCosTheta*effRandCosTheta); //from sin^2(theta)+cos^2(theta)=1
-			effRandPhi      = (360.*deg)*G4UniformRand();
-			effdirection = G4ThreeVector(effRandSinTheta*cos(effRandPhi), effRandSinTheta*sin(effRandPhi), effRandCosTheta);
-			//converts from Spherical polar(physics def.) to cartesian via (rsin(theta)cos(phi),rsin(theta)cos(phi),rcos(theta)) r=1,unit length
+			effPart = G4ParticleTable::GetParticleTable()->FindParticle("gamma");
 		}
-
-//         ApparatusDICE* Dice=fDetector->GetDice();
-
-
-		//after running through if-statements above we now have particle type definition, position, mom. direction, and the energy (or their initialised values)
 		
+		fParticleGun->SetParticleDefinition(effPart);
+		m0=effPart->GetPDGMass();
+	}
+
+	G4double RandTheta, effRandCosTheta, effRandSinTheta, effRandPhi;
+	G4ThreeVector effdirection,secdirection;
+	
+	//////////
+	//ORIGIN CONTROLS 
+	//////////        
+
+	G4double x = 0.*mm;
+	G4double y = 0.*mm;
+	G4double z = 0.*mm;
+	if(fEffPositionBool){
+		x = fEffPosition.x();
+		y = fEffPosition.y();
+		z = fEffPosition.z();	
+	}
+
+	// If we want to simulate a realistic beam spot, instead of perfect pencil beam.
+	if(fBeamSpotSigma>0){
+		x = G4RandGauss::shoot(x,fBeamSpotSigma)*mm;
+		y = G4RandGauss::shoot(y,fBeamSpotSigma)*mm;
+	}
+	
+	
+	//If there is a lifetime AND a beam velocity set move the origin randomly in Z
+	if(fEffGunBetaZ&&fEffGunLifetime>0){
+		double t=G4RandExponential::shoot(fEffGunLifetime);
+		t/=sqrt(1-fEffGunBetaZ*fEffGunBetaZ);
+		z+=t*CLHEP::c_light*fEffGunBetaZ;
+	}
+	
+	G4ThreeVector thisEffPosition = G4ThreeVector(x,y,z);//in constructor
+	
+	fParticleGun->SetParticlePosition(thisEffPosition);
+	
+	//////////
+	//DIRECTION CONTROLS (directly forced, beam, or cone)
+	//////////
+	
+	if(fEffDirectionBool) { 
+		effdirection = fEffDirection;
+
+		if(fConeAngleBool){
+			//min max input order doesnt actually matter
+			G4double cmin =cos(fAngleMinInit);
+			G4double cmax =cos(fAngleInit);
+			G4double CosTheta = G4UniformRand()*abs(cmax-cmin);
+			if(cmin<cmax)CosTheta+=cmin;
+			else CosTheta+=cmax;
+
+			// 	      G4cout<<asin(SinTheta)<<G4endl;
+			G4double SinTheta = sqrt(1. - pow(CosTheta, 2.0));
+			G4double Phi      = fPhiMin+((fPhiMax-fPhiMin)*G4UniformRand());
+
+			effdirection = G4ThreeVector(SinTheta*cos(Phi), SinTheta*sin(Phi), CosTheta);
+			// G4cout<<effdirection<<G4endl;
+		}	  
+	} else {
+		//G4cout<<"Random "<< G4endl; //may offer the solution, an altered 2pi rando. Using 4pi for efficiency
+		// random direction if no preference provided
+		effRandCosTheta = 2.*G4UniformRand()-1.0; //cos(theta) = 2cos^2(0.5theta)-1 ??
+		effRandSinTheta = sqrt(1. - effRandCosTheta*effRandCosTheta); //from sin^2(theta)+cos^2(theta)=1
+		effRandPhi      = (360.*deg)*G4UniformRand();
+		effdirection = G4ThreeVector(effRandSinTheta*cos(effRandPhi), effRandSinTheta*sin(effRandPhi), effRandCosTheta);
+		//converts from Spherical polar(physics def.) to cartesian via (rsin(theta)cos(phi),rsin(theta)cos(phi),rcos(theta)) r=1,unit length
+	}
+
+	// After running through if-statements above we now have particle type definition, position, mom. direction, and the energy (or their initialised values)
+	// For pairs, the above is only set for the electron
+	G4double EofPrim=fEffEnergy;
+	G4double EofSec=0;
+	
+	// If pair production, adjust energy and create correlated direction
+	if(pairs){
+		EofPrim=std::abs(fEffEnergy-1022*keV);
+		EofSec=EofPrim*G4UniformRand();
+		EofPrim-=EofSec;
 		
+		// Set mean seperation to 60 degrees with a broad distribution
+		RandTheta=-1;
+		while(RandTheta<0){
+			RandTheta=G4RandGauss::shoot(1.0472,0.8)*rad;
+		}
+		effRandCosTheta = cos(RandTheta);
+		effRandSinTheta = sqrt(1. - effRandCosTheta*effRandCosTheta); 
+		effRandPhi      = (360.*deg)*G4UniformRand();
+		secdirection = G4ThreeVector(effRandSinTheta*cos(effRandPhi), effRandSinTheta*sin(effRandPhi), effRandCosTheta);
+		
+		secdirection.rotateY(effdirection.theta());
+		secdirection.rotateZ(effdirection.phi());
+	}
+	
+	
+	// If there is a beam beta boost, apply it
+	if(fEffGunBetaZ>0){
+		effdirection.setMag(sqrt(pow(m0+EofPrim,2)-m0*m0));
+		G4LorentzVector LorVec=G4LorentzVector(effdirection,m0+EofPrim);
+		LorVec.boostZ(fEffGunBetaZ);
+		effdirection=LorVec.getV();
+		fParticleGun->SetParticleMomentumDirection(LorVec.getV());
+		fParticleGun->SetParticleEnergy(LorVec.getT()-m0);
+	}else{
+		fParticleGun->SetParticleEnergy(EofPrim);
+		fParticleGun->SetParticleMomentumDirection(effdirection);
+	}
+	
+	// Record primary info for viewing in rootfile
+	if(fDetector->RecordingGun()){
+		fHistoManager->BeamEnergy(EofPrim);	
+		fHistoManager->BeamTheta(effdirection.theta());
+		fHistoManager->BeamPhi(effdirection.phi());
+		fHistoManager->BeamPos(thisEffPosition);
+	}
+
+	// create vertex
+	fParticleGun->GeneratePrimaryVertex(anEvent);
+
+	// Generate the second paticle if pair production 
+	if(pairs){
+		
+		// If there is a beam beta boost, apply it
 		if(fEffGunBetaZ>0){
-			effdirection.setMag(sqrt(pow(m0+fEffEnergy,2)-m0*m0));
-			G4LorentzVector LorVec=G4LorentzVector(effdirection,m0+fEffEnergy);
+			secdirection.setMag(sqrt(pow(m0+EofSec,2)-m0*m0));
+			G4LorentzVector LorVec=G4LorentzVector(secdirection,m0+EofSec);
 			LorVec.boostZ(fEffGunBetaZ);
-            effdirection=LorVec.getV();
+			secdirection=LorVec.getV();
 			fParticleGun->SetParticleMomentumDirection(LorVec.getV());
 			fParticleGun->SetParticleEnergy(LorVec.getT()-m0);
-			
-			if(fEffGunLifetime>0){
-				double t=G4RandExponential::shoot(fEffGunLifetime);
-				t/=sqrt(1-fEffGunBetaZ*fEffGunBetaZ);
-				z+=t*CLHEP::c_light*fEffGunBetaZ;
-			}
-			
 		}else{
-			fParticleGun->SetParticleEnergy(fEffEnergy);
-			fParticleGun->SetParticleMomentumDirection(effdirection);
+			fParticleGun->SetParticleEnergy(EofSec);
+			fParticleGun->SetParticleMomentumDirection(secdirection);
 		}
 		
-		G4ThreeVector thisEffPosition = G4ThreeVector(x,y,z);//in constructor
-		fParticleGun->SetParticlePosition(thisEffPosition);
+		fParticleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle("e+"));
 		
-        if(fDetector->RecordingGun()){
-            fHistoManager->BeamEnergy(fEffEnergy);	
-            fHistoManager->BeamTheta(effdirection.theta());
-            fHistoManager->BeamPhi(effdirection.phi());
-            fHistoManager->BeamPos(thisEffPosition);
-        }
-
-
-	//create vertex
-	//
-	fParticleGun->GeneratePrimaryVertex(anEvent);
+		// create additional vertex
+		fParticleGun->GeneratePrimaryVertex(anEvent);	
+	}
+		
 }
 
 void PrimaryGeneratorAction::PassEfficiencyPosition(G4ThreeVector  num){

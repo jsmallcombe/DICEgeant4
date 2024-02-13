@@ -10,7 +10,8 @@
 /DetSys/world/SetFieldOffset 0 22.5 0 mm
 /DetSys/world/SetFieldAntiMirror 1
 /DetSys/world/SetFieldMirror 2 
-/DetSys/world/SetFieldAntiMirror 3
+#/DetSys/world/SetFieldAntiMirror 3  # regular setup
+/DetSys/world/SetFieldMirror 3       # pair production
 
 ### If you call SetDiceField after calling TabMagneticField, the field strength of TabMagneticField will be scaled.
 #/DetSys/app/SetDiceField 0.25 tesla
@@ -100,8 +101,10 @@
 
 ### Basic ### 2
 /DetSys/gun/position 0.0 0.0 0.0 mm
-/DetSys/gun/particle e-
-/DetSys/gun/efficiencyEnergy 1000 keV
+#/DetSys/gun/particle e-
+#/DetSys/gun/efficiencyEnergy 1000 keV
+/DetSys/gun/particle pp
+/DetSys/gun/efficiencyEnergy 2500 keV
 
 ### Nucleus ### 
 #/gun/particle ion
@@ -119,6 +122,10 @@
 # /DetSys/gun/SetBeta 0.05
 # /DetSys/gun/SetLifetime 1 ns
 
+### Create a particle filter. Configure to pass only gammas. Then invert to pass anything other than gammas.
+/vis/filtering/trajectories/create/particleFilter
+/vis/filtering/trajectories/particleFilter-0/add gamma
+/vis/filtering/trajectories/particleFilter-0/invert true
 
 ### Run And View Events ### 
 # /vis/scene/endOfEventAction accumulate 500
@@ -127,7 +134,7 @@
 ### Only View Sili hits ### 
 /vis/disable
 /DetSys/SiHits/VisStore
-# /DetSys/SiHits/PrettyOnly  ### Lie's and only shows clean events that dont scatter
+# /DetSys/SiHits/PrettyOnly  ### Lies by only shows clean events that dont scatter
 # /DetSys/SiHits/StoreMultiplicity 2 ### Only store higher multiplicity events
 /run/beamOn 500
 /vis/enable

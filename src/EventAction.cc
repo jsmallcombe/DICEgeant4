@@ -85,13 +85,15 @@ void EventAction::EndOfEventAction(const G4Event*) {
             fHistoManager->FillStepNtuple(fStepTrackerI[0][i], fStepTrackerI[1][i], fStepTrackerI[2][i], fStepTrackerI[3][i],  fStepTrackerI[4][i], fStepTrackerI[5][i], fStepTrackerI[6][i], fStepTrackerI[7][i], fStepTrackerI[8][i], fStepTrackerD[0][i]/keV, fStepTrackerD[1][i]/mm, fStepTrackerD[2][i]/mm, fStepTrackerD[3][i]/mm, fStepTrackerD[4][i]/second, fStepTrackerI[9][i]);
         }
 
+        // Always be pretty=true unless pretty checking is turned on
         bool PrettyHit=true;
-		if(fHistoManager->PrettyHitsOnly){
+		
+		if(fHistoManager->PrettyHitsOnly){//Fake prettyness IS turned on
 			PrettyHit=(fGoodTrackEnd&&!fWorldExit);
 		}
         
-        if(fNumberOfHits>=fHistoManager->fStoreMultMin&&fHistoManager->HitsStore&&PrettyHit){
-            
+        // If we are storing hits, and it is pretty (or prettyness not required) AND multiplicity achieved, save it
+        if(fNumberOfHits>=fHistoManager->fStoreMultMin&&fHistoManager->HitsStore&&PrettyHit){            
 //             G4cout<<G4endl<<"STORING EVENTS"<<G4endl;
             G4EventManager::GetEventManager()->KeepTheCurrentEvent();
 //             evt->KeepTheEvent(true);

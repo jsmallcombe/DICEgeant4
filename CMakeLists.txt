@@ -50,6 +50,7 @@ set(DICE10_SCRIPTS
     ExampleSortFiles/QuickFlatOrange.C
     ExampleSortFiles/FlatOrangeScan.C
     ExampleSortFiles/remote_vis.mac
+    FieldExample.txt
   )
   
 

@@ -3,10 +3,11 @@
 /DetSys/world/material Vacuum
 
 ### Configure Apparatus To Build ###
- 
-/DetSys/world/TabMagneticField ExportTestNew.txt
-/DetSys/world/SetFieldMirrorPos 0 -22.5 0 mm
-#/DetSys/world/SetFieldOffset 0 0 0 mm
+
+/DetSys/world/TabMagneticField FieldExample.txt
+#/DetSys/world/SetFieldMirrorPos 0 -22.5 0 mm
+### SetFieldMirrorPos Is In the intrinsic frame of the field before offsetting
+/DetSys/world/SetFieldOffset 0 22.5 0 mm
 /DetSys/world/SetFieldAntiMirror 1
 /DetSys/world/SetFieldMirror 2 
 /DetSys/world/SetFieldAntiMirror 3

@@ -304,7 +304,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	
 	G4double 	Orange_BeamDetY=75*mm; // Height of target vs BB34
 	
-	G4double 	Orange_BeamShieldSep=10*mm;
+	G4double 	Orange_BeamShieldSep=8*mm;
 	G4double 	Orange_ShieldMidBeamSep=20*mm;  // Distance to the shield widest point
 	
 	G4double 	Orange_MagMidOffset=0*mm; // Distance between center line of magnet and target
@@ -315,8 +315,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4double 	Orange_MagHalfThick=2*mm; // Perpendicular Half Thickness of the magnets 
 	G4double 	Orange_MagGapMinHalf=7.5*mm; // Gap between magnet halves (at side of shield)
 	
-	G4double 	Orange_TargetWardingY=15*mm; // Half Gap Target Ladder Needs
-	G4double 	Orange_TargetWardingZ=2*mm; // Half Gap Target Ladder Needs (Beamward)
+	G4double 	Orange_TargetWardingY=12.5*mm; // Half Gap Target Ladder Needs
+	G4double 	Orange_TargetWardingZ=2.5*mm; // Half Gap Target Ladder Needs (Beamward)
 	
     G4double ScintThick=1*mm; //half
     G4double Orange_ScintSep=(ScintThick+fBB34PCB_HalfThickness)+2.55*mm; // Distance between midpoint off BB34 and Scint 
@@ -340,11 +340,14 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4double 	Orange_ShieldFrontHalfWidth=Orange_ShieldTanAngle*(Orange_BeamShieldSep+SafetyGap);
 	G4double 	Orange_ShieldMidDepth=Orange_ShieldMidBeamSep-Orange_BeamShieldSep;
 	G4double 	Orange_ShieldMidHalfWidth=Orange_ShieldFrontHalfWidth+Orange_ShieldTanAngle*(Orange_ShieldMidDepth);
-	G4double 	Orange_ShieldBottomDepth=Orange_ShieldMidHalfWidth;
+	G4double 	Orange_ShieldBottomDepth=18*mm-Orange_BeamShieldSep;
 	
 	if(Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep>Orange_BeamDetY+SafetyGap){
 		Orange_ShieldBottomDepth=Orange_BeamDetY-Orange_ShieldMidBeamSep-SafetyGap;
 	}
+	
+	G4double ShieldInsertBottomY=Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep;
+	
 
     G4double MStart=Orange_MagGapMinHalf;
     if(StartMagAtShield){MStart=Orange_ShieldMidHalfWidth;}
@@ -352,12 +355,20 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     G4double LowestPointOfMagnet=Orange_MagY+Orange_MagMidOffset;
 	if(Orange_MagAng>0)LowestPointOfMagnet+=(fBB34Chip_HalfWidth-MStart)*tan(Orange_MagAng);
     
-	G4double Orange_ShieldHalfX=((fBB34Chip_HalfLength+SafetyGap)/Orange_BeamDetY)*LowestPointOfMagnet;
+	G4double Pole_SepHalf=((fBB34Chip_HalfLength+SafetyGap)/Orange_BeamDetY)*LowestPointOfMagnet;
 	
-	if(Orange_ShieldHalfX<=0){
-		Orange_ShieldHalfX=10;
+	if(Pole_SepHalf<=0){
+		Pole_SepHalf=10;
 		G4cout<<G4endl<<"POLL SEPARATION OVERRIDDEN DUE TO MAGENT PLACEMENT ERROR";
 	}
+	
+	G4double Orange_ShieldHalfX=Pole_SepHalf+Orange_MagHalfThick*2;
+	
+	G4double Orange_InsertHalfX=((fBB34Chip_HalfLength+SafetyGap)/Orange_BeamDetY)*ShieldInsertBottomY;
+	if(Orange_ShieldHalfX<Orange_InsertHalfX){
+		Orange_InsertHalfX=Orange_ShieldHalfX*0.8;
+	}
+	
 	
 	if(Orange_MagAng<0){
 		G4double ShrtMag=MStart+abs(Orange_MagY/tan(Orange_MagAng));
@@ -367,7 +378,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 		}
 	}
 	
-	if(sqrt(pow(Orange_ShieldHalfX+Orange_MagHalfThick*2+SafetyGap,2) + pow(Orange_MagZ+SafetyGap,2))>145*mm)
+	if(sqrt(pow(Pole_SepHalf+Orange_MagHalfThick*2+SafetyGap,2) + pow(Orange_MagZ+SafetyGap,2))>145*mm)
     G4cout<<G4endl<<"MAGNETS TOO LARGE TO FIT INSIDE ISOK160";
 	
 	
@@ -377,7 +388,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     G4cout<<G4endl<<"ShieldCenter Z length (Tot.) "<<Orange_ShieldMidHalfWidth*2;
     G4cout<<G4endl<<"Magnet Shield-gap (i.e. Magnet separation along yoke) "<<MStart*2;
     G4cout<<G4endl<<"Shield Thickness "<<Orange_ShieldHalfX*2;
-    G4cout<<G4endl<<"Magnet Pole Separation "<<Orange_ShieldHalfX*2;
+    G4cout<<G4endl<<"Magnet Pole Separation "<<Pole_SepHalf*2;
     G4cout<<G4endl<<"Beam  <-> Detector Distance "<<Orange_BeamDetY;
     G4cout<<G4endl<<"MagnetTop <-> Beam Separation "<<Orange_MagMidOffset-Orange_MagY;
     G4cout<<G4endl<<"MagnetCenterline <-> Beam Separation "<<Orange_MagMidOffset;
@@ -387,40 +398,50 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     G4cout<<G4endl<<"Magnet Z Extent "<<Orange_MagZ;
     G4cout<<G4endl;
 	
-	// Place shield
-
-    G4LogicalVolume *ShieldBoxL=0;
-    G4VSolid* ShieldBox=0;
-    std::vector<G4TwoVector> OrangeShieldPoly(5);
-    
+	
+	//////////////////////////////////////
+	// Build and Place Shield
+	//////////////////////////////////////
+	
+	// Used outside shield loop
 	G4ExtrudedSolid* ShieldCutBox=nullptr;
+	
 	if(!fRemoveShield){
+
+		// Define the shape of the insert
+		std::vector<G4TwoVector> OrangeShieldPoly(6);		
         OrangeShieldPoly[0].set(Orange_ShieldFrontHalfWidth,Orange_ShieldMidDepth);
         OrangeShieldPoly[1].set(Orange_ShieldMidHalfWidth,0);
-        OrangeShieldPoly[2].set(0,-Orange_ShieldBottomDepth);
-        OrangeShieldPoly[3].set(-Orange_ShieldMidHalfWidth,0);
-        OrangeShieldPoly[4].set(-Orange_ShieldFrontHalfWidth,Orange_ShieldMidDepth);
+//         OrangeShieldPoly[2].set(0,-Orange_ShieldBottomDepth);
+        OrangeShieldPoly[2].set(Orange_ShieldMidHalfWidth,-Orange_ShieldBottomDepth);
+        OrangeShieldPoly[3].set(-Orange_ShieldMidHalfWidth,-Orange_ShieldBottomDepth);
+        OrangeShieldPoly[4].set(-Orange_ShieldMidHalfWidth,0);
+        OrangeShieldPoly[5].set(-Orange_ShieldFrontHalfWidth,Orange_ShieldMidDepth);
         
-        ShieldBox = new G4ExtrudedSolid("Box1", OrangeShieldPoly, Orange_ShieldHalfX, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
+		// Extrude the solid
+        G4VSolid* ShieldBox = new G4ExtrudedSolid("Box1", OrangeShieldPoly, Orange_InsertHalfX, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
 		
+		// Cut the notch for target ladder 
 		if(Orange_BeamShieldSep<Orange_TargetWardingY){
 			G4Box* CutBoxS = new G4Box("CutBoxS",Orange_TargetWardingZ, Orange_TargetWardingY, Orange_ShieldHalfX+SafetyGap);
 			ShieldBox = new G4SubtractionSolid("Box2", ShieldBox, CutBoxS,0,G4ThreeVector(0,0,0));
 		}
 		
-		ShieldBoxL = new G4LogicalVolume(ShieldBox, mMaterial,"ShieldBoxL_FORBID",0,0,0);
+		// Make the logical volume, with FORBID tag for pretty pictures
+		G4LogicalVolume *ShieldBoxL = new G4LogicalVolume(ShieldBox, mMaterial,"ShieldBoxL_FORBID",0,0,0);
 		G4RotationMatrix* rotate1 = new G4RotationMatrix;
 		rotate1->rotateZ(Zbar);
 		rotate1->rotateY(90*deg);
 		ShieldBoxL->SetVisAttributes(OneVisAtt);
-		new G4PVPlacement(rotate1,rotZbar*G4ThreeVector(0,0,0), ShieldBoxL,"Shield", expHallLog,false,0); 
-		
-		
+		new G4PVPlacement(rotate1,rotZbar*G4ThreeVector(0,0,0), ShieldBoxL,"ShieldInsert", expHallLog,false,0); 
+	
+		// Extend the poly very slightly before making a cut box
 		for(unsigned int i=0;i<OrangeShieldPoly.size();i++)OrangeShieldPoly[i]*=1.01;
-        ShieldCutBox = new G4ExtrudedSolid("CutBox1", OrangeShieldPoly, Orange_ShieldHalfX*1.1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
+		// Extrude the slightly bigger shape to use as a cutout in other parts (field region and xray block)
+        ShieldCutBox = new G4ExtrudedSolid("CutBox1", OrangeShieldPoly, Orange_InsertHalfX*1.01, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
 		
 		
-		//Place new under-shield x-ray block
+		// Build and place the new under-shield x-ray block
 		
 		G4double XrayHW=Orange_ShieldMidHalfWidth;
 		if(Orange_ShieldMidHalfWidth>MStart){XrayHW=MStart;}
@@ -431,15 +452,16 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 		XrayHH/=2;
 		//Goes to EITHER the bottom of the magnets OR a little under the shield.
 		
-		G4VSolid* XrayBox = new G4Box("XrayBox",Orange_ShieldHalfX,XrayHH,XrayHW);
+		G4VSolid* XrayBox = new G4Box("XrayBox",Orange_ShieldHalfX,XrayHH,XrayHW-KaptonThickness);
+		G4VSolid* XrayCover = new G4Box("XrayBox",Orange_ShieldHalfX-0.1*mm,XrayHH,XrayHW);
 		
-		G4VSolid* XrayCover = new G4Box("XrayBox",Orange_ShieldHalfX-0.1*mm,XrayHH,XrayHW+KaptonThickness);
-		XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, XrayBox,0,G4ThreeVector(0,KaptonThickness,0));
 		
 		G4RotationMatrix* subtrarot = new G4RotationMatrix;
 		subtrarot->rotateY(90*deg); //ShieldCutBox is the wrong way as G4ExtrudedSolid in Z-axis by default
-		
         XrayBox = new G4SubtractionSolid("XrayShape", XrayBox, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH,0));
+		XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, XrayBox,0,G4ThreeVector(0,KaptonThickness,0));
+        XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH+KaptonThickness,0));
+		
 		
 		G4LogicalVolume *XrayLog = new G4LogicalVolume(XrayBox, XrayMat,"XrayLog_FORBID",0,0,0);
 		G4RotationMatrix* rotateblock = new G4RotationMatrix;
@@ -516,7 +538,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     
 //     for(unsigned int i=0;i<MagPolygon.size();i++)MagPolygon[i]+=G4TwoVector(0,-Orange_MagMidOffset);
 
-	G4VSolid* fFieldBox = new G4ExtrudedSolid("FieldVolBox", MagPolygon, Orange_ShieldHalfX, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
+	G4VSolid* fFieldBox = new G4ExtrudedSolid("FieldVolBox", MagPolygon, Pole_SepHalf, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 	G4VSolid* fMagBox = new G4ExtrudedSolid("MagBox", MagPolygon, Orange_MagHalfThick, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 	G4VSolid* fMagKap = new G4ExtrudedSolid("MagKap", MagPolygon, KaptonThickness*0.5, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 
@@ -528,8 +550,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	
 	G4Material* matWorld = G4Material::GetMaterial("Vacuum");
     
-	G4double 	MPX=(Orange_ShieldHalfX+Orange_MagHalfThick+KaptonThickness);
-	G4double 	MPXk=(Orange_ShieldHalfX+KaptonThickness*0.5);
+	G4double 	MPX=(Pole_SepHalf+Orange_MagHalfThick+KaptonThickness);
+	G4double 	MPXk=(Pole_SepHalf+KaptonThickness*0.5);
     
 	G4LogicalVolume *MagBoxL = new G4LogicalVolume(fMagBox, mMaterial,"MagBoxL_FORBID",0,0,0);
 	G4LogicalVolume *MagKapL = new G4LogicalVolume(fMagKap, KapMat,"MagKapL_FORBID",0,0,0);

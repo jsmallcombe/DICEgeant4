@@ -76,21 +76,18 @@ int main(int argc, char** argv)
 	 G4VisManager* visManager = new G4VisExecutive;
 	 visManager->Initialize();
 
-//     std::string arg1(argv[1]);
-//     if(arg1=="-l"){
-     
-	 if(argc != 1) {
-        // batch mode
-        G4String command = "/control/execute ";
-        G4String fileName = argv[1];
-        UImanager->ApplyCommand(command+fileName);
-	 }else{
+	G4String command = "/control/execute ";
+	G4String fileName="vis.mac";
+	
+	 if(argc!=2){
         // local interactive mode : define visualization and UI terminal
         G4UIExecutive* ui = new G4UIExecutive(argc, argv);
-        UImanager->ApplyCommand("/control/execute vis.mac");
+        UImanager->ApplyCommand(command+fileName);
         ui->SessionStart();
         delete ui;	 
-    }
+    }else{
+        UImanager->ApplyCommand(command+fileName);
+	}
 	 
 // 	 else { // remote interactive mode : define visualization and UI terminal
 // 		G4UIExecutive* ui = new G4UIExecutive(argc, argv, "tcsh");

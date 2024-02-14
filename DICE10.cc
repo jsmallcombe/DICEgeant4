@@ -78,7 +78,9 @@ int main(int argc, char** argv)
 
 	G4String command = "/control/execute ";
 	G4String fileName="vis.mac";
-	
+	if(argc==2)fileName = argv[1];
+	else if(argc>2)fileName = argv[2];
+		
 	 if(argc!=2){
         // local interactive mode : define visualization and UI terminal
         G4UIExecutive* ui = new G4UIExecutive(argc, argv);

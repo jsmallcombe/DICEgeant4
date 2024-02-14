@@ -475,8 +475,6 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 
 		// Place carbon blocker
 		
-		// NEEDS FIXING IF KEEPING THE UNDERSHIELD BLOCK
-		
 		if(fAddBlocker){
 			
 			G4double HalfBlockGap=0.5*(Orange_BeamDetY-(XrayHH*2+Orange_ShieldMidBeamSep+SafetyGap*1.5));
@@ -485,7 +483,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 				G4Box* ElectronBlockerBox = new G4Box("ElectronBlockerBox",fBB34Chip_HalfLength,HalfBlockGap,CrossBlockHalfThickness);
 				G4LogicalVolume *ElectronBlockerLog = new G4LogicalVolume(ElectronBlockerBox, BlockerMat,"ElectronBlockerLog_FORBID",0,0,0);
 				ElectronBlockerLog->SetVisAttributes(ThreeVisAtt);
-				new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-HalfBlockGap-XrayHH*2-Orange_ShieldMidBeamSep-KaptonThickness,0), ElectronBlockerLog,"BB34Detector", expHallLog,false,0);
+				new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-HalfBlockGap-XrayHH*2-Orange_ShieldMidBeamSep-KaptonThickness,0), ElectronBlockerLog,"ElectronBlocker", expHallLog,false,0);
 			}else{
 				G4cout<<G4endl<<"NO ROOM FOR ELECTRON BLOCKER";
 			}

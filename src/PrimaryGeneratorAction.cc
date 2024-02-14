@@ -103,7 +103,7 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 
-	bool pairs=true;
+	bool pairs=false;
 	
 	// Changed so that most grsi "/Detsys/gun/" commands still effect gun when using
 	// Underlying geant4 commands such as '/gun/particle ion" & "/gun/ion"

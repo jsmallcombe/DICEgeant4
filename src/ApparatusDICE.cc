@@ -322,7 +322,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     G4double Orange_ScintSep=(ScintThick+fBB34PCB_HalfThickness)+2.55*mm; // Distance between midpoint off BB34 and Scint 
 	G4double CrossBlockHalfThickness=1*mm;
     
-	if(fUseA)Orange_MagMidOffset=fAdjLengthA; // Distance between center line of magnet and target
+	if(fUseA)Orange_MagMidOffset=std::abs(fAdjLengthA); // Distance between center line of magnet and target
 	if(fUseB)Orange_BeamDetY=fAdjLengthB; // Height of target vs BB34
 	if(fUseC)Orange_ShieldMidBeamSep=fAdjLengthC;// Distance to the shield widest point
 	if(fUseD)Orange_MagY=fAdjLengthD;    // Total vertical coverage/height of the magnet field region
@@ -571,7 +571,9 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 		}
         
         for(int j=-1;j<2;j+=2){
-            new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(j*MPX,0,0), MagBoxL,"Mag", expHallLog,false,0); 
+			int cn=0;;
+			if(fAdjLengthA<0)cn=i+j*0.5+2;
+            new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(j*MPX,0,0), MagBoxL,"Mag", expHallLog,false,cn); 
             new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(j*MPXk,0,0), MagKapL,"MagKap", expHallLog,false,0); 
         }
     }

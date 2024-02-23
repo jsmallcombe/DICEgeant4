@@ -51,6 +51,10 @@ set(DICE10_SCRIPTS
     ExampleSortFiles/FlatOrangeScan.C
     ExampleSortFiles/remote_vis.mac
     FieldExample.txt
+	DiceAutoSort/AutoDiceTest.sh
+	DiceAutoSort/FlatOrangePostSort.C
+	DiceAutoSort/AutoPostProcess.C
+	DiceAutoSort/FlatOrangeScan.C
   )
   
 

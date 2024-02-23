@@ -182,13 +182,13 @@ void ApparatusDICE::BuildPlaceBasicTest(G4LogicalVolume* expHallLog){
 	// Mother volume is the "logical" within which this physical should occur, for instance we can but segments inside a detector
 	// All physicals with name "SiSegmentPhys#_#" where # are number will be treated as detecors for the purposes of output, where the numbers # are used to specify the volumes
 	// The exact definition of the special names can befound in DetectorConstruction::ParseVolumeName(G4String volumeName) of DetectorConstruction.cc
-	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(0,0,20*mm), fDetectorLogical, "SiSegmentPhys0_0",  expHallLog, false, 0);
+	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(0,0,5*mm), fDetectorLogical, "SiSegmentPhys0_0",  expHallLog, false, 0);
 	
 	
-	G4Box* bx = new G4Box("bx", 150*mm, 150*mm, 150*mm);
-	G4LogicalVolume* lg = new G4LogicalVolume(bx, G4Material::GetMaterial("Vacuum"), "lg", 0,0,0); 
-// 	lg->SetVisAttributes(vis_att_hid); 
-	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(), lg, "wrldbx",  expHallLog, false, 0);
+// // 	G4Box* bx = new G4Box("bx", 150*mm, 150*mm, 150*mm);
+// // 	G4LogicalVolume* lg = new G4LogicalVolume(bx, G4Material::GetMaterial("Vacuum"), "lg", 0,0,0); 
+// // // 	lg->SetVisAttributes(vis_att_hid); 
+// // 	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(), lg, "wrldbx",  expHallLog, false, 0);
 }
     
 G4int ApparatusDICE::BuildMicronSiN=0;

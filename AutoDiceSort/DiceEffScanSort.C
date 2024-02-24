@@ -284,10 +284,10 @@ void DiceEffScanSort(double Ein=400,double SimmN=1000000,string rootout = "", co
 	out.cd("");
     
 	
-	for(int x=1;x<E_GoodChan->GetNbinsX();x++){
-	for(int y=1;y<E_GoodChan->GetNbinsY();y++){
+	for(int x=1;x<=E_GoodChan->GetNbinsX();x++){
+	for(int y=1;y<=E_GoodChan->GetNbinsY();y++){
 		double z=E_GoodChan->GetBinContent(x,y);
-		if(z<SimmN*0.001)E_GoodChan->SetBinContent(x,y,0);
+		if(z<SimmN*0.0002)E_GoodChan->SetBinContent(x,y,0);
 		
 	}}
 	

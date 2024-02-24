@@ -44,12 +44,8 @@ target_link_libraries(DICE10 ${Geant4_LIBRARIES})
 set(DICE10_SCRIPTS
     vis.mac
     dice.mac
-    ExampleSortFiles/AutoEffCurve.sh
-    ExampleSortFiles/jpeg.mac
     ExampleSortFiles/DiceSort.C
-    ExampleSortFiles/QuickFlatOrange.C
-    ExampleSortFiles/FlatOrangeScan.C
-    ExampleSortFiles/remote_vis.mac
+    ExampleSortFiles/QuickPairsSort.C
     FieldExample.txt
 	AutoDiceSort/AutoDiceTest.sh
 	AutoDiceSort/ExptSort.C

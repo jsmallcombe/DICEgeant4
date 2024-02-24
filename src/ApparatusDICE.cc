@@ -170,7 +170,7 @@ void ApparatusDICE::BuildPlaceBasicTest(G4LogicalVolume* expHallLog){
 	
 	// Create a G4Box, a "Solid" type object, defines geometry but does not have material properies or exist inside this simulated world. Only a geometric blueprint.
 	// Inputs: name, 3 half lengths of the cuboid 
-	G4Box* fDetectorSolid = new G4Box("fDetectorSolid", 15*mm, 15*mm, 2*mm);
+	G4Box* fDetectorSolid = new G4Box("fDetectorSolid", 15*mm, 15*mm, 15*mm);
 
 	// Create a G4LogicalVolume a "logical", combines a "solid" with material properies and other options (not used here) describing how it should be treated during the simulation. Still only a blueprint, does not exist in the simulated world
 	// Inputs : Solid (pointer), Material, name, 3 options not used here (0,0,0)
@@ -182,7 +182,7 @@ void ApparatusDICE::BuildPlaceBasicTest(G4LogicalVolume* expHallLog){
 	// Mother volume is the "logical" within which this physical should occur, for instance we can but segments inside a detector
 	// All physicals with name "SiSegmentPhys#_#" where # are number will be treated as detecors for the purposes of output, where the numbers # are used to specify the volumes
 	// The exact definition of the special names can befound in DetectorConstruction::ParseVolumeName(G4String volumeName) of DetectorConstruction.cc
-	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(0,0,5*mm), fDetectorLogical, "SiSegmentPhys0_0",  expHallLog, false, 0);
+	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(0,0,0*mm), fDetectorLogical, "SiSegmentPhys0_0",  expHallLog, false, 0);
 	
 	
 // // 	G4Box* bx = new G4Box("bx", 150*mm, 150*mm, 150*mm);

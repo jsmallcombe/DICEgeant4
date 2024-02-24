@@ -1,4 +1,4 @@
-void FlatOrangePostSort(const char * DetDataFileName,const char * HistFolder,double beta=0,const char * outfileName = "DicePostSort.root", const char *ntuplefileName = "g4out.root") {
+void ExptSort(const char * DetDataFileName,const char * HistFolder,double beta=0,const char * outfileName = "DicePostSort.root", const char *ntuplefileName = "g4out.root") {
 	    
 	//// Random number generator to add electronic noise on to "perfect" geant4 detectors ///
 	TRandom r;
@@ -14,10 +14,6 @@ void FlatOrangePostSort(const char * DetDataFileName,const char * HistFolder,dou
     TTree *newtree = (TTree*)ntuplefile->Get("ntuple");
     if(newtree==nullptr)return;
 
-	
-	TFile out(outfileName,"UPDATE");
-	out.mkdir(HistFolder);
-	gROOT->cd();
 	
 	TFile DetDataFile(DetDataFileName,"READ");
 	gROOT->cd();
@@ -37,6 +33,11 @@ void FlatOrangePostSort(const char * DetDataFileName,const char * HistFolder,dou
 			
 		}
 	}
+	
+	TFile out(outfileName,"UPDATE");
+	out.mkdir(HistFolder);
+	gROOT->cd();
+	
 	
 	TH2 *gdch = (TH2*)DetDataFile.Get("E_GoodChan");
 	if(!gdch){

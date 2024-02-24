@@ -1,4 +1,4 @@
-void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", const char *rootin = "g4out.root") {
+void DiceEffScanSort(double Ein=400,double SimmN=1000000,string rootout = "", const char *rootin = "g4out.root") {
 	
     double THETALIMDEG=10;//The limit on allowed theta std in a segment
     
@@ -284,11 +284,12 @@ void FlatOrangeScan(double Ein=400,double SimmN=1000000,string rootout = "", con
 	out.cd("");
     
 	
-	for(int b=1;b<E_GoodChan->GetNbins();b++){
-		double y=E_GoodChan->GetBinContent(b);
-		if(y<SimmN*0.001)E_GoodChan->SetBinContent(b,0);
+	for(int x=1;x<E_GoodChan->GetNbinsX();x++){
+	for(int y=1;y<E_GoodChan->GetNbinsY();y++){
+		double z=E_GoodChan->GetBinContent(x,y);
+		if(z<SimmN*0.001)E_GoodChan->SetBinContent(x,y,0);
 		
-	}
+	}}
 	
 	
     out.Write();

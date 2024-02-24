@@ -25,9 +25,10 @@ echo "/DetSys/world/SetFieldAntiMirror 1" >> autodice.mac
 echo "/DetSys/world/SetFieldMirror 2" >> autodice.mac 
 echo "/DetSys/world/SetFieldAntiMirror 3" >> autodice.mac 
 
-# echo "/DetSys/app/SetDiceField 0.18 tesla" >> autodice.mac 
+# # # # Will scale field if used with TabMagneticField
+# # # # echo "/DetSys/app/SetDiceField 0.18 tesla" >> autodice.mac 
 
-# 	echo "DetSys/det/RemoveShield true" >> autodice.mac 
+# # # # echo "DetSys/det/RemoveShield true" >> autodice.mac 
 
 echo "/DetSys/det/AddBlocker true" >> autodice.mac 
 echo "/DetSys/app/SetDiceArbA 25 mm" >> autodice.mac 
@@ -46,11 +47,11 @@ do
 	echo "/run/beamOn $NumberOfPoints" >> autodice_main.mac 
 # # 	#running the sim with macro created here
 	./DICE10 autodice_main.mac 
-	root -l -q DiceAutoSort/FlatOrangeScan.C"("$E","$NumberOfPoints*3")"
+	root -l -q AutoDiceSort/DiceEffScanSort.C"("$E","$NumberOfPoints*3")"
 	
 done
 hadd -f SumDice.root *flatorange*.root
-root -l -q DiceAutoSort/AutoPostProcess.C"(\"SumDice.root\")"
+root -l -q AutoDiceSort/ScanPostProcess.C"(\"SumDice.root\")"
 rm -rf *flatorange*.root
 rm -rf autodice_main.mac
 
@@ -70,10 +71,9 @@ do
 	hadd -f BetaData$B.root betadata*.root
 	rm -rf betadata*.root
 	
-	root -l -q DiceAutoSort/FlatOrangePostSort.C"(\"SumDice.root\",\"Beta"$B"\","$B",\"DiceBetaSort.root\",\"BetaData"$B".root\")"
+	root -l -q AutoDiceSort/ExptSort.C"(\"SumDice.root\",\"Beta"$B"\","$B",\"DiceBetaSort.root\",\"BetaData"$B".root\")"
 
 done
-rm -rf autodice.mac
 rm -rf autodicebeta.mac
 rm -rf BetaData*.root
 
@@ -81,24 +81,32 @@ rm -rf BetaData*.root
 rm -rf DeltaSorted.root
 cat autodice.mac > autodicedelta.mac 
 echo "/DetSys/gun/efficiencyEnergy 50 keV" >> autodicedelta.mac 
-echo "/DetSys/gun/SetBeta $B" >> autodicedelta.mac 
 echo "/run/beamOn $NumberOfPoints" >> autodicedelta.mac 
 ./DICE10 autodicedelta.mac 
-root -l -q DiceAutoSort/FlatOrangePostSort.C"(\"SumDice.root\",\"Deltas\",0,\"DeltaSorted.root\")"
+root -l -q AutoDiceSort/ExptSort.C"(\"SumDice.root\",\"Deltas\",0,\"DeltaSorted.root\")"
 rm -rf autodicedelta.mac
 
 
-rm -rf GammaSorted.root
+rm -rf HighESorted.root
+cat autodice.mac > autodicehigh.mac 
+echo "/DetSys/gun/efficiencyEnergy 3000 keV" >> autodicehigh.mac 
+echo "/run/beamOn $NumberOfPoints" >> autodicehigh.mac 
+./DICE10 autodicehigh.mac 
+root -l -q AutoDiceSort/ExptSort.C"(\"SumDice.root\",\"HighE\",0,\"HighESorted.root\")"
+rm -rf autodicehigh.mac
 
+rm -rf GammaSorted.root
 cat autodice.mac > autodicegamma.mac 
 echo "/DetSys/gun/particle gamma" >> autodicegamma.mac 
 echo "/DetSys/gun/efficiencyEnergy 511 keV" >> autodicegamma.mac 
-echo "/DetSys/gun/SetBeta $B" >> autodicegamma.mac 
 echo "/run/beamOn $NumberOfPoints" >> autodicegamma.mac 
 ./DICE10 autodicegamma.mac 
-root -l -q DiceAutoSort/FlatOrangePostSort.C"(\"SumDice.root\",\"Gammas\",0,\"GammaSorted.root\")"
+root -l -q AutoDiceSort/ExptSort.C"(\"SumDice.root\",\"Gammas\",0,\"GammaSorted.root\")"
 rm -rf autodicegamma.mac
 
 
+hadd -f FullDiceSort.root SumDice.root DiceBetaSort.root GammaSorted.root DeltaSorted.root HighESorted.root
+rm -rf DiceBetaSort.root GammaSorted.root DeltaSorted.root HighESorted.root
 
-hadd -f FullDiceSort.root SumDice.root DiceBetaSort.root GammaSorted.root DeltaSorted.root
+rm -rf autodice.mac
+

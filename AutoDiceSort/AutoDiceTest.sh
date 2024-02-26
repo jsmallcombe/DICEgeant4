@@ -1,4 +1,4 @@
-energypoints="100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500"
+energypoints="100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700"
 # energypoints="100 300 500 700 900 1100 1300 1500"
 # energypoints="400 800 1200"
 
@@ -73,8 +73,8 @@ do
 	
 	root -l -q AutoDiceSort/ExptSort.C"(\"SumDice.root\",\"Beta"$B"\","$B",\"DiceBetaSort.root\",\"BetaData"$B".root\")"
 
+	rm -rf autodicebeta.mac
 done
-rm -rf autodicebeta.mac
 rm -rf BetaData*.root
 
 

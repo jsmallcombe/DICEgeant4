@@ -79,7 +79,7 @@ if (!inputFile || inputFile-> IsZombie ()) {
 				double xpre,ypre,x,y;
 				
 				
-				// Old version were cut was done in angles
+// // 				//Old version where cut was done in angles
 // // 				grf->GetPoint(0,xpre,ypre);
 // // 				adj->SetPoint(0,0,-1);
 // // 				adj->SetPoint(1,xpre,ypre);
@@ -97,16 +97,31 @@ if (!inputFile || inputFile-> IsZombie ()) {
 // // 					ypre=y;
 // // 				}
 				
-				// New version; cut is done before angle, so leave zeros out, for interpolation
 				
-				for(int p=0;p<grf->GetN();p++){
+				// New version; cut is done before angle, so leave zeros out, for interpolation
+// 				for(int p=0;p<grf->GetN();p++){
+// 					grf->GetPoint(p,x,y);
+// 					
+// 					if(y>0){
+// 						adj->SetPoint(adj->GetN(),x,y);
+// 					}
+// 				}
+                
+//             // New new version which creates some extra points, so we dont end up with errors from single point extraction
+				grf->GetPoint(0,xpre,ypre);
+				for(int p=1;p<grf->GetN();p++){
 					grf->GetPoint(p,x,y);
 					
-					if(y>0){
-						adj->SetPoint(adj->GetN(),x,y);
+					if(ypre*y<0){
+						double dX=x-xpre;
+						if(ypre>0)adj->SetPoint(adj->GetN(),xpre+dX*0.5,ypre);
+						else adj->SetPoint(adj->GetN(),xpre+dX*0.5,y);
 					}
+					if(y>0)adj->SetPoint(adj->GetN(),x,y);
+					
+					xpre=x;
+					ypre=y;
 				}
-				
 				
 				inputFile->cd("CorrAngles");
 					stringstream SS;

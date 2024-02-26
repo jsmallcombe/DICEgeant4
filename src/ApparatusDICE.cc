@@ -292,6 +292,7 @@ G4LogicalVolume* ApparatusDICE::BuildBB34(){
 void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zbar){
 	G4Material* BlockerMat = G4Material::GetMaterial(fBlockerMaterial);
 	G4Material *mMaterial = G4Material::GetMaterial(fMagnetMaterial);
+	G4Material *ShieldInMat = G4Material::GetMaterial(fShieldMaterial);
     G4Material* ScintMat = G4Material::GetMaterial(fScintMaterial);
     G4Material* XrayMat = G4Material::GetMaterial(fXrayMaterial);
     G4Material* KapMat = G4Material::GetMaterial(fKaptonMaterial);
@@ -428,7 +429,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 		}
 		
 		// Make the logical volume, with FORBID tag for pretty pictures
-		G4LogicalVolume *ShieldBoxL = new G4LogicalVolume(ShieldBox, mMaterial,"ShieldBoxL_FORBID",0,0,0);
+		G4LogicalVolume *ShieldBoxL = new G4LogicalVolume(ShieldBox, ShieldInMat,"ShieldBoxL_FORBID",0,0,0);
 		G4RotationMatrix* rotate1 = new G4RotationMatrix;
 		rotate1->rotateZ(Zbar);
 		rotate1->rotateY(90*deg);

@@ -1,4 +1,8 @@
-void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const char *rootin = "g4out.root") {
+void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const char *rootin = "g4out.root",double dE=100,bool symmetrize=true) {
+	
+	int Ebin = round(2000/dE);
+	double EbinMin=dE*0.5;
+	double EbinMax=EbinMin+dE*Ebin;
 	
     double grid_eff_cut=0.0001;
     
@@ -29,7 +33,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 	out.cd();//cd into output file so histograms created in memory are associated with that file at creation rather than being manually saved there later.
 
     TH1F* E_RawSum=new TH1F("E_RawSum","RawHitEnergy;Electron Energy (keV);Counts",2000,0,2000);
-    TH2F* E_RawSplit=new TH2F("E_RawSplit","RawHitsVsEmissionEnergy;Hit Energy (keV);Emission Energy (keV);Counts",2000,0,2000,20,50,2050);
+    TH2F* E_RawSplit=new TH2F("E_RawSplit","RawHitsVsEmissionEnergy;Hit Energy (keV);Emission Energy (keV);Counts",2000,0,2000,Ebin,EbinMin,EbinMax);
     TH2F* E_RawSumChan=new TH2F("E_RawSumChan","RawHitEnergyChan;Electron Energy (keV);Hit Segment;Counts",2000,0,2000,16,0,16);
     
     TH1F* E_AddbackSum=new TH1F("E_AddbackSum","AddbackEnergy;Electron Energy (keV);Counts",2000,0,2000);
@@ -37,31 +41,31 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     
     TH1F* E_GoodSum=new TH1F("E_GoodSum","EmissionEqualAddbackSelected;Electron Energy (keV);Counts",2000,0,2000);
     
-    TH2F* E_GoodChan=new TH2F("E_GoodChan","FullEnergyVsSeg;Electron Energy (keV);Hit Segment;Counts",20,50,2050,16,0,16);
-    TH2F* E_GoodChanThetaLim=new TH2F("E_GoodChanThetaLim","FullEnergyVsSegThetaLimited;Electron Energy (keV);Hit Segment;Counts",20,50,2050,16,0,16);
-    TH2F* E_GoodChanThetaLimHalf=new TH2F("E_GoodChanThetaLimHalf","FullEnergyVsSegThetaLimitedHalf;Electron Energy (keV);Hit Segment;Counts",20,50,2050,16,0,16);
+    TH2F* E_GoodChan=new TH2F("E_GoodChan","FullEnergyVsSeg;Electron Energy (keV);Hit Segment;Counts",Ebin,EbinMin,EbinMax,16,0,16);
+    TH2F* E_GoodChanThetaLim=new TH2F("E_GoodChanThetaLim","FullEnergyVsSegThetaLimited;Electron Energy (keV);Hit Segment;Counts",Ebin,EbinMin,EbinMax,16,0,16);
+    TH2F* E_GoodChanThetaLimHalf=new TH2F("E_GoodChanThetaLimHalf","FullEnergyVsSegThetaLimitedHalf;Electron Energy (keV);Hit Segment;Counts",Ebin,EbinMin,EbinMax,16,0,16);
     
-    TH1F* Efficiency=new TH1F("Efficiency","Efficiency;Emission Energy (keV);Full Energy Detection Efficiency (%)",20,50,2050);
-    TH1F* PeakTotal=new TH1F("PeakTotal","PeakToTotal;Emission Energy (keV);Detection PeakToTotal",20,50,2050);
+    TH1F* Efficiency=new TH1F("Efficiency","Efficiency;Emission Energy (keV);Full Energy Detection Efficiency (%)",Ebin,EbinMin,EbinMax);
+    TH1F* PeakTotal=new TH1F("PeakTotal","PeakToTotal;Emission Energy (keV);Detection PeakToTotal",Ebin,EbinMin,EbinMax);
     
-    TH1F* EfficiencyB=new TH1F("EfficiencyB","Efficiency;Emission Energy (keV);Full Energy Detection Efficiency (%)",20,50,2050);
-    TH1F* EfficiencyCut=new TH1F("EfficiencyCut","EfficiencyThetaCut;Emission Energy (keV);Full Energy Detection Efficiency (%)",20,50,2050);
-    TH1F* EfficiencyCutHalf=new TH1F("EfficiencyCutHalf","EfficiencyThetaCutHalf;Emission Energy (keV);Full Energy Detection Efficiency (%)",20,50,2050);
+    TH1F* EfficiencyB=new TH1F("EfficiencyB","Efficiency;Emission Energy (keV);Full Energy Detection Efficiency (%)",Ebin,EbinMin,EbinMax);
+    TH1F* EfficiencyCut=new TH1F("EfficiencyCut","EfficiencyThetaCut;Emission Energy (keV);Full Energy Detection Efficiency (%)",Ebin,EbinMin,EbinMax);
+    TH1F* EfficiencyCutHalf=new TH1F("EfficiencyCutHalf","EfficiencyThetaCutHalf;Emission Energy (keV);Full Energy Detection Efficiency (%)",Ebin,EbinMin,EbinMax);
     
 	out.mkdir("Angles");
 	out.cd("Angles");
-    TH3F* AngleESeg=new TH3F("AngleESeg","EmissionAngleEnergyHitSegment;Emission Angle Theta #theta [Rad.];Emission Energy (keV);Hit Segment",360,0,3.14159,20,50,2050,16,0,16);
+    TH3F* AngleESeg=new TH3F("AngleESeg","EmissionAngleEnergyHitSegment;Emission Angle Theta #theta [Rad.];Emission Energy (keV);Hit Segment",360,0,3.14159,Ebin,EbinMin,EbinMax,16,0,16);
     TH2F* AngleESegGrid=new TH2F("AngleESegGrid","AngleESegGrid;Angle #theta [Rad.];Emission Energy (keV)",180*4,0,TMath::Pi()*4,15*4,50,6050);
     
-        TH2F* SigmaEseg=new TH2F("SigmaEseg","ThetaSigmaESeg;Emission Energy (keV);Segment;S.t.d. Theta (deg.)",20,50,2050,16,0,16);
+        TH2F* SigmaEseg=new TH2F("SigmaEseg","ThetaSigmaESeg;Emission Energy (keV);Segment;S.t.d. Theta (deg.)",Ebin,EbinMin,EbinMax,16,0,16);
     
     
-        TH2F* E_Theta=new TH2F("E_Theta","EmissionEnergyVsAngle;Emission Angle Theta #theta [Rad.];Emission Energy (keV)",180,0,3.14159,20,50,2050);
+        TH2F* E_Theta=new TH2F("E_Theta","EmissionEnergyVsAngle;Emission Angle Theta #theta [Rad.];Emission Energy (keV)",180,0,3.14159,Ebin,EbinMin,EbinMax);
     
         TH2F *GridAngle[16];
         for(int i=0;i<16;i++){
             stringstream ss;ss<<"SegmentAngle"<< setw(2) << setfill('0')<<i;
-            GridAngle[i] = new TH2F(ss.str().c_str(),(ss.str()+";Emission Angle Theta #theta [Rad.];Electron Energy (keV)").c_str(),360,0,3.14159,20,50,2050);
+            GridAngle[i] = new TH2F(ss.str().c_str(),(ss.str()+";Emission Angle Theta #theta [Rad.];Electron Energy (keV)").c_str(),360,0,3.14159,Ebin,EbinMin,EbinMax);
         }
         
         
@@ -237,7 +241,21 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     
 /////////////////////
 
-
+	if(symmetrize){
+		for(int g=0;g<8;g++){
+			TH2* h1=GridAngle[g];
+			TH2* h2=GridAngle[15-g];
+			for(int y=1;y<=h1->GetNbinsY();y++){
+				int nX=h1->GetNbinsX();
+				for(int x=1;x<=nX;x++){
+					int x2=nX+1-x;
+					double symsum=h1->GetBinContent(x,y)+h2->GetBinContent(x2,y);
+					h1->SetBinContent(x,y,symsum);
+					h2->SetBinContent(x2,y,symsum);
+				}
+			}
+		}
+	}
 	
 	TGraph AngleExpt[16][4];
 
@@ -349,12 +367,31 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     TH2F* E_GoodChanThetaLimCut=(TH2F*)E_GoodChanThetaLim->Clone("E_GoodChanThetaLimCut");
     TH2F* E_GoodChanThetaLimHalfCut=(TH2F*)E_GoodChanThetaLimHalf->Clone("E_GoodChanThetaLimHalfCut");
 	gROOT->cd();
-    
+	
+	int SimmNC=SimmN;
+	
+	if(symmetrize){
+		SimmNC*=2;
+		TH2* Fix[3]={E_GoodChanCut,E_GoodChanThetaLimCut,E_GoodChanThetaLimHalfCut};
+		
+		for(int g=0;g<3;g++){
+			TH2* h1=Fix[g];
+			for(int x=1;x<=h1->GetNbinsX();x++){
+				int nY=h1->GetNbinsY();
+				for(int y=1;y<=nY/2;y++){
+					int y2=nY+1-y;
+					double symsum=h1->GetBinContent(x,y)+h1->GetBinContent(x,y2);
+					h1->SetBinContent(x,y,symsum);
+					h1->SetBinContent(x,y2,symsum);
+				}
+			}
+		}
+	}
 	
 	for(int x=1;x<=E_GoodChan->GetNbinsX();x++){
 	for(int y=1;y<=E_GoodChan->GetNbinsY();y++){
-		double z=E_GoodChan->GetBinContent(x,y);
-		if(z<SimmN*grid_eff_cut){
+		double z=E_GoodChanCut->GetBinContent(x,y);
+		if(z<SimmNC*grid_eff_cut){
             E_GoodChanCut->SetBinContent(x,y,0);
             E_GoodChanThetaLimCut->SetBinContent(x,y,0);
             E_GoodChanThetaLimHalfCut->SetBinContent(x,y,0);
@@ -368,9 +405,9 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     
     for(int b=1;b<=Efficiency->GetNbinsX();b++){
     
-        EfficiencyB->SetBinContent(b,100*h1->GetBinContent(b)/SimmN);
-        EfficiencyCut->SetBinContent(b,100*h2->GetBinContent(b)/SimmN);
-        EfficiencyCutHalf->SetBinContent(b,100*h3->GetBinContent(b)/SimmN);
+        EfficiencyB->SetBinContent(b,100*h1->GetBinContent(b)/SimmNC);
+        EfficiencyCut->SetBinContent(b,100*h2->GetBinContent(b)/SimmNC);
+        EfficiencyCutHalf->SetBinContent(b,100*h3->GetBinContent(b)/SimmNC);
     }
 
     delete h1;

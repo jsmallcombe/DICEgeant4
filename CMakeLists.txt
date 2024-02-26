@@ -47,10 +47,9 @@ set(DICE10_SCRIPTS
     ExampleSortFiles/DiceSort.C
     ExampleSortFiles/QuickPairsSort.C
     FieldExample.txt
-	AutoDiceSort/AutoDiceTest.sh
-	AutoDiceSort/ExptSort.C
-	AutoDiceSort/DiceEffScanSort.C
-	AutoDiceSort/ScanPostProcess.C
+	AutoDiceSort/AutoDice.sh
+	AutoDiceSort/ExptEquivSort.C
+	AutoDiceSort/DiceEffScanCombinedSort.C
   )
   
 

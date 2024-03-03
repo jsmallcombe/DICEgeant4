@@ -10,7 +10,7 @@ dE=100
 betapoints="0.05 0.1 0.2 .5"
 # betapoints="0.1"
 
-do_G4_part=true
+do_G4_part=false
 NumberOfPoints=1000000
 NumberOfBetaPoints=100000
 
@@ -112,7 +112,7 @@ root -l -q AutoDiceSort/DiceEffScanCombinedSort.C"("$NumberOfPoints*3",\"SumDice
 for B in $betapoints;
 do
 	hadd -f AutoSortFiles/BetaData$B.root AutoSortFiles/betadata"$B"_*.root
-	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Beta"$B"\","$B",\"AutoSortFiles/DiceBetaSort.root\",\"AutoSortFiles/BetaData"$B".root\")"
+	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Beta"$B"\","$B",\"AutoSortFiles/DiceBetaSort.root\",\"AutoSortFiles/BetaData"$B".root\","$NumberOfBetaPoints")"
 done
 
 root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Deltas\",0,\"AutoSortFiles/ExtraSorted.root\",\"AutoSortFiles/deltatup.root\")"

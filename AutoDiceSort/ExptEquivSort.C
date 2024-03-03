@@ -1,4 +1,4 @@
-void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double beta=0,const char * outfileName = "DicePostSort.root", const char *ntuplefileName = "g4out.root") {
+void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double beta=0,const char * outfileName = "DicePostSort.root", const char *ntuplefileName = "g4out.root",int Nevent=0) {
 	    
 	//// Random number generator to add electronic noise on to "perfect" geant4 detectors ///
 	TRandom r;
@@ -36,6 +36,9 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 		}
 	}
 	
+
+	
+	
 	TFile out(outfileName,"UPDATE");
 	out.mkdir(HistFolder);
 	gROOT->cd();
@@ -66,7 +69,15 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 			E_Corr[2]=new TH1F("E_CorrMeanStrict","E_CorrMeanStrict;Electron Energy (keV);Counts",2000,0,2000);
 			E_Corr[3]=new TH1F("E_CorrModeStrict","E_CorrModeStrict;Electron Energy (keV);Counts",2000,0,2000);
 		}
-	
+		
+		TH1 *Eff,*EffFit;
+		if(Nevent>0){
+			Eff=(TH1*)DetDataFile.Get("Efficiency")->Clone("Eff");
+			EffFit=(TH1*)DetDataFile.Get("Efficiency")->Clone("EffFit");
+			
+			Eff->Reset();
+			EffFit->Reset();
+		}
 	gROOT->cd();//cd back into main session memory 
 	
 	// The TTree newtree is the big list of energies and detector segments we need to load from
@@ -212,6 +223,28 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 		TMult=0;
 	
 	}
+	
+	
+	
+	if(Nevent>0){
+		TH1* h=EGrigGate;
+		if(beta>0) h=E_Corr[0];
+		
+		
+		TAxis* ax=Eff->GetXaxis();
+		TAxis* AX=h->GetXaxis();
+		for(int b=1;b<=ax->GetNbins();b++){
+			double e=ax->GetBinCenter(b);
+			double de=ax->GetBinWidth(b)*0.5;
+			
+			Eff->SetBinContent(b,h->Integral(AX->FindBin(e-5),AX->FindBin(e+5))*100/Nevent);
+
+			TF1* fit=UserQuickSingleGausAutoFit(h,e,e-de,e+de,1);
+			h->GetListOfFunctions()->Add(fit);
+			EffFit->SetBinContent(b,2.5066*fit->GetParameter(0)*fit->GetParameter(2)*100/Nevent);
+		}
+	}
+	
 	
     out.Write();
     out.Close();	

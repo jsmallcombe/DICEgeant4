@@ -78,12 +78,14 @@ private:
  	G4LogicalVolume* fDetectorLog;
     
 	G4String fMagnetMaterial; 
+	G4String fYokeMaterial; 
 	G4String fShieldMaterial; 
 	G4String fBlockerMaterial; 
 	G4String fWaferMaterial; 
 	G4String fScintMaterial; 
 	G4String fXrayMaterial; 
 	G4String fKaptonMaterial; 
+	G4String fTargetMaterial; 
 
     G4VisAttributes *OneVisAtt,*TwoVisAtt,*ThreeVisAtt,*FourVisAtt,*FiveVisAtt;
 	G4VisAttributes* vis_att_hid;

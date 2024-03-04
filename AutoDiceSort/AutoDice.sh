@@ -47,7 +47,7 @@ if [ "$do_G4_part" = true ] ; then
 	echo "/DetSys/app/SetDiceArbC 15 mm" >> autodice.mac 
 	echo "/DetSys/app/SetDiceArbD -20 mm" >> autodice.mac 
 
-	echo "/DetSys/app/addDiceDetector 1" >> autodice.mac 
+	echo "/DetSys/app/addDiceDetector -1" >> autodice.mac 
 
 
 	rm -rf AutoSortFiles/Tuple*.root

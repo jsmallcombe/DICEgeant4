@@ -98,10 +98,10 @@
 
 ### Basic ### 2
 /DetSys/gun/position 0.0 0.0 0.0 mm
-#/DetSys/gun/particle e-
-#/DetSys/gun/efficiencyEnergy 1000 keV
-/DetSys/gun/particle pp
-/DetSys/gun/efficiencyEnergy 2500 keV
+/DetSys/gun/particle e-
+/DetSys/gun/efficiencyEnergy 800 keV
+#/DetSys/gun/particle pp
+#/DetSys/gun/efficiencyEnergy 2500 keV
 
 ### Nucleus ### 
 #/gun/particle ion
@@ -133,7 +133,7 @@
 /DetSys/SiHits/VisStore
 # /DetSys/SiHits/PrettyOnly  ### Lies by only shows clean events that dont scatter
 # /DetSys/SiHits/StoreMultiplicity 2 ### Only store higher multiplicity events
-/run/beamOn 500
+/run/beamOn 100
 /vis/enable
 /vis/scene/endOfEventAction accumulate 
 /vis/viewer/flush

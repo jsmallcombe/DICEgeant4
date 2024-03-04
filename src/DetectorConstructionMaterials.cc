@@ -195,7 +195,10 @@ void DetectorConstruction::DefineMaterials()
 
     G4Material* Ti = new G4Material(name="Titanium", z=22., 47.867*g/mole, 4.54*g/cm3); //
     myMaterials.push_back(Ti);
-
+    
+    G4Material* Ni = new G4Material(name="Nickle", z=28., 58.69*g/mole, 8.90*g/cm3); //
+    myMaterials.push_back(Ni);
+    
     G4Material* Sn = new G4Material(name="Tin", z=50., 118.71*g/mole, 6.99*g/cm3);//
     myMaterials.push_back(Sn);
 

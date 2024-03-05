@@ -23,6 +23,7 @@ if [ "$do_G4_part" = true ] ; then
 	echo "/DetSys/world/material Vacuum" >> autodice.mac 
 	echo "/DetSys/gun/BeamSpot 1 mm" >> autodice.mac 
 	echo "/DetSys/det/RecordGun 1" >> autodice.mac 
+	echo "/DetSys/det/RecordPentration 1" >> autodice.mac 
 	echo "/DetSys/gun/position 0.0 0.0 0.0 mm " >> autodice.mac 
 
 	echo "/DetSys/gun/particle e-" >> autodice.mac 
@@ -41,13 +42,14 @@ if [ "$do_G4_part" = true ] ; then
 
 	# # # # echo "DetSys/det/RemoveShield true" >> autodice.mac 
 
-	echo "/DetSys/det/AddBlocker true" >> autodice.mac 
-	echo "/DetSys/app/SetDiceArbA 25 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceArbB 60 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceArbC 15 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceArbD -20 mm" >> autodice.mac 
+	echo "/DetSys/app/SetDiceLength MagMidOffset 25 mm" >> autodice.mac 
+	echo "/DetSys/app/SetDiceLength ShieldMidBeamSep 15 mm" >> autodice.mac 
+	echo "/DetSys/app/SetDiceLength MagY -20 mm" >> autodice.mac 
+	echo "/DetSys/app/SetDiceLength MagGapMinHalf 10 mm" >> autodice.mac 
+	##echo "/DetSys/app/SetDiceLength PoleSepHalf 10 mm" >> autodice.mac 
 
-	echo "/DetSys/app/addDiceDetector -1" >> autodice.mac 
+	# # # # Set negative to add a target foil and ISOK160 chamber
+	echo "/DetSys/app/addDiceDetector 1" >> autodice.mac 
 
 
 	rm -rf AutoSortFiles/Tuple*.root

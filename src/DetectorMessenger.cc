@@ -48,6 +48,7 @@
 #include "G4UIcmdWithADouble.hh"
 
 #include <string>
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
@@ -130,39 +131,14 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 	fApparatusDiceFieldCmd->SetUnitCategory("Magnetic flux density");
 	fApparatusDiceFieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 	
-	fApparatusDiceLengthCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/app/SetDiceLength",this);
-	fApparatusDiceLengthCmd->SetGuidance("Set DICE detector length.");
-	fApparatusDiceLengthCmd->SetUnitCategory("Length");
-	fApparatusDiceLengthCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+	fApparatusDiceSetCmd = new G4UIcmdWithAString("/DetSys/app/SetDiceLength",this);
+	fApparatusDiceSetCmd->SetGuidance("Choose DICE detector length to set");
+	fApparatusDiceSetCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 	
 	fApparatusDiceIntCmd = new G4UIcmdWithAnInteger("/DetSys/app/SetDiceN",this);
 	fApparatusDiceIntCmd->SetGuidance("Set DICE Int N");
 	fApparatusDiceIntCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-    fApparatusDiceArbACmd = new G4UIcmdWithADoubleAndUnit("/DetSys/app/SetDiceArbA",this);
-	fApparatusDiceArbACmd->SetGuidance("Set DICE detector length.");
-// 	fApparatusDiceArbACmd->SetUnitCategory("Length");
-	fApparatusDiceArbACmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-    fApparatusDiceArbBCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/app/SetDiceArbB",this);
-	fApparatusDiceArbBCmd->SetGuidance("Set DICE detector length.");
-// 	fApparatusDiceArbBCmd->SetUnitCategory("Length");
-	fApparatusDiceArbBCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-    fApparatusDiceArbCCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/app/SetDiceArbC",this);
-	fApparatusDiceArbCCmd->SetGuidance("Set DICE detector length.");
-// 	fApparatusDiceArbCCmd->SetUnitCategory("Length");
-	fApparatusDiceArbCCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-    fApparatusDiceArbDCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/app/SetDiceArbD",this);
-	fApparatusDiceArbDCmd->SetGuidance("Set DICE detector length.");
-// 	fApparatusDiceArbDCmd->SetUnitCategory("Length");
-	fApparatusDiceArbDCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-    fApparatusDiceArbECmd = new G4UIcmdWithADoubleAndUnit("/DetSys/app/SetDiceArbE",this);
-	fApparatusDiceArbECmd->SetGuidance("Set DICE detector length.");
-// 	fConeAngleCmd->SetUnitCategory("Angle");
-	fApparatusDiceArbECmd->AvailableForStates(G4State_PreInit,G4State_Idle);
     
 }
 
@@ -193,13 +169,8 @@ DetectorMessenger::~DetectorMessenger()
 	
 	delete fAddApparatusDiceDetectorCmd;
 	delete fApparatusDiceFieldCmd;
-	delete fApparatusDiceLengthCmd;
+	delete fApparatusDiceSetCmd;
 	delete fApparatusDiceIntCmd;
-	delete fApparatusDiceArbACmd;
-	delete fApparatusDiceArbBCmd;
-	delete fApparatusDiceArbCCmd;
-	delete fApparatusDiceArbDCmd;
-	delete fApparatusDiceArbECmd;
 	
 }
 
@@ -271,24 +242,13 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 		fDetector->SetDiceInt(fApparatusDiceIntCmd->GetNewIntValue(newValue));
 	}
 	
-	if(command == fApparatusDiceLengthCmd) {
-		fDetector->SetDiceLength(0,fApparatusDiceLengthCmd->GetNewDoubleValue(newValue));
+	if(command == fApparatusDiceSetCmd) {
+		G4String Name,Val,Unit;
+		std::istringstream is(newValue);
+		is>>Name>>Val>>Unit;
+		Val+=" "+Unit;
+		fDetector->DiceSetParam(Name,G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(Val));
 	}
-	if(command == fApparatusDiceArbACmd) {
-		fDetector->SetDiceLength(1,fApparatusDiceArbACmd->GetNewDoubleValue(newValue));
-	}
-	if(command == fApparatusDiceArbBCmd) {
-		fDetector->SetDiceLength(2,fApparatusDiceArbBCmd->GetNewDoubleValue(newValue));
-	}
-	if(command == fApparatusDiceArbCCmd) {
-		fDetector->SetDiceLength(3,fApparatusDiceArbCCmd->GetNewDoubleValue(newValue));
-	}	
-	if(command == fApparatusDiceArbDCmd) {
-		fDetector->SetDiceLength(4,fApparatusDiceArbDCmd->GetNewDoubleValue(newValue));
-	}	
-	if(command == fApparatusDiceArbECmd) {
-		fDetector->SetDiceLength(5,fApparatusDiceArbECmd->GetNewDoubleValue(newValue));
-	}	
 	
 }
 

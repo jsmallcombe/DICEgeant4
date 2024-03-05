@@ -6,11 +6,12 @@
 /DetSys/app/SetDiceField 0.25 tesla
 #/DetSys/det/RemoveShield true
 /DetSys/det/AddBlocker true
-/DetSys/app/SetDiceArbA -7.50 mm
-/DetSys/app/SetDiceArbB 55 mm
-/DetSys/app/SetDiceArbC 15 mm
-/DetSys/app/SetDiceArbD -15 mm
-# /DetSys/app/SetDiceArbE 0 deg
+
+/DetSys/app/SetDiceLength MagMidOffset 22.5 mm
+/DetSys/app/SetDiceLength BeamDetY 60 mm
+/DetSys/app/SetDiceLength ShieldMidBeamSep 15 mm
+/DetSys/app/SetDiceLength MagY -20 mm
+
 /DetSys/app/addDiceDetector -1
 
 ## Record the initial beam data ###

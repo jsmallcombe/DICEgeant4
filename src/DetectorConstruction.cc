@@ -308,34 +308,6 @@ void DetectorConstruction::SetFieldOffsetVec(G4ThreeVector Mpoint){
 	}
 }
 
-
-void DetectorConstruction::SetDiceLength(G4int Nsel,G4double Length){
-    switch (Nsel) {
-    case 1:
-        fAppDICE->fAdjLengthA=Length;
-		fAppDICE->fUseA=true;
-        break;
-    case 2:
-        fAppDICE->fAdjLengthB=Length;
-		fAppDICE->fUseB=true;
-        break;
-    case 3:
-        fAppDICE->fAdjLengthC=Length;
-		fAppDICE->fUseC=true;
-        break;
-    case 4:
-        fAppDICE->fAdjLengthD=Length;
-		fAppDICE->fUseD=true;
-        break;
-    case 5:
-        fAppDICE->fAdjLengthE=Length;
-		fAppDICE->fUseE=true;
-        break;
-    default:
-        fAppDICE->fAdjLength=Length;
-    }
-    
-}
 void DetectorConstruction::SetDiceInt(G4int N){
 	fAppDICE->fAdjNumber=N;
 }
@@ -349,3 +321,8 @@ ApparatusDICE* DetectorConstruction::GetDice(){
 	return fAppDICE;
 }
 
+void DetectorConstruction::DiceSetParam(G4String N,G4double input){
+		fAppDICE->SetParam(N,input);
+}
+	
+	

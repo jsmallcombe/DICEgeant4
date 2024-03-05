@@ -96,23 +96,54 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	fBB34Chip_Al=500*CLHEP::nm;
     
     
-	///////////////////////////////////////////////////////
-	////// Controlled by DetectorConstruction class ///////
-	///////////////////////////////////////////////////////
-	
-	fAdjLength= 10*CLHEP::mm;
-	fAdjLengthA= 10*CLHEP::mm;
-	fAdjLengthB= 10*CLHEP::mm;
-	fAdjLengthC= 10*CLHEP::mm;
-	fAdjLengthD= 10*CLHEP::mm;
-	fAdjLengthE= 10*CLHEP::mm;
+	//////////////////////////////////////////////////////////////////////
+	////// Optionally Controlled by DetectorConstruction class ///////
+	//////////////////////////////////////////////////////////////////////
+
 	fAdjNumber=4;
 	
-	fUseA=false;
-	fUseB=false;
-	fUseC=false;
-	fUseD=false;
-	fUseE=false;
+	    
+	Orange_MagMidOffset=15*mm; // Distance between center line of magnet and target
+	SetNmLst.push_back("MagMidOffset");
+	SetPtrLst.push_back(&Orange_MagMidOffset);
+	
+	Orange_BeamDetY=60*mm; // Height of target vs BB34
+	SetNmLst.push_back("BeamDetY");
+	SetPtrLst.push_back(&Orange_BeamDetY);
+	
+	Orange_ShieldMidBeamSep=20*mm;  // Distance to the shield widest pointgb
+	SetNmLst.push_back("ShieldMidBeamSep");
+	SetPtrLst.push_back(&Orange_ShieldMidBeamSep);
+	
+	Orange_MagY=20*mm;  // Total vertical coverage/height of the magnet field region (variable gets halved after input)
+	SetNmLst.push_back("MagY");
+	SetPtrLst.push_back(&Orange_MagY);
+	
+	Orange_MagAng=0*deg; // Flare angle of the magnets
+	SetNmLst.push_back("MagAng");
+	SetPtrLst.push_back(&Orange_MagAng);
+
+	Orange_BeamShieldSep=8*mm;
+	SetNmLst.push_back("BeamShieldSep");
+	SetPtrLst.push_back(&Orange_BeamShieldSep);
+	
+	Orange_MagZ=60*mm; // Beam extent of magnets
+	SetNmLst.push_back("MagZ");
+	SetPtrLst.push_back(&Orange_MagZ);
+	
+	Orange_MagHalfThick=2.5*mm; // Perpendicular Half Thickness of the magnets 
+	SetNmLst.push_back("MagHalfThick");
+	SetPtrLst.push_back(&Orange_MagHalfThick);
+	
+	Orange_MagGapMinHalf=10*mm; // Min Half Gap between magnet halves (at side of shield)
+	SetNmLst.push_back("MagGapMinHalf");
+	SetPtrLst.push_back(&Orange_MagGapMinHalf);
+	
+	PoleSepHalf=-1;
+	SetNmLst.push_back("PoleSepHalf");
+	SetPtrLst.push_back(&PoleSepHalf);
+	
+
 	
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
@@ -126,6 +157,17 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 ApparatusDICE::~ApparatusDICE()
 {
 } // end ~ApparatusDICE
+
+
+void ApparatusDICE::SetParam(G4String str,G4double input){
+	for(unsigned int i=0;i<SetNmLst.size();i++){
+		if(SetNmLst[i]==str){
+			*SetPtrLst[i]=input;
+			return;
+		}
+	}
+	
+}
 
 ///////////////////////////////////////
 // build and place components        //
@@ -204,7 +246,7 @@ void ApparatusDICE::BuildPlaceBasicTest(G4LogicalVolume* expHallLog){
 G4int ApparatusDICE::BuildMicronSiN=0;
 
 G4LogicalVolume* ApparatusDICE::BuildBB34(){
-	
+
 	std::vector<G4TwoVector> PCBPolygon(6);
 	PCBPolygon[0].set(fBB34PCB_HalfWidth,-fBB34PCB_HalfALength);
 	PCBPolygon[1].set(fBB34PCB_HalfWidth,fBB34PCB_HalfALength);
@@ -300,6 +342,9 @@ G4LogicalVolume* ApparatusDICE::BuildBB34(){
 }
 
 void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zbar){
+	
+	//// Set Materials ////
+	
 	G4Material* BlockerMat = G4Material::GetMaterial(fBlockerMaterial);
 	G4Material *mMaterial = G4Material::GetMaterial(fMagnetMaterial);
 	G4Material *YokeMat = G4Material::GetMaterial(fYokeMaterial);
@@ -308,80 +353,85 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     G4Material* XrayMat = G4Material::GetMaterial(fXrayMaterial);
     G4Material* KapMat = G4Material::GetMaterial(fKaptonMaterial);
 	
+	//// Initilisation of general parameters ////
+	
 	G4RotationMatrix rotZbar;
     rotZbar.rotateZ(-Zbar);	
 
 	G4double 	SafetyGap=2*mm;
-	
-	G4double 	Orange_BeamDetY=75*mm; // Height of target vs BB34
-	
-	G4double 	Orange_BeamShieldSep=8*mm;
-	G4double 	Orange_ShieldMidBeamSep=20*mm;  // Distance to the shield widest point
-	
-	G4double 	Orange_MagMidOffset=0*mm; // Distance between center line of magnet and target
-	G4double 	Orange_MagY=30*mm;  // Total vertical coverage/height of the magnet field region (variable gets halved after input)
-	G4double 	Orange_MagAng=0*deg; // Flare angle of the magnets
 
-	G4double 	Orange_MagZ=60*mm; // Beam extent of magnets
-	G4double 	Orange_MagHalfThick=2*mm; // Perpendicular Half Thickness of the magnets 
-	G4double 	Orange_MagGapMinHalf=7.5*mm; // Gap between magnet halves (at side of shield)
+	G4cout<<"DICE SetAbleParameters :"<<G4endl;
+	std::cout<<"DICE SetAbleParameters :"<<std::endl;
+	for(unsigned int i=0;i<SetNmLst.size();i++){
+		G4cout<<SetNmLst[i]<<" "<<*SetPtrLst[i]<<G4endl;
+		std::cout<<SetNmLst[i]<<" "<<*SetPtrLst[i]<<std::endl;
+	}
+	G4cout<<"Fin."<<G4endl;
+	std::cout<<"Fin."<<std::endl;
 	
-	G4double 	Orange_YokeHalfThick=4*mm; // Perpendicular Half Thickness of the magnets 
-	
+	G4double 	Orange_YokeHalfThick=4*mm; // Perpendicular Half Thickness of the Yoke 
 	G4double 	Orange_TargetWardingY=12.5*mm; // Half Gap Target Ladder Needs
 	G4double 	Orange_TargetWardingZ=2.5*mm; // Half Gap Target Ladder Needs (Beamward)
-	
     G4double ScintThick=1*mm; //half
-    G4double Orange_ScintSep=(ScintThick+fBB34PCB_HalfThickness)+2.55*mm; // Distance between midpoint off BB34 and Scint 
-	G4double CrossBlockHalfThickness=1*mm;
     
-	if(fUseA)Orange_MagMidOffset=std::abs(fAdjLengthA); // Distance between center line of magnet and target
-	if(fUseB)Orange_BeamDetY=fAdjLengthB; // Height of target vs BB34
-	if(fUseC)Orange_ShieldMidBeamSep=fAdjLengthC;// Distance to the shield widest point
-	if(fUseD)Orange_MagY=fAdjLengthD;    // Total vertical coverage/height of the magnet field region
-	if(fUseE)Orange_MagAng=fAdjLengthE;  // Flare angle of the magnets
+	G4double CrossBlockHalfThickness=1*mm; //Under shield electron blocker
+	G4double 	KaptonThickness=0.1*mm; // Abs thickness of kapton covers
+    
+	//// Parameter Processing ////
 	
-	G4double 	KaptonThickness=0.1*mm; // Height of target vs BB34
+    G4double Orange_ScintSep=(ScintThick+fBB34PCB_HalfThickness)+2.55*mm; // Distance between midpoint off BB34 and Scint 
 	
-	// MAG HEIGHT IS DIVIDED BY TWO AFTER INPUT
-    Orange_MagY*=0.5; 
+	bool SetMagCopyNum=(Orange_MagMidOffset<0);
+	Orange_MagMidOffset=std::abs(Orange_MagMidOffset);
+	
+    Orange_MagY*=0.5;  // MAG HEIGHT IS DIVIDED BY TWO AFTER INPUT
     
     bool StartMagAtShield=true;
     if(Orange_MagY<0){Orange_MagY=abs(Orange_MagY);StartMagAtShield=false;}
-    
-	G4double 	Orange_ShieldTanAngle=(fBB34Chip_HalfWidth+SafetyGap)/Orange_BeamDetY;
-	G4double 	Orange_ShieldFrontHalfWidth=Orange_ShieldTanAngle*(Orange_BeamShieldSep+SafetyGap);
+	
+	G4double 	Orange_ShieldTanAngle=(fBB34Chip_HalfWidth+SafetyGap)/(Orange_BeamDetY+SafetyGap*2);
+	G4double 	Orange_ShieldFrontHalfWidth=Orange_ShieldTanAngle*Orange_BeamShieldSep;
 	G4double 	Orange_ShieldMidDepth=Orange_ShieldMidBeamSep-Orange_BeamShieldSep;
 	G4double 	Orange_ShieldMidHalfWidth=Orange_ShieldFrontHalfWidth+Orange_ShieldTanAngle*(Orange_ShieldMidDepth);
 	G4double 	Orange_ShieldBottomDepth=18*mm-Orange_BeamShieldSep;
 	
+	// Fixing unphysics geometry inputs
 	if(Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep>Orange_BeamDetY+SafetyGap){
 		Orange_ShieldBottomDepth=Orange_BeamDetY-Orange_ShieldMidBeamSep-SafetyGap;
 	}
 	
 	G4double ShieldInsertBottomY=Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep;
 	
-
     G4double MStart=Orange_MagGapMinHalf;
     if(StartMagAtShield){MStart=Orange_ShieldMidHalfWidth;}
     
     G4double LowestPointOfMagnet=Orange_MagY+Orange_MagMidOffset;
 	if(Orange_MagAng>0)LowestPointOfMagnet+=(fBB34Chip_HalfWidth-MStart)*tan(Orange_MagAng);
     
-	G4double Pole_SepHalf=((fBB34Chip_HalfLength+SafetyGap)/Orange_BeamDetY)*LowestPointOfMagnet;
-	
-	if(Pole_SepHalf<=0){
-		Pole_SepHalf=10;
-		G4cout<<G4endl<<"POLL SEPARATION OVERRIDDEN DUE TO MAGENT PLACEMENT ERROR";
+	G4double RecommendedPole=((fBB34Chip_HalfLength+SafetyGap)/(Orange_BeamDetY+SafetyGap*2))*LowestPointOfMagnet;
+	if(PoleSepHalf<0){
+		PoleSepHalf=RecommendedPole;
+	}else{
+		G4cout<<G4endl<<"Poll Separation manually set to "<<PoleSepHalf;
+		G4cout<<G4endl<<"Recommened Value "<<RecommendedPole;
+		std::cout<<std::endl<<"Poll Separation manually set to "<<PoleSepHalf;
+		std::cout<<std::endl<<"Recommened Value "<<RecommendedPole<<std::endl;
 	}
 	
-	G4double Orange_ShieldHalfX=Pole_SepHalf+Orange_MagHalfThick*2;
+	if(PoleSepHalf<=0){
+		PoleSepHalf=10;
+		G4cout<<G4endl<<"POLL SEPARATION OVERRIDDEN DUE TO ERROR";
+	}
+	
+	G4double Orange_ShieldHalfX=PoleSepHalf+Orange_MagHalfThick*2;
 	
 	G4double Orange_InsertHalfX=((fBB34Chip_HalfLength+SafetyGap)/Orange_BeamDetY)*ShieldInsertBottomY;
 	if(Orange_ShieldHalfX<Orange_InsertHalfX){
 		Orange_InsertHalfX=Orange_ShieldHalfX*0.8;
 	}
-	
+	if(PoleSepHalf<Orange_InsertHalfX){
+		Orange_InsertHalfX=PoleSepHalf;
+	}
 	
 	if(Orange_MagAng<0){
 		G4double ShrtMag=MStart+abs(Orange_MagY/tan(Orange_MagAng));
@@ -391,7 +441,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 		}
 	}
 	
-	if(sqrt(pow(Pole_SepHalf+Orange_MagHalfThick*2+SafetyGap,2) + pow(Orange_MagZ+SafetyGap,2))>145*mm)
+	if(sqrt(pow(PoleSepHalf+Orange_MagHalfThick*2+SafetyGap,2) + pow(Orange_MagZ+SafetyGap,2))>145*mm)
     G4cout<<G4endl<<"MAGNETS TOO LARGE TO FIT INSIDE ISOK160";
 	
 	
@@ -400,8 +450,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     G4cout<<G4endl<<"Beam <-> ShieldCenter Distance "<<Orange_ShieldMidBeamSep;
     G4cout<<G4endl<<"ShieldCenter Z length (Tot.) "<<Orange_ShieldMidHalfWidth*2;
     G4cout<<G4endl<<"Magnet Shield-gap (i.e. Magnet separation along yoke) "<<MStart*2;
-    G4cout<<G4endl<<"Shield Thickness "<<Orange_ShieldHalfX*2;
-    G4cout<<G4endl<<"Magnet Pole Separation "<<Pole_SepHalf*2;
+    G4cout<<G4endl<<"Shield X Thickness "<<Orange_ShieldHalfX*2;
+    G4cout<<G4endl<<"Magnet Pole Separation "<<PoleSepHalf*2;
     G4cout<<G4endl<<"Beam  <-> Detector Distance "<<Orange_BeamDetY;
     G4cout<<G4endl<<"MagnetTop <-> Beam Separation "<<Orange_MagMidOffset-Orange_MagY;
     G4cout<<G4endl<<"MagnetCenterline <-> Beam Separation "<<Orange_MagMidOffset;
@@ -471,9 +521,9 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 		
 		G4RotationMatrix* subtrarot = new G4RotationMatrix;
 		subtrarot->rotateY(90*deg); //ShieldCutBox is the wrong way as G4ExtrudedSolid in Z-axis by default
-        XrayBox = new G4SubtractionSolid("XrayShape", XrayBox, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH,0));
 		XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, XrayBox,0,G4ThreeVector(0,KaptonThickness,0));
-        XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH+KaptonThickness,0));
+		XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH+KaptonThickness,0));
+        XrayBox = new G4SubtractionSolid("XrayShape", XrayBox, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH,0));
 		
 		
 		G4LogicalVolume *XrayLog = new G4LogicalVolume(XrayBox, XrayMat,"XrayLog_FORBID",0,0,0);
@@ -531,7 +581,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     BuildMicronSiN++;
     new G4PVPlacement(rotate4,rotZbar*G4ThreeVector(0,-Orange_BeamDetY-Orange_ScintSep,(0.5*mm+ScintD)), ScintL,TT.str(), expHallLog,false,0);
     
-	// Place Copper Block
+	// Place Copper Coolant Block Under Detector
 	
     G4Box* CopperBox = new G4Box("CopperBox", fBB34PCB_HalfALength, 5*mm, fBB34PCB_HalfWidth); 
     G4LogicalVolume *CopperL = new G4LogicalVolume(CopperBox, G4Material::GetMaterial("Copper"),"CopperL",0,0,0);
@@ -551,7 +601,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     
 //     for(unsigned int i=0;i<MagPolygon.size();i++)MagPolygon[i]+=G4TwoVector(0,-Orange_MagMidOffset);
 
-	G4VSolid* fFieldBox = new G4ExtrudedSolid("FieldVolBox", MagPolygon, Pole_SepHalf, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
+	G4VSolid* fFieldBox = new G4ExtrudedSolid("FieldVolBox", MagPolygon, PoleSepHalf, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 	G4VSolid* fMagBox = new G4ExtrudedSolid("MagBox", MagPolygon, Orange_MagHalfThick, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 	G4VSolid* fMagKap = new G4ExtrudedSolid("MagKap", MagPolygon, KaptonThickness*0.5, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 
@@ -576,8 +626,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	
 	G4Material* matWorld = G4Material::GetMaterial("Vacuum");
     
-	G4double 	MPX=(Pole_SepHalf+Orange_MagHalfThick+KaptonThickness);
-	G4double 	MPXk=(Pole_SepHalf+KaptonThickness*0.5);
+	G4double 	MPX=(PoleSepHalf+Orange_MagHalfThick+KaptonThickness);
+	G4double 	MPXk=(PoleSepHalf+KaptonThickness*0.5);
     
 	G4LogicalVolume *MagBoxL = new G4LogicalVolume(fMagBox, mMaterial,"MagBoxL_FORBID",0,0,0);
 	G4LogicalVolume *MagKapL = new G4LogicalVolume(fMagKap, KapMat,"MagKapL_FORBID",0,0,0);
@@ -602,7 +652,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
         
         for(int j=-1;j<2;j+=2){
 			int cn=0;;
-			if(fAdjLengthA<0)cn=i+j*0.5+2;
+			if(SetMagCopyNum)cn=i+j*0.5+2;
             new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(j*MPX,0,0), MagBoxL,"Mag", expHallLog,false,cn); 
             new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(j*MPXk,0,0), MagKapL,"MagKap", expHallLog,false,0); 
         }

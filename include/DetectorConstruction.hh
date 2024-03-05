@@ -110,7 +110,6 @@ public:
 	void AddApparatusDiceDetector(G4String Options);
 	void SetDiceFieldStrength(G4double Field);
 	
-	void SetDiceLength(G4int Nsel, G4double Length);
 	void SetDiceInt(G4int N);
     
     ApparatusDICE* GetDice();
@@ -136,6 +135,7 @@ public:
 	void SetFieldMirror(int,bool);
 	void SetFieldMirrorPoint(G4ThreeVector);
 	void SetFieldOffsetVec(G4ThreeVector);
+	void DiceSetParam(G4String,G4double);
 	
 private:
 	bool CheckVolumeName(G4String volumeName);

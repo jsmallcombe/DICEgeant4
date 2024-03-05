@@ -57,20 +57,14 @@ public:
 	///////////////////////////////////////////////////////
 	
     G4int fBuildOption;
-    
-	G4double fAdjLength;
-	G4double fAdjLengthA;
-	G4double fAdjLengthB;
-	G4double fAdjLengthC;
-	G4double fAdjLengthD;
-	G4double fAdjLengthE;
+
 	G4int    fAdjNumber;
 	bool fRemoveShield;
 	bool fAddBlocker;
 	bool fUniformFieldOn;
 	
-	bool fUseA,fUseB,fUseC,fUseD,fUseE;
-    
+    void SetParam(G4String,G4double);
+	
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
 	
@@ -107,6 +101,21 @@ private:
 	G4double 	fBB34Chip_Dead;
 	G4double 	fBB34Chip_DeadAngle;
 	G4double 	fBB34Chip_Al;
+	
+	G4double 	Orange_MagMidOffset;
+	G4double 	Orange_BeamDetY;
+	G4double 	Orange_ShieldMidBeamSep;
+	G4double 	Orange_MagY;
+	G4double 	Orange_MagAng;
+	G4double Orange_BeamShieldSep;
+	G4double Orange_MagZ;
+	G4double Orange_MagHalfThick;
+	G4double Orange_MagGapMinHalf;
+	G4double PoleSepHalf;
+	
+	
+	std::vector<G4double*> SetPtrLst;
+	std::vector<G4String> SetNmLst;
 	
 private:
 	//////////////////////////////////////////////////////

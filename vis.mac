@@ -4,17 +4,17 @@
 
 ### Configure Apparatus To Build ###
 
-/DetSys/world/TabMagneticField FieldExample.txt
+#/DetSys/world/TabMagneticField FieldExample.txt
 #/DetSys/world/SetFieldMirrorPos 0 -22.5 0 mm
 ### SetFieldMirrorPos Is In the intrinsic frame of the field before offsetting
-/DetSys/world/SetFieldOffset 0 22.5 0 mm
-/DetSys/world/SetFieldAntiMirror 1
-/DetSys/world/SetFieldMirror 2 
-#/DetSys/world/SetFieldAntiMirror 3  # regular setup
-/DetSys/world/SetFieldMirror 3       # pair production
+#/DetSys/world/SetFieldOffset 0 22.5 0 mm
+#/DetSys/world/SetFieldAntiMirror 1
+#/DetSys/world/SetFieldMirror 2 
+##/DetSys/world/SetFieldAntiMirror 3  # regular setup
+#/DetSys/world/SetFieldMirror 3       # pair production
 
 ### If you call SetDiceField after calling TabMagneticField, the field strength of TabMagneticField will be scaled.
-#/DetSys/app/SetDiceField 0.25 tesla
+/DetSys/app/SetDiceField 0.25 tesla
 
 
 ### Remove photon shield entirely
@@ -24,21 +24,24 @@
 /DetSys/det/AddBlocker true
 
 ### Orange - Target <-> Magnet-Center Offset
-/DetSys/app/SetDiceArbA 22.5 mm
+/DetSys/app/SetDiceLength MagMidOffset 22.5 mm
 
 ### Detector Distance; Beam/Target <-> BB34
-/DetSys/app/SetDiceArbB 55 mm
+/DetSys/app/SetDiceLength BeamDetY 60 mm
 
 ### Beam/Target <-> Shield-Widest-point Distance 
-/DetSys/app/SetDiceArbC 15 mm
+/DetSys/app/SetDiceLength ShieldMidBeamSep 15 mm
 
 ### Total vertical "Y" coverage/height of the magnets
 ### Set negative to allow magnets to overlap with shield in the "X" direction
-/DetSys/app/SetDiceArbD 20 mm
+/DetSys/app/SetDiceLength MagY -20 mm
 
 ### Flare angle of the magnets
-#/DetSys/app/SetDiceArbE -15 deg
+/DetSys/app/SetDiceLength MagAng -5 degree
 
+/DetSys/app/SetDiceLength MagGapMinHalf 10 mm
+	
+/DetSys/app/SetDiceLength PoleSepHalf 10 mm
 
 /DetSys/app/addDiceDetector 1
 ### 1 Orange

@@ -42,7 +42,7 @@
 
 #include "DetectorConstruction.hh"
 
-const G4int MAXNTCOL            = 21;
+const G4int MAXNTCOL            = 26;
 
 const G4bool WRITEEKINHISTOS    = true;//bools needed to write histos
 const G4bool WRITEEDEPHISTOS    = true;
@@ -117,6 +117,11 @@ public:
 	
 	bool PrettyHitsOnly;
 	void SetPrettyHitsOnly(){PrettyHitsOnly=true;}
+	
+	G4ThreeVector BB34dir, BB34pos;
+	
+	void SetBB34Penetrate(const G4ThreeVector& dir, const G4ThreeVector& pos);
+	void ResetBB34Penetrate();
 
 private:
 // 	void MakeHistogram(G4AnalysisManager* analysisManager, G4String filename,  G4String title, G4double xmin, G4double xmax, G4int nbins);

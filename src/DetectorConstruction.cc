@@ -102,6 +102,7 @@ DetectorConstruction::DetectorConstruction() :
 	fAppDICE= new ApparatusDICE();
 
     fRecordGun = false;
+    fRecordBB34Pentration = false;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

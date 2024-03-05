@@ -190,5 +190,7 @@ void EventAction::ClearVariables() {
 	
 	fGoodTrackEnd=false;
 	fWorldExit=false;
+	
+	fHistoManager->ResetBB34Penetrate();
 }
 

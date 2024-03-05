@@ -80,6 +80,7 @@ private:
 	G4UIcmdWithAnInteger*	   fTabMagneticFieldAntiMirrorCmd;
 
 	G4UIcmdWithABool*           fRecordGunCmd;
+	G4UIcmdWithABool*           fRecordPentrationCmd;
     G4UIcmdWithABool*           fRemoveShieldCmd;
     G4UIcmdWithABool*           fAddBlockerCmd;
     

@@ -145,17 +145,33 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep) {
 		
 	}// if(fDetector->HasProperties(volume))
 	
-	// No next volume means exit world
-	// Getting rid of these is good if you want a pretty picture
+	
+	
 	if(!theTrack->GetNextVolume()){
-			fEventAction->TrackExitsWorld();
+		
+		// No next volume means exit world
+		// Getting rid of these is good if you want a pretty picture
+		fEventAction->TrackExitsWorld();
+		
 	}else{
-        if(theTrack->GetNextVolume()->GetLogicalVolume()->GetName().contains("FORBID")){
+		//There is a next volume 
+		
+		G4String NextLogName=theTrack->GetNextVolume()->GetLogicalVolume()->GetName();
+		
+        if(NextLogName.contains("FORBID")){//Parts of the DICE Geometry we have labelled as bad events
             if(fEventAction->fHistoManager->PrettyHitsOnly){
 				fEventAction->TrackExitsWorld(); //This just tells our own variable that one of the tracks in the even "exited the world" i.e. did something forbidden.
-				theTrack->SetTrackStatus(fStopAndKill); //Actually kill it, because why track further
+				theTrack->SetTrackStatus(fStopAndKill); //Actually kill it, because why track further, when set to "pretty only" mode
 			}
         }
+        
+        // If entering the BB34
+		if(NextLogName.contains("ChipMetalLog")){
+			if(NextLogName!=volume->GetLogicalVolume()->GetName()){
+				G4ThreeVector preDir=aStep->GetPreStepPoint()->GetMomentumDirection();
+				fEventAction->fHistoManager->SetBB34Penetrate(preDir, postPos);
+			}
+		}
     }
 }
 

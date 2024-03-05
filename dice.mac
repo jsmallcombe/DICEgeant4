@@ -15,6 +15,7 @@
 
 ## Record the initial beam data ###
 /DetSys/det/RecordGun 1
+/DetSys/det/RecordPentration 1
 
 ### Set Particle Generator ### 
 /DetSys/gun/position 0.0 0.0 0.0 mm

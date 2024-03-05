@@ -93,6 +93,9 @@ public:
 	void RecordGun( G4bool input ){fRecordGun = input;};
 	G4bool RecordingGun(){return fRecordGun;};
 	
+	void RecordBB34Penetration( G4bool input ){fRecordBB34Pentration = input;};
+	G4bool RecordingBB34Penetration(){return fRecordBB34Pentration;};
+	
 	bool HasProperties(G4VPhysicalVolume* vol) { return fPropertiesMap.find(vol) != fPropertiesMap.end(); }
 	DetectorProperties GetProperties(G4VPhysicalVolume* vol) { return fPropertiesMap.at(vol); }
 	void SetProperties();
@@ -143,6 +146,7 @@ private:
 	G4double  fWorldSizeZ;
 
     G4bool    fRecordGun;  
+    G4bool    fRecordBB34Pentration;  
     G4bool    fRemoveShield;
     G4bool    fAddBlocker;
 

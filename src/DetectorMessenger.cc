@@ -111,6 +111,10 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 	fRecordGunCmd->SetGuidance("Record the particle for each event in the tree");
 	fRecordGunCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
     
+   	fRecordPentrationCmd = new G4UIcmdWithABool("/DetSys/det/RecordPentration",this);
+	fRecordPentrationCmd->SetGuidance("Record the BB34 penetation");
+	fRecordPentrationCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
+	
    	fRemoveShieldCmd = new G4UIcmdWithABool("/DetSys/det/RemoveShield",this);
 	fRemoveShieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
     
@@ -182,6 +186,7 @@ DetectorMessenger::~DetectorMessenger()
 	delete fTabMagneticFieldAntiMirrorCmd;
 
 	delete fRecordGunCmd;
+	delete fRecordPentrationCmd;
     
     delete fRemoveShieldCmd;
     delete fAddBlockerCmd;
@@ -241,6 +246,10 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 	
 	if(command == fRecordGunCmd) {
 		fDetector->RecordGun(fRecordGunCmd->GetNewBoolValue(newValue));
+	}
+	
+	if(command == fRecordPentrationCmd) {
+		fDetector->RecordBB34Penetration(fRecordPentrationCmd->GetNewBoolValue(newValue));
 	}
 	
 	if(command == fRemoveShieldCmd) {

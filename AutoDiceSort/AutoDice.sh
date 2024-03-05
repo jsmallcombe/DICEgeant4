@@ -41,7 +41,9 @@ if [ "$do_G4_part" = true ] ; then
 	# # # # echo "/DetSys/app/SetDiceField 0.18 tesla" >> autodice.mac 
 
 	# # # # echo "DetSys/det/RemoveShield true" >> autodice.mac 
-
+	echo "/DetSys/det/AddBlocker true" >> autodice.mac 
+	
+	echo "/DetSys/app/SetDiceLength BeamDetY 60 mm" >> autodice.mac 
 	echo "/DetSys/app/SetDiceLength MagMidOffset 25 mm" >> autodice.mac 
 	echo "/DetSys/app/SetDiceLength ShieldMidBeamSep 15 mm" >> autodice.mac 
 	echo "/DetSys/app/SetDiceLength MagY -20 mm" >> autodice.mac 

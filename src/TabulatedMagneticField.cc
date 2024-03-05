@@ -157,6 +157,10 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename) //called in
 
 
 void TabulatedMagneticField::SetField(G4double MaxSetField){
+	if(MaxSetField<0){
+		MaxSetField=fMaxM*std::abs(MaxSetField/tesla);
+	}
+	
 	G4cout<<"Changing Max Field value from "<< fMaxM/tesla <<" Tesla to"<<MaxSetField/tesla <<" Tesla."<<G4endl;
 	
 	G4double scale =MaxSetField/fMaxM;

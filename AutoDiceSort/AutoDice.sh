@@ -66,9 +66,10 @@ if [ "$do_G4_part" = true ] ; then
 		mv g4out.root AutoSortFiles/Tuple$E.root
 	done
 	rm -rf autodice_main.mac
+	
+	hadd -f AutoSortFiles/SumTuple.root AutoSortFiles/Tuple*.root
 
-
-	rm -rf AutoSortFiles/BetaTuple*.root
+	rm -rf AutoSortFiles/betadata*.root
 	for B in $betapoints;
 	do
 		for E in $energypoints;
@@ -80,6 +81,8 @@ if [ "$do_G4_part" = true ] ; then
 			./DICE10 autodicebeta.mac 
 			mv g4out.root AutoSortFiles/betadata"$B"_"$E".root	
 		done
+		
+		hadd -f AutoSortFiles/BetaData$B.root AutoSortFiles/betadata"$B"_*.root
 	done
 
 	rm -rf AutoSortFiles/ExtraSorted.root
@@ -110,13 +113,11 @@ if [ "$do_G4_part" = true ] ; then
 
 fi
 
-hadd -f AutoSortFiles/SumTuple.root AutoSortFiles/Tuple*.root
 root -l -q AutoDiceSort/DiceEffScanCombinedSort.C"("$NumberOfPoints*3",\"SumDice.root\",\"AutoSortFiles/SumTuple.root\","$dE")"
 
 for B in $betapoints;
 do
-	hadd -f AutoSortFiles/BetaData$B.root AutoSortFiles/betadata"$B"_*.root
-	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Beta"$B"\","$B",\"AutoSortFiles/DiceBetaSort.root\",\"AutoSortFiles/BetaData"$B".root\","$NumberOfBetaPoints")"
+	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Beta"$B"\","$B",\"AutoSortFiles/DiceBetaSort.root\",\"AutoSortFiles/BetaData"$B".root\","$NumberOfBetaPoints*3")"
 done
 
 root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Deltas\",0,\"AutoSortFiles/ExtraSorted.root\",\"AutoSortFiles/deltatup.root\")"

@@ -144,7 +144,6 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	SetPtrLst.push_back(&PoleSepHalf);
 	
 
-	
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
 	
@@ -540,7 +539,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 		
 		if(fAddBlocker){
 			
-			G4double HalfBlockGap=0.5*(Orange_BeamDetY-(XrayHH*2+Orange_ShieldMidBeamSep+SafetyGap*1.5));
+			G4double HalfBlockGap=0.5*(Orange_BeamDetY-2.95*mm-(XrayHH*2+Orange_ShieldMidBeamSep+KaptonThickness));
 
 			if(HalfBlockGap>SafetyGap*1.5){
 				G4Box* ElectronBlockerBox = new G4Box("ElectronBlockerBox",fBB34Chip_HalfLength,HalfBlockGap,CrossBlockHalfThickness);

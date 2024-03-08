@@ -237,7 +237,12 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 			double e=ax->GetBinCenter(b);
 			double de=ax->GetBinWidth(b)*0.5;
 			
-			Eff->SetBinContent(b,h->Integral(AX->FindBin(e-5),AX->FindBin(e+5))*100/Nevent);
+			double bg=h->Integral(AX->FindBin(e-de*0.75),AX->FindBin(e+de*0.75));
+			double pc=h->Integral(AX->FindBin(e-de*0.25),AX->FindBin(e+de*0.25));
+			bg-=pc;
+			pc-=bg*0.5;
+			
+			Eff->SetBinContent(b,pc*100/Nevent);
 
 			TF1* fit=UserQuickSingleGausAutoFit(h,e,e-de,e+de,1);
 			h->GetListOfFunctions()->Add(fit);

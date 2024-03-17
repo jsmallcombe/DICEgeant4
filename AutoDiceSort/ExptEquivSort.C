@@ -62,12 +62,14 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 		TH1F* E_AddbackVetoSum=new TH1F("AddbackVetoSum","AddbackVetoSum;Electron Energy (keV);Counts",2000,0,2000);
 		TH1F* EGrigGate=new TH1F("EGrigGate","EGrigGate;Electron Energy (keV);Counts",2000,0,2000);
 		TH1F* E_Corr[4];
-		
+		TH2F* E_CorrGrid;
 		if(beta>0){
 			E_Corr[0]=new TH1F("E_CorrMean","E_CorrMean;Electron Energy (keV);Counts",2000,0,2000);
 			E_Corr[1]=new TH1F("E_CorrMode","E_CorrMode;Electron Energy (keV);Counts",2000,0,2000);
 			E_Corr[2]=new TH1F("E_CorrMeanStrict","E_CorrMeanStrict;Electron Energy (keV);Counts",2000,0,2000);
 			E_Corr[3]=new TH1F("E_CorrModeStrict","E_CorrModeStrict;Electron Energy (keV);Counts",2000,0,2000);
+			
+			E_CorrGrid=new TH2F("E_CorrGrid","E_CorrGrid;Electron Energy (keV);Counts",2000,0,2000,16,0,16);
 		}
 		
 		TH1 *Eff,*EffFit;
@@ -204,6 +206,9 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 								if(et>0){
 									double ecor=((Eaddback+511-beta*cos(et)*sqrt(Eaddback*Eaddback+2*511*Eaddback))/sqrt(1-beta*beta))-511;
 									E_Corr[m]->Fill(ecor);
+									if(m==0){
+										E_CorrGrid->Fill(ecor,Seg);
+									}
 								}
 							}
 						}

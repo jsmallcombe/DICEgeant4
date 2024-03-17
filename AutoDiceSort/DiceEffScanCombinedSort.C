@@ -52,6 +52,9 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     TH1F* EfficiencyCut=new TH1F("EfficiencyCut","EfficiencyThetaCut;Emission Energy (keV);Full Energy Detection Efficiency (%)",Ebin,EbinMin,EbinMax);
     TH1F* EfficiencyCutHalf=new TH1F("EfficiencyCutHalf","EfficiencyThetaCutHalf;Emission Energy (keV);Full Energy Detection Efficiency (%)",Ebin,EbinMin,EbinMax);
     
+    TH1F* GridSpreadA=new TH1F("GridSpreadA","GridSpreadA;Emission Energy (keV);GridN",Ebin,EbinMin,EbinMax);
+    TH1F* GridSpreadB=new TH1F("GridSpreadB","GridSpreadB;Emission Energy (keV);GridN",Ebin,EbinMin,EbinMax);
+	
 	out.mkdir("Angles");
 	out.cd("Angles");
     TH3F* AngleESeg=new TH3F("AngleESeg","EmissionAngleEnergyHitSegment;Emission Angle Theta #theta [Rad.];Emission Energy (keV);Hit Segment",360,0,3.14159,Ebin,EbinMin,EbinMax,16,0,16);
@@ -72,10 +75,27 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
         TH2F* AngleSeg[20];
         TGraph* HitMap[20];
         for(int e=0;e<20;e++){
-            stringstream ss;ss<<"AngleSeg_"<< setw(4) << setfill('0')<<(e+1)*100<<"keV";
+            stringstream ss;ss<<"AngleSeg_"<< setw(4) << setfill('0')<<(e+1)*dE<<"keV";
             AngleSeg[e] = new TH2F(ss.str().c_str(),(ss.str()+";Emission Angle Theta #theta [Rad.];Hit Segment").c_str(),360,0,3.14159,16,0,16);
             HitMap[e]=new TGraph();
         }
+        
+		out.mkdir("ThetaPhi");
+		out.cd("ThetaPhi");
+		
+        TH3F* ChanThetaPhi[20];
+        for(int e=0;e<20;e++){
+			stringstream nn;
+			nn<<dE*(e+1)<<"_ChanThetaPhi";
+			ChanThetaPhi[e]=new TH3F(nn.str().c_str(),(nn.str()+";Emission Angle Theta #theta [Rad.];Emission Angle Phi #theta [Rad.];Hit Segment").c_str(),180,0,3.14159,180,0,3.14159,8,0,8);
+		}
+        TH3F* EThetaPhi[8];
+        for(int e=0;e<8;e++){
+			stringstream nn;
+			nn<<"Chan"<<e<<"_EThetaPhi";
+			EThetaPhi[e]=new TH3F(nn.str().c_str(),(nn.str()+";Emission Angle Theta #theta [Rad.];Emission Angle Phi #theta [Rad.];Beam Energy").c_str(),180,0,3.14159,180,0,3.14159,Ebin,EbinMin,EbinMax);
+		}
+		
 	out.cd("");
         
     
@@ -89,7 +109,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 	// Next we create local variables into which we will read data from the list
 	int EventID;
 	int detNumber,cryNumber;
-	double depEnergy,primaryTheta,primaryE;
+	double depEnergy,primaryTheta,primaryPhi,primaryE;
 	double posx,posz;
 	
         
@@ -102,6 +122,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 	newtree->SetBranchAddress("posx",&posx);
 	newtree->SetBranchAddress("posz",&posz);
 	newtree->SetBranchAddress("primaryTheta",&primaryTheta);
+	newtree->SetBranchAddress("primaryPhi",&primaryPhi);
 	newtree->SetBranchAddress("primaryE",&primaryE);
 
 	// As each detector within one physical event is stored as a new "line/row" in our list we have to collect them first
@@ -115,6 +136,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     bool VETO2=false;
     double Eaddback=0;
     double Theta=0;
+    double Phi=0;
     double Mult=0;
     double TMult=0;
     
@@ -138,7 +160,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
             if(cryNumber==2&&e>100){
                 VETO2=true;
             }
-            if(cryNumber==0&&e>30){
+            if(cryNumber==0&&e>0.1){
                 if(detNumber>0&&detNumber<17){//0 is guard ring
                     Eaddback+=e;
                     detNumber--; // Shift to zero index
@@ -154,6 +176,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
                 }
             }
             Theta=primaryTheta;
+            Phi=std::abs(primaryPhi);
             TMult++;
             
 		}else{
@@ -176,51 +199,71 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
         double Seg=0;
         for(unsigned int i=0;i<EventHolder.size();i++){
             double e=EventHolder[i];
-            if(e>30){
+            if(e>0.1){
                 Esumtmp+=e;
                 Seg+=e*i;
-            }else if(Esumtmp>0){ // So only segments neigbouring will be summed;
+            }else if(Esumtmp>0){ // So only segments neighbouring will be summed;
                 break;
             }
         }
         if(abs(Esumtmp-Eaddback)>5)Eaddback=0;
         
-		if(Eaddback>30) {
-        Seg/=Eaddback;
-        E_AddbackSum->Fill(Eaddback);
-        if(!(VETO1||VETO2)){
-        E_AddbackVetoSum->Fill(Eaddback);
-        PeakTotal->Fill(primaryE);
-        if(abs(Eaddback-primaryE)<10){
-        
-            E_GoodSum->Fill(Eaddback);
-            Efficiency->Fill(primaryE);
-            
-            E_GoodChan->Fill(primaryE,Seg);
-            E_GoodChanThetaLim->Fill(primaryE,Seg);
-            E_GoodChanThetaLimHalf->Fill(primaryE,Seg);
-            
-            E_Theta->Fill(Theta,primaryE);
-        
-            AngleESeg->Fill(Theta,primaryE,Seg);
-            
-            if(abs(round(Seg))<16)GridAngle[(int)abs(round(Seg))]->Fill(Theta,primaryE);
-            
-            
-            int X=(int)round(Seg)%4;
-            int Y=Seg/4;
-            AngleESegGrid->Fill(TMath::Pi()*Y+Theta,X*1500+primaryE);
-        
-            unsigned int ei=round(primaryE/100)-1;
-            if(ei<20){
-                AngleSeg[ei]->Fill(Theta,Seg);
-                    
-                if(HitMap[ei]->GetN()<100){
-                    HitMap[ei]->SetPoint(HitMap[ei]->GetN(),pZ,pX);
-                }
-            }
-            
-        }}}    
+		
+		if(Eaddback>0.1) {
+			Seg/=Eaddback; // Taking an energy weighted segment position (consider alternates) 
+
+			E_AddbackSum->Fill(Eaddback);
+			
+			if(!(VETO1||VETO2)){ // No scintillator triggers
+				
+				E_AddbackVetoSum->Fill(Eaddback);
+				PeakTotal->Fill(primaryE);
+				
+				if(abs(Eaddback-primaryE)<10){
+				
+					E_GoodSum->Fill(Eaddback);
+					Efficiency->Fill(primaryE);
+					
+					E_GoodChan->Fill(primaryE,Seg);
+					E_GoodChanThetaLim->Fill(primaryE,Seg);
+					E_GoodChanThetaLimHalf->Fill(primaryE,Seg);
+					
+					E_Theta->Fill(Theta,primaryE);
+				
+					AngleESeg->Fill(Theta,primaryE,Seg);
+					
+					if(abs(round(Seg))<16)GridAngle[(int)abs(round(Seg))]->Fill(Theta,primaryE);
+					
+					
+					int X=(int)round(Seg)%4;
+					int Y=Seg/4;
+					AngleESegGrid->Fill(TMath::Pi()*Y+Theta,X*1500+primaryE);
+				
+					
+					unsigned int TPchan=std::round(Seg);
+					double TPtheta=Theta;
+					if(TPchan>8){
+						TPchan=16-TPchan;
+						TPtheta=TMath::Pi()-Theta;
+					}
+					
+					if(TPchan<8){
+						EThetaPhi[TPchan]->Fill(TPtheta,Phi,primaryE);
+					}
+					
+					unsigned int ei=round(primaryE/dE)-1;
+					if(ei<20){
+						AngleSeg[ei]->Fill(Theta,Seg);
+						
+						ChanThetaPhi[ei]->Fill(TPtheta,Phi,TPchan);
+							
+						if(HitMap[ei]->GetN()<100){
+							HitMap[ei]->SetPoint(HitMap[ei]->GetN(),pZ,pX);
+						}
+					}
+				}
+			}
+		}    
         /////  Reset things ready for next event
 // 		for(auto &i : EventHolder){
 // 			std::fill(i.begin(), i.end(), 0);
@@ -465,8 +508,22 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     multiGraph->Write("HitMap",TObject::kOverwrite);
 	gROOT->cd();
     
-
-    
+/////////////////////
+	
+	TAxis *ya=E_GoodChanCut->GetXaxis();
+	for(int b=1;b<=ya->GetNbins();b++){
+		TH1* h=E_GoodChanCut->ProjectionY("_py",b,b);
+		int N=h->Integral();
+		int NA=0,NB=0;
+		for(int g=0;g<16;g++){
+			double n=h->GetBinContent(g);
+			if(n>N*0.1)NA++;
+			if(n>N*0.05)NB++;
+		}
+		GridSpreadA->SetBinContent(b,NA);
+		GridSpreadB->SetBinContent(b,NB);
+	}
+	
 /////////////////////
 
 	// Save and close the output file

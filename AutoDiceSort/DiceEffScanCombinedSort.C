@@ -80,8 +80,14 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
             HitMap[e]=new TGraph();
         }
         
-		out.mkdir("ThetaPhi");
-		out.cd("ThetaPhi");
+    
+	out.mkdir("HitMaps");
+	out.cd("HitMaps");
+        TH2F* HitMapTot=new TH2F("HitMapTot","HitMapAll;Z [mm];X [mm]",200,-40,40,100,-20,20);
+	out.cd("");
+        
+    out.mkdir("ThetaPhi");
+    out.cd("ThetaPhi");
 		
         TH3F* ChanThetaPhi[20];
         for(int e=0;e<20;e++){
@@ -94,6 +100,12 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 			stringstream nn;
 			nn<<"Chan"<<e<<"_EThetaPhi";
 			EThetaPhi[e]=new TH3F(nn.str().c_str(),(nn.str()+";Emission Angle Theta #theta [Rad.];Emission Angle Phi #theta [Rad.];Beam Energy").c_str(),180,0,3.14159,180,0,3.14159,Ebin,EbinMin,EbinMax);
+		}
+        TH2F* ThetaPhi[20];
+        for(int e=0;e<20;e++){
+			stringstream nn;
+			nn<<dE*(e+1)<<"_ThetaPhi";
+			ThetaPhi[e]=new TH2F(nn.str().c_str(),(nn.str()+";Emission Angle Theta #theta [Rad.];Emission Angle Phi #theta [Rad.]").c_str(),180,0,3.14159,180,0,3.14159);
 		}
 		
 	out.cd("");
@@ -176,7 +188,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
                 }
             }
             Theta=primaryTheta;
-            Phi=std::abs(primaryPhi);
+            Phi=std::abs(primaryPhi);// -pi to pi
             TMult++;
             
 		}else{
@@ -242,10 +254,11 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 					
 					unsigned int TPchan=std::round(Seg);
 					double TPtheta=Theta;
-					if(TPchan>8){
+					if(TPchan>8){//To double up the statistics for symetric config, flip across center
 						TPchan=16-TPchan;
+					}else{
 						TPtheta=TMath::Pi()-Theta;
-					}
+                    }
 					
 					if(TPchan<8){
 						EThetaPhi[TPchan]->Fill(TPtheta,Phi,primaryE);
@@ -256,10 +269,13 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 						AngleSeg[ei]->Fill(Theta,Seg);
 						
 						ChanThetaPhi[ei]->Fill(TPtheta,Phi,TPchan);
+						ThetaPhi[ei]->Fill(TPtheta,Phi);
 							
 						if(HitMap[ei]->GetN()<100){
 							HitMap[ei]->SetPoint(HitMap[ei]->GetN(),pZ,pX);
 						}
+						
+						HitMapTot->Fill(pZ,pX);
 					}
 				}
 			}
@@ -461,7 +477,6 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     // Create a TMultiGraph to hold TGraphs 
     TMultiGraph* multiGraph = new TMultiGraph();
     
-	out.mkdir("HitMaps");
 	out.cd("HitMaps");
     
         for(int e=0;e<20;e++){
@@ -525,6 +540,31 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 	}
 	
 /////////////////////
+
+    for (int i = 0; i < 20; ++i) {
+        if (ChanThetaPhi[i]->GetEntries() == 0) {
+            delete ChanThetaPhi[i];
+            ChanThetaPhi[i] = nullptr;  // Set the pointer to null
+        }
+        if (ThetaPhi[i]->GetEntries() == 0) {
+            delete ThetaPhi[i];
+            ThetaPhi[i] = nullptr;  // Set the pointer to null
+        }
+        if (AngleSeg[i]->GetEntries() == 0) {
+            delete AngleSeg[i];
+            AngleSeg[i] = nullptr;  // Set the pointer to null
+        }
+    }
+    
+    for (int i = 0; i < 8; ++i) {
+        if (EThetaPhi[i]->GetEntries() == 0) {
+            delete EThetaPhi[i];
+            EThetaPhi[i] = nullptr;  // Set the pointer to null
+        }
+    }
+
+/////////////////////
+    
 
 	// Save and close the output file
     out.Write();

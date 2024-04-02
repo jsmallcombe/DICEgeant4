@@ -18,6 +18,11 @@
 /DetSys/det/RecordGun 1
 /DetSys/det/RecordPentration 1
 
+### Must be included when using real field. Automatic step determination is wrong for the complex field. 
+### Still need to determine the optiman StepLimit (Small = slow though)
+#/DetSys/phys/SetStepper 1
+#/DetSys/world/StepLimit 10 mm
+	
 ### Set Particle Generator ### 
 /DetSys/gun/position 0.0 0.0 0.0 mm
 

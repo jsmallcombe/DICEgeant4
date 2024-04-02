@@ -23,6 +23,9 @@
 ### Add the under shield graphit electron blocker
 /DetSys/det/AddBlocker true
 
+### Add the magnet phi shrouds to block the funny field region
+# /DetSys/app/SetDiceLength PhiBlockThickness 1.5 mm
+
 ### Orange - Target <-> Magnet-Center Offset
 /DetSys/app/SetDiceLength MagMidOffset 22.5 mm
 

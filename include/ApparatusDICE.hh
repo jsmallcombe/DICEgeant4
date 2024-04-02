@@ -113,6 +113,7 @@ private:
 	G4double Orange_MagGapMinHalf;
 	G4double PoleSepHalf;
 	
+	G4double PhiBlockThickness;
 	
 	std::vector<G4double*> SetPtrLst;
 	std::vector<G4String> SetNmLst;

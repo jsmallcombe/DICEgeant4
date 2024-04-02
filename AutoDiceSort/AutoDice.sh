@@ -53,6 +53,10 @@ if [ "$do_G4_part" = true ] ; then
 	# # # # Set negative to add a target foil and ISOK160 chamber
 	echo "/DetSys/app/addDiceDetector 1" >> autodice.mac 
 
+	# # # # Must be included when using real field. Automatic step determination is wrong for the complex field. 
+	# # # # Still need to determine the optiman StepLimit (Small = slow though)
+	echo "/DetSys/phys/SetStepper 1" >> autodice.mac 
+	echo "/DetSys/world/StepLimit 10 mm" >> autodice.mac 
 
 	rm -rf AutoSortFiles/Tuple*.root
 	for E in $energypoints;

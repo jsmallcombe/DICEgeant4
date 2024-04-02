@@ -143,6 +143,9 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	SetNmLst.push_back("PoleSepHalf");
 	SetPtrLst.push_back(&PoleSepHalf);
 	
+	PhiBlockThickness=-1;
+	SetNmLst.push_back("PhiBlockThickness");
+	SetPtrLst.push_back(&PhiBlockThickness);
 
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
@@ -550,6 +553,42 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 				G4cout<<G4endl<<"NO ROOM FOR ELECTRON BLOCKER";
 			}
 		}
+	}
+	
+	// Blocker for field region in phi
+	
+	if(PhiBlockThickness>0){
+		
+		PhiBlockThickness*=0.5;
+		
+		G4cout<<G4endl<<fBB34Chip_HalfLength-fBB34Chip_Dead;
+		G4cout<<G4endl<<Orange_BeamDetY;
+		G4cout<<G4endl<<((fBB34Chip_HalfLength-fBB34Chip_Dead)/Orange_BeamDetY);
+		G4cout<<G4endl<<(Orange_MagMidOffset-Orange_MagY);
+		G4cout<<G4endl<<((fBB34Chip_HalfLength-fBB34Chip_Dead)/Orange_BeamDetY)*(Orange_MagMidOffset-Orange_MagY);
+		G4cout<<G4endl<<PoleSepHalf;
+		
+		
+		G4double phiblkuc=PoleSepHalf-(((fBB34Chip_HalfLength-fBB34Chip_Dead)/Orange_BeamDetY)*(Orange_MagMidOffset-Orange_MagY));
+		G4cout<<G4endl<<PoleSepHalf;
+		G4double phiblkl=(Orange_MagZ-Orange_ShieldMidHalfWidth)*0.5;
+		G4double phiblkw=phiblkuc+Orange_MagHalfThick*2;
+		phiblkw*=0.5;
+		
+		G4RotationMatrix* rotatepblock = new G4RotationMatrix;
+		rotatepblock->rotateZ(Zbar);
+		G4Box* PhiBlockerBox = new G4Box("ElectronBlockerBox",phiblkw,PhiBlockThickness,phiblkl);
+		G4LogicalVolume *PhiBlockerLog = new G4LogicalVolume(PhiBlockerBox, BlockerMat,"PhiBlockerLog_FORBID",0,0,0);
+		PhiBlockerLog->SetVisAttributes(ThreeVisAtt);
+		
+		G4double phX=PoleSepHalf+phiblkw-phiblkuc;
+		G4double phY=Orange_MagY+PhiBlockThickness-Orange_MagMidOffset;
+		G4double phZ=Orange_ShieldMidHalfWidth+phiblkl;
+		
+		for(int x=-1;x<2;x+=2){
+			for(int z=-1;z<2;z+=2){
+				new G4PVPlacement(rotatepblock,rotZbar*G4ThreeVector(x*phX,phY,z*phZ), PhiBlockerLog,"PhiBlocker", expHallLog,false,0);
+		}}
 	}
 	
 	// Place BB34 detector

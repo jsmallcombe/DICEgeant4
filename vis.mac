@@ -42,9 +42,11 @@
 ### Flare angle of the magnets
 /DetSys/app/SetDiceLength MagAng -5 degree
 
+### Distance from magnet to Z=0
 /DetSys/app/SetDiceLength MagGapMinHalf 10 mm
 	
-/DetSys/app/SetDiceLength PoleSepHalf 10 mm
+### Override the automatic optimum seperation of magnet poles
+# /DetSys/app/SetDiceLength PoleSepHalf 10 mm
 
 /DetSys/app/addDiceDetector 1
 ### 1 Orange

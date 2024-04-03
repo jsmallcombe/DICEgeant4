@@ -362,8 +362,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 
 	G4double 	SafetyGap=2*mm;
 
-	G4cout<<"DICE SetAbleParameters :"<<G4endl;
-	std::cout<<"DICE SetAbleParameters :"<<std::endl;
+	G4cout<<"DICE SetableParameters :"<<G4endl;
+	std::cout<<"DICE SetableParameters :"<<std::endl;
 	for(unsigned int i=0;i<SetNmLst.size();i++){
 		G4cout<<SetNmLst[i]<<" "<<*SetPtrLst[i]<<G4endl;
 		std::cout<<SetNmLst[i]<<" "<<*SetPtrLst[i]<<std::endl;
@@ -561,16 +561,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 		
 		PhiBlockThickness*=0.5;
 		
-		G4cout<<G4endl<<fBB34Chip_HalfLength-fBB34Chip_Dead;
-		G4cout<<G4endl<<Orange_BeamDetY;
-		G4cout<<G4endl<<((fBB34Chip_HalfLength-fBB34Chip_Dead)/Orange_BeamDetY);
-		G4cout<<G4endl<<(Orange_MagMidOffset-Orange_MagY);
-		G4cout<<G4endl<<((fBB34Chip_HalfLength-fBB34Chip_Dead)/Orange_BeamDetY)*(Orange_MagMidOffset-Orange_MagY);
-		G4cout<<G4endl<<PoleSepHalf;
-		
-		
 		G4double phiblkuc=PoleSepHalf-(((fBB34Chip_HalfLength-fBB34Chip_Dead)/Orange_BeamDetY)*(Orange_MagMidOffset-Orange_MagY));
-		G4cout<<G4endl<<PoleSepHalf;
 		G4double phiblkl=(Orange_MagZ-Orange_ShieldMidHalfWidth)*0.5;
 		G4double phiblkw=phiblkuc+Orange_MagHalfThick*2;
 		phiblkw*=0.5;

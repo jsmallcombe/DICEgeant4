@@ -23,14 +23,14 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 		for(int b=0;b<16;b++){
 			for(int m=0;m<4;m++){
 				stringstream ss;
-				ss<<"AnglesCorr/grid"<<b<<"_"<<m;
+				ss<<"ThetaEval/grid"<<b<<"_"<<m;
 				TGraph *grf = (TGraph*)DetDataFile.Get(ss.str().c_str());
 				
 				if(grf){
 					AngleExpt[b][m]=grf;
 				}else{
-					cout<<endl<<"NO GRAPH"<<endl;
-					return;
+					AngleExpt[b][m]=nullptr;
+					cout<<endl<<"No Graph "<<b<<" "<<m<<endl;
 				}
 			}
 		}
@@ -44,24 +44,32 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 	gROOT->cd();
 	
 	
-	TH2 *gdch = (TH2*)DetDataFile.Get("E_GoodChanCut");
+	TH2 *gdch = (TH2*)DetDataFile.Get("LowChanCut/E_Chan_GoodECut");
 	if(!gdch){
 		cout<<endl<<"No Good Chan"<<endl;
 		return;
 	}
-	TH2 *gdchtheta = (TH2*)DetDataFile.Get("E_GoodChanThetaLimCut");
+	TH2 *gdchtheta = (TH2*)DetDataFile.Get("LowChanCut/E_Chan_GoodEThetaLimCut");
 	if(!gdchtheta){
 		cout<<endl<<"No Good Chan Theta"<<endl;
 		return;
 	}
+	TH2 *gdchthetahalf = (TH2*)DetDataFile.Get("LowChanCut/E_Chan_GoodEThetaLimHalfCut");
+	if(!gdchthetahalf){
+		cout<<endl<<"No Good Chan ThetaHalf"<<endl;
+		return;
+	}
+	
+	TH2* GdTH[4]={gdchtheta,gdchtheta,gdchthetahalf,gdchthetahalf};
 	
 	out.cd(HistFolder);//cd into output file so histograms created in memory are associated with that file at creation rather than being manually saved there later.
 
 		TH1F* E_RawSum=new TH1F("Raw","RawHitEnergy;Electron Energy (keV);Counts",2000,0,2000);
 		TH1F* E_AddbackSum=new TH1F("AddbackSum","AddbackSum;Electron Energy (keV);Counts",2000,0,2000);
 		TH1F* E_AddbackVetoSum=new TH1F("AddbackVetoSum","AddbackVetoSum;Electron Energy (keV);Counts",2000,0,2000);
-		TH1F* EGrigGate=new TH1F("EGrigGate","EGrigGate;Electron Energy (keV);Counts",2000,0,2000);
+		TH1F* EGridGated=new TH1F("EGridGated","EGridGated;Electron Energy (keV);Counts",2000,0,2000);
 		TH1F* E_Corr[4];
+		TH1* FitHist;
 		TH2F* E_CorrGrid;
 		if(beta>0){
 			E_Corr[0]=new TH1F("E_CorrMean","E_CorrMean;Electron Energy (keV);Counts",2000,0,2000);
@@ -69,7 +77,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 			E_Corr[2]=new TH1F("E_CorrMeanStrict","E_CorrMeanStrict;Electron Energy (keV);Counts",2000,0,2000);
 			E_Corr[3]=new TH1F("E_CorrModeStrict","E_CorrModeStrict;Electron Energy (keV);Counts",2000,0,2000);
 			
-			E_CorrGrid=new TH2F("E_CorrGrid","E_CorrGrid;Electron Energy (keV);Counts",2000,0,2000,16,0,16);
+			E_CorrGrid=new TH2F("E_CorrGrid","E_CorrGrid;Electron Energy (keV);Grid #",2000,0,2000,16,0,16);
 		}
 		
 		TH1 *Eff,*EffFit;
@@ -119,6 +127,8 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
     
     double pX,pZ;
 
+	TAxis* Ebinax=gdch->GetXaxis();
+	
 	// A loop over every line of the input data in sequence
 	for(long jentry=0;jentry<nentries;jentry++){
 		
@@ -192,15 +202,19 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 			if(!(VETO1||VETO2)){
 				E_AddbackVetoSum->Fill(Eaddback);
 				
+				int Ebin=Ebinax->FindBin(Eaddback);
+				if(gdch->GetBinContent(Ebin,Seg+1)>0){
 				
-				if(gdch->GetBinContent(gdch->GetXaxis()->FindBin(Eaddback),Seg+1)>0){
-				
-					EGrigGate->Fill(Eaddback);
+					EGridGated->Fill(Eaddback);
 				
 					if(beta>0){
 						
-						if(gdchtheta->GetBinContent(gdch->GetXaxis()->FindBin(Eaddback),Seg+1)>0){
-							for(int m=0;m<4;m++){
+						for(int m=0;m<4;m++){
+							if(GdTH[m]->GetBinContent(Ebin,Seg+1)>0){
+								if(!AngleExpt[Seg][m]){
+									cout<<endl<<"ATTEMPTING TO USE NULL GRAPH "<<Seg<<" "<<m<<endl;
+									return;
+								}
 								double et=AngleExpt[Seg][m]->Eval(Eaddback);
 			// 					if(m==0)cout<<endl<<Seg<<" "<<Eaddback<<" "<<et;
 								if(et>0){
@@ -230,11 +244,16 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 	}
 	
 	
-	
+	// Efficiency fitting
 	if(Nevent>0){
-		TH1* h=EGrigGate;
+		TH1* h=EGridGated;
 		if(beta>0) h=E_Corr[0];
 		
+		out.cd(HistFolder);
+			FitHist=(TH1*)h->Clone("FitHist");
+		gROOT->cd();
+		
+		h=FitHist;
 		
 		TAxis* ax=Eff->GetXaxis();
 		TAxis* AX=h->GetXaxis();

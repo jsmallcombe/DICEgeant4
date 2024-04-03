@@ -89,7 +89,6 @@ if [ "$do_G4_part" = true ] ; then
 		hadd -f AutoSortFiles/BetaData$B.root AutoSortFiles/betadata"$B"_*.root
 	done
 
-	rm -rf AutoSortFiles/ExtraSorted.root
 	cat autodice.mac > autodicedelta.mac 
 	echo "/DetSys/gun/efficiencyEnergy 50 keV" >> autodicedelta.mac 
 	echo "/run/beamOn $NumberOfPoints" >> autodicedelta.mac 
@@ -119,11 +118,14 @@ fi
 
 root -l -q AutoDiceSort/DiceEffScanCombinedSort.C"("$NumberOfPoints*3",\"SumDice.root\",\"AutoSortFiles/SumTuple.root\","$dE")"
 
+rm -rf AutoSortFiles/DiceBetaSort.root
 for B in $betapoints;
 do
 	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Beta"$B"\","$B",\"AutoSortFiles/DiceBetaSort.root\",\"AutoSortFiles/BetaData"$B".root\","$NumberOfBetaPoints*3")"
 done
 
+rm -rf AutoSortFiles/ExtraSorted.root
+	
 root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Deltas\",0,\"AutoSortFiles/ExtraSorted.root\",\"AutoSortFiles/deltatup.root\")"
 root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"HighE\",0,\"AutoSortFiles/ExtraSorted.root\",\"AutoSortFiles/highetup.root\")"
 root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Gammas\",0,\"AutoSortFiles/ExtraSorted.root\",\"AutoSortFiles/gammatup.root\")"

@@ -201,11 +201,7 @@ void ApparatusDICE::Build(G4LogicalVolume* expHallLog,G4String Options)
 	if(Opt<0){
 		new G4PVPlacement(0,G4ThreeVector(), BuildISOK160Cross(),"ISOK", World,false,0); 
 
-		
-		G4Box* FoilTargBox = new G4Box("FoilTargBox", 5*mm,5*mm,1*um);
-		G4Material* TargMat = G4Material::GetMaterial(fTargetMaterial);
-		G4LogicalVolume *FoilTargLog = new G4LogicalVolume(FoilTargBox, TargMat,"FoilTarg",0,0,0);
-		new G4PVPlacement(0,G4ThreeVector(0,0,0), FoilTargLog,"TargetFoil", expHallLog,false,0); 
+		BuildPlaceTargetLadder(World);
 	}
 	
 	
@@ -244,6 +240,27 @@ void ApparatusDICE::BuildPlaceBasicTest(G4LogicalVolume* expHallLog){
 // // // 	lg->SetVisAttributes(vis_att_hid); 
 // // 	new G4PVPlacement(new G4RotationMatrix(),G4ThreeVector(), lg, "wrldbx",  expHallLog, false, 0);
 }
+    
+    
+void ApparatusDICE::BuildPlaceTargetLadder(G4LogicalVolume* expHallLog){
+	
+		G4Box* FoilTargBox = new G4Box("FoilTargBox", 5*mm,5*mm,1*um);
+		G4Material* TargMat = G4Material::GetMaterial(fTargetMaterial);
+		G4LogicalVolume *FoilTargLog = new G4LogicalVolume(FoilTargBox, TargMat,"FoilTarg",0,0,0);
+		FoilTargLog->SetVisAttributes(new G4VisAttributes(G4Colour(0.3,0.6,0.1)));
+		new G4PVPlacement(0,G4ThreeVector(0,0,0), FoilTargLog,"TargetFoil", expHallLog,false,0); 
+		
+		
+		G4Box* FrameBox = new G4Box("FrameBox", 30*mm,10*mm,1.5*mm);
+		G4Box* FrameHoleBox = new G4Box("FrameHoleBox", 5*mm,5*mm,2*mm);
+		G4VSolid* Frame = new G4SubtractionSolid("Frame", FrameBox, FrameHoleBox,0,G4ThreeVector(0,0,0));
+
+		G4Material* FrameMat = G4Material::GetMaterial("G4_STAINLESS-STEEL");
+		G4LogicalVolume *FrameLog = new G4LogicalVolume(Frame, FrameMat,"FrameLog",0,0,0);
+		new G4PVPlacement(0,G4ThreeVector(0,0,0), FrameLog,"TargFrame", expHallLog,false,0); 
+}
+    
+    
     
 G4int ApparatusDICE::BuildMicronSiN=0;
 

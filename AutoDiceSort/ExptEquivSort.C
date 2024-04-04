@@ -67,6 +67,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 		TH1F* E_RawSum=new TH1F("Raw","RawHitEnergy;Electron Energy (keV);Counts",2000,0,2000);
 		TH1F* E_AddbackSum=new TH1F("AddbackSum","AddbackSum;Electron Energy (keV);Counts",2000,0,2000);
 		TH1F* E_AddbackVetoSum=new TH1F("AddbackVetoSum","AddbackVetoSum;Electron Energy (keV);Counts",2000,0,2000);
+		TH2F* AddbackVetoSumChan=new TH2F("AddbackVetoSumChan","AddbackVetoSumChan;Electron Energy (keV);Counts",2000,0,2000,16,0,16);
 		TH1F* EGridGated=new TH1F("EGridGated","EGridGated;Electron Energy (keV);Counts",2000,0,2000);
 		TH1F* E_Corr[4];
 		TH1* FitHist;
@@ -147,7 +148,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
             if(cryNumber==2&&e>100){
                 VETO2=true;
             }
-            if(cryNumber==0&&e>0.1){
+            if(cryNumber==0&&e>30){
                 if(detNumber>0&&detNumber<17){//0 is guard ring
                     Eaddback+=e;
                     detNumber--; // Shift to zero index
@@ -201,6 +202,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 			E_AddbackSum->Fill(Eaddback);
 			if(!(VETO1||VETO2)){
 				E_AddbackVetoSum->Fill(Eaddback);
+				AddbackVetoSumChan->Fill(Eaddback,Seg);
 				
 				int Ebin=Ebinax->FindBin(Eaddback);
 				if(gdch->GetBinContent(Ebin,Seg+1)>0){

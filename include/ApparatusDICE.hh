@@ -126,6 +126,8 @@ private:
 	// methods
 	void BuildPlaceBasicTest(G4LogicalVolume*);
 	
+	void BuildPlaceTargetLadder(G4LogicalVolume*);
+	
     G4LogicalVolume* BuildBB34();
     
     static G4int BuildMicronSiN;

@@ -54,9 +54,9 @@ if [ "$do_G4_part" = true ] ; then
 	echo "/DetSys/app/addDiceDetector 1" >> autodice.mac 
 
 	# # # # Must be included when using real field. Automatic step determination is wrong for the complex field. 
-	# # # # Still need to determine the optiman StepLimit (Small = slow though)
+	# # # # StepLimit = 20 mm optimum speed. StepLimit<=2mm *tiny* difference, but massive computation cost. 
 	echo "/DetSys/phys/SetStepper 1" >> autodice.mac 
-	echo "/DetSys/world/StepLimit 10 mm" >> autodice.mac 
+	echo "/DetSys/world/StepLimit 20 mm" >> autodice.mac 
 
 	rm -rf AutoSortFiles/Tuple*.root
 	for E in $energypoints;

@@ -147,7 +147,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
             if(cryNumber==2&&e>100){
                 VETO2=true;
             }
-            if(cryNumber==0&&e>30){
+            if(cryNumber==0&&e>0.1){
                 if(detNumber>0&&detNumber<17){//0 is guard ring
                     Eaddback+=e;
                     detNumber--; // Shift to zero index

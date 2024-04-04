@@ -10,12 +10,13 @@
 #/DetSys/world/SetFieldOffset 0 22.5 0 mm
 #/DetSys/world/SetFieldAntiMirror 1
 #/DetSys/world/SetFieldMirror 2 
-##/DetSys/world/SetFieldAntiMirror 3  # regular setup
-#/DetSys/world/SetFieldMirror 3       # pair production
+#/DetSys/world/SetFieldAntiMirror 3  # regular setup
+##/DetSys/world/SetFieldMirror 3       # pair production
 
-### If you call SetDiceField after calling TabMagneticField, the field strength of TabMagneticField will be scaled.
-/DetSys/app/SetDiceField 0.25 tesla
-
+### Set a uniform field between magnets
+### If called *after* TabMagneticField, the field is scaled.
+### If negative input, uses relative scaling -1 tesla = 100%
+#/DetSys/app/SetDiceField 0.25 tesla
 
 ### Remove photon shield entirely
 #/DetSys/det/RemoveShield true
@@ -35,15 +36,14 @@
 ### Beam/Target <-> Shield-Widest-point Distance 
 /DetSys/app/SetDiceLength ShieldMidBeamSep 15 mm
 
-### Total vertical "Y" coverage/height of the magnets
-### Set negative to allow magnets to overlap with shield in the "X" direction
-/DetSys/app/SetDiceLength MagY -20 mm
+### TOTAL vertical Y height of the magnets (active direction)
+/DetSys/app/SetDiceLength MagY 20 mm
 
 ### Flare angle of the magnets
 /DetSys/app/SetDiceLength MagAng -5 degree
 
 ### Distance from magnet to Z=0
-/DetSys/app/SetDiceLength MagGapMinHalf 10 mm
+#/DetSys/app/SetDiceLength MagGapMinHalf 10 mm
 	
 ### Override the automatic optimum seperation of magnet poles
 # /DetSys/app/SetDiceLength PoleSepHalf 10 mm

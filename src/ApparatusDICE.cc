@@ -135,7 +135,7 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	SetNmLst.push_back("MagHalfThick");
 	SetPtrLst.push_back(&Orange_MagHalfThick);
 	
-	Orange_MagGapMinHalf=10*mm; // Min Half Gap between magnet halves (at side of shield)
+	Orange_MagGapMinHalf=-1; // Min Half Gap between magnet halves (at side of shield)
 	SetNmLst.push_back("MagGapMinHalf");
 	SetPtrLst.push_back(&Orange_MagGapMinHalf);
 	
@@ -388,8 +388,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	
     Orange_MagY*=0.5;  // MAG HEIGHT IS DIVIDED BY TWO AFTER INPUT
     
-    bool StartMagAtShield=true;
-    if(Orange_MagY<0){Orange_MagY=abs(Orange_MagY);StartMagAtShield=false;}
+    Orange_MagY=std::abs(Orange_MagY);
 	
 	G4double 	Orange_ShieldTanAngle=(fBB34Chip_HalfWidth+SafetyGap)/(Orange_BeamDetY+SafetyGap*2);
 	G4double 	Orange_ShieldFrontHalfWidth=Orange_ShieldTanAngle*Orange_BeamShieldSep;
@@ -404,8 +403,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	
 	G4double ShieldInsertBottomY=Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep;
 	
-    G4double MStart=Orange_MagGapMinHalf;
-    if(StartMagAtShield){MStart=Orange_ShieldMidHalfWidth;}
+    G4double MStart=Orange_ShieldMidHalfWidth;
+    if(Orange_MagGapMinHalf>0){MStart=Orange_MagGapMinHalf;}
     
     G4double LowestPointOfMagnet=Orange_MagY+Orange_MagMidOffset;
 	if(Orange_MagAng>0)LowestPointOfMagnet+=(fBB34Chip_HalfWidth-MStart)*tan(Orange_MagAng);
@@ -634,7 +633,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4VSolid* fMagBox = new G4ExtrudedSolid("MagBox", MagPolygon, Orange_MagHalfThick, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 	G4VSolid* fMagKap = new G4ExtrudedSolid("MagKap", MagPolygon, KaptonThickness*0.5, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 
-    if(!StartMagAtShield&&!fRemoveShield){
+	
+    if((Orange_MagGapMinHalf<Orange_ShieldMidHalfWidth)&&!fRemoveShield){
         fFieldBox = new G4SubtractionSolid("FieldVolBoxCut", fFieldBox, ShieldCutBox,0,G4ThreeVector(0,0,0));
     }
     

@@ -363,6 +363,23 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 			}
 		}
 		
+		for(int g=0;g<20;g++){
+			TH2* h1=AngleSeg[g];
+			TH2* h2=AngleSeg[15-g];
+			for(int y=1;y<=h1->GetNbinsY();y++){
+				int nX=h1->GetNbinsX();
+				for(int x=1;x<=nX;x++){
+					int x2=nX+1-x;
+					double symsum=h1->GetBinContent(x,y)+h2->GetBinContent(x2,y);
+					h1->SetBinContent(x,y,symsum);
+					h2->SetBinContent(x2,y,symsum);
+				}
+			}
+		}
+		
+		
+		
+		
 		TH2* Fix[3]={E_Chan_GoodE,E_Chan_GoodEThetaLim,E_Chan_GoodEThetaLimHalf};
 		
 		for(int g=0;g<3;g++){

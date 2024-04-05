@@ -72,13 +72,9 @@
 /vis/touchable/set/forceWireframe
 /vis/touchable/set/colour 0 0 0 2
 /vis/touchable/set/lineWidth 2
-/vis/set/touchable World 0 ISOK 0 Mag 0
+/vis/set/touchable World 0 ISOK 0
 /vis/touchable/set/forceWireframe
 /vis/touchable/set/colour 0 0 0 2
-/vis/touchable/set/lineWidth 2
-#/vis/set/touchable World 0 ISOK 0
-#/vis/touchable/set/forceWireframe
-#/vis/touchable/set/colour 0 0 0 2
 
 ### Required ### 
 /vis/drawVolume 

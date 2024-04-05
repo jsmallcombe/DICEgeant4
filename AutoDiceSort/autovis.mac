@@ -1,0 +1,17 @@
+/DetSys/gun/efficiencyEnergy 600 keV
+/vis/open OGL
+/vis/viewer/set/background 1 1 1 1
+/vis/viewer/set/style surface
+/vis/set/touchable World 0 ISOK 0
+/vis/touchable/set/forceWireframe
+/vis/drawVolume 
+/vis/viewer/set/upVector 0 1 0
+/vis/viewer/set/viewpointThetaPhi -80 -25 deg
+/vis/viewer/zoomTo 1
+/vis/scene/add/trajectories smooth
+/vis/disable
+/DetSys/SiHits/VisStore
+/run/beamOn 2000
+/vis/enable
+/vis/scene/endOfEventAction accumulate 
+/vis/viewer/flush

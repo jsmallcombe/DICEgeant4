@@ -10,6 +10,9 @@ dE=100
 betapoints="0.05 0.1 0.2 .5"
 # betapoints="0.1"
 
+do_lifetime_part=false
+lifeepoints="400 600 800 1000 1500"
+
 do_G4_part=false
 NumberOfPoints=1000000
 NumberOfBetaPoints=100000
@@ -112,6 +115,41 @@ if [ "$do_G4_part" = true ] ; then
 	mv g4out.root AutoSortFiles/gammatup.root	
 	rm -rf autodicegamma.mac
 
+	
+	cat autodice.mac >  
+	echo "/DetSys/gun/efficiencyEnergy 511 keV" >> autodicegamma.mac 
+	echo "/run/beamOn $NumberOfPoints" >> autodicegamma.mac 
+	./DICE10 autodicegamma.mac 
+	mv g4out.root AutoSortFiles/gammatup.root	
+	rm -rf autodicegamma.mac
+	
+	if [ "$do_lifetime_part" = true ] ; then
+		rm -rf AutoSortFiles/TupleLife*.root 
+		for E in $lifeepoints;
+		do
+			cat autodice.mac > autodicelife.mac 
+			echo "/DetSys/gun/efficiencyEnergy $E keV" >> autodicelife.mac 
+			echo "/DetSys/gun/SetBeta 0.1" >> autodicelife.mac 
+			echo "/DetSys/gun/SetLifetime 1 ns" >> autodicelife.mac 
+			echo "/run/beamOn $NumberOfBetaPoints" >> autodicelife.mac 
+		# # 	running the sim with macro created here
+			./DICE10 autodicelife.mac 
+			mv g4out.root AutoSortFiles/TupleLifeA$E.root
+			
+			cat autodice.mac > autodicelife.mac 
+			echo "/DetSys/gun/efficiencyEnergy $E keV" >> autodicelife.mac 
+			echo "/DetSys/gun/SetBeta 0.02" >> autodicelife.mac 
+			echo "/DetSys/gun/SetLifetime 10 ns" >> autodicelife.mac 
+			echo "/run/beamOn $NumberOfBetaPoints" >> autodicelife.mac 
+		# # 	running the sim with macro created here
+			./DICE10 autodicelife.mac 
+			mv g4out.root AutoSortFiles/TupleLifeB$E.root
+		done
+		hadd -f AutoSortFiles/TupleLifeA.root AutoSortFiles/TupleLifeA*.root
+		hadd -f AutoSortFiles/TupleLifeB.root AutoSortFiles/TupleLifeB*.root
+		rm -rf autodicelife.mac
+	fi
+	
 	rm -rf autodice.mac
 
 fi
@@ -121,13 +159,21 @@ root -l -q AutoDiceSort/DiceEffScanCombinedSort.C"("$NumberOfPoints*3",\"SumDice
 rm -rf AutoSortFiles/DiceBetaSort.root
 for B in $betapoints;
 do
-	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Beta"$B"\","$B",\"AutoSortFiles/DiceBetaSort.root\",\"AutoSortFiles/BetaData"$B".root\","$NumberOfBetaPoints*3")"
+	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Beta"$B"\","$B",\"AutoSortFiles/DiceBetaSort.root\",\"AutoSortFiles/BetaData"$B".root\","$NumberOfBetaPoints*3","$dE")"
 done
 
 rm -rf AutoSortFiles/ExtraSorted.root
-	
+
 root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Deltas\",0,\"AutoSortFiles/ExtraSorted.root\",\"AutoSortFiles/deltatup.root\")"
 root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"HighE\",0,\"AutoSortFiles/ExtraSorted.root\",\"AutoSortFiles/highetup.root\")"
 root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Gammas\",0,\"AutoSortFiles/ExtraSorted.root\",\"AutoSortFiles/gammatup.root\")"
+
+
+if [ "$do_lifetime_part" = true ] ; then
+	rm -rf AutoSortFiles/Lifetime.root
+	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"LifetimeA\",0.1,\"AutoSortFiles/ExtraSorted.root\",\"AutoSortFiles/TupleLifeA.root\","$NumberOfBetaPoints*3")"
+	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"LifetimeB\",0.1,\"AutoSortFiles/ExtraSorted.root\",\"AutoSortFiles/TupleLifeB.root\","$NumberOfBetaPoints*3")"
+fi
+
 
 hadd -f FullDiceSort.root SumDice.root AutoSortFiles/DiceBetaSort.root AutoSortFiles/ExtraSorted.root

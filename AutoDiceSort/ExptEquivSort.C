@@ -1,4 +1,4 @@
-void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double beta=0,const char * outfileName = "DicePostSort.root", const char *ntuplefileName = "g4out.root",int Nevent=0) {
+void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double beta=0,const char * outfileName = "DicePostSort.root", const char *ntuplefileName = "g4out.root",int Nevent=0,double dE=0) {
 	    
 	//// Random number generator to add electronic noise on to "perfect" geant4 detectors ///
 	TRandom r;
@@ -72,6 +72,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 		TH1F* E_Corr[4];
 		TH1* FitHist;
 		TH2F* E_CorrGrid;
+		TH2F* CoMExptGrid[16];
 		if(beta>0){
 			E_Corr[0]=new TH1F("E_CorrMean","E_CorrMean;Electron Energy (keV);Counts",2000,0,2000);
 			E_Corr[1]=new TH1F("E_CorrMode","E_CorrMode;Electron Energy (keV);Counts",2000,0,2000);
@@ -79,6 +80,26 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 			E_Corr[3]=new TH1F("E_CorrModeStrict","E_CorrModeStrict;Electron Energy (keV);Counts",2000,0,2000);
 			
 			E_CorrGrid=new TH2F("E_CorrGrid","E_CorrGrid;Electron Energy (keV);Grid #",2000,0,2000,16,0,16);
+			
+			if(dE){
+				stringstream folder;
+				folder<<HistFolder<<"/CoMExptGrid";
+				out.mkdir(folder.str().c_str());
+				out.cd(folder.str().c_str());
+
+				int Ebin = round(2000/dE);
+				double EbinMin=dE*0.5;
+				double EbinMax=EbinMin+dE*Ebin;
+	
+				for(int b=0;b<16;b++){
+					stringstream ss;
+					ss<<"TrueEDetGrid"<<b;
+					
+					CoMExptGrid[b]=new TH2F(ss.str().c_str(),(ss.str()+";Hit Energy (keV);Emission Energy (keV);Counts").c_str(),2000,0,2000,Ebin,EbinMin,EbinMax);
+				}
+				
+				out.cd(HistFolder);
+			}
 		}
 		
 		TH1 *Eff,*EffFit;
@@ -99,7 +120,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 	// Next we create local variables into which we will read data from the list
 	int EventID;
 	int detNumber,cryNumber;
-	double depEnergy,primaryTheta;
+	double depEnergy,primaryE,primaryTheta;
 	double posx,posz;
 	
 	// Define the link between the "columns" of the list and the local variables we want to read them into
@@ -108,6 +129,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 	newtree->SetBranchAddress("detNumber",&detNumber);
 	newtree->SetBranchAddress("cryNumber",&cryNumber);
 	newtree->SetBranchAddress("depEnergy",&depEnergy);
+	newtree->SetBranchAddress("primaryE",&primaryE);
 	newtree->SetBranchAddress("primaryTheta",&primaryTheta);
 	newtree->SetBranchAddress("posx",&posx);
 	newtree->SetBranchAddress("posz",&posz);
@@ -228,6 +250,11 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 								}
 							}
 						}
+						
+						if(dE){
+							CoMExptGrid[Seg]->Fill(Eaddback,primaryE);
+						}
+						
 					}
 				}
 			}    

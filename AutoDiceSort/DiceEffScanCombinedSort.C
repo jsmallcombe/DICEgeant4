@@ -136,7 +136,6 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     /////// Finish declaring histograms
     
     
-    
 	// The TTree newtree is the big list of energies and detector segments we need to load from
 	// First we get the length of the list and output it
 	long nentries = newtree->GetEntries();

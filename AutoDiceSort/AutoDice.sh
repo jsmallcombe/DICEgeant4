@@ -6,16 +6,16 @@ dE=100
 # # dE=400
 
 # betapoints="0.05 0.1 0.2 .5"
-betapoints="0.1"
+betapoints="0.2"
 
-lifeepoints="400 600 800 1000 1500"
+lifeepoints="500 1000"
 
 NumberOfPoints=1000000
 NumberOfBetaPoints=100000
 do_G4_part=false
 do_vischeck=true
-do_extras=false
-do_lifetime_part=false
+do_extras=true
+do_lifetime_part=true
 
 # extras = gammas,betas,deltas, and lifetimes
 
@@ -37,7 +37,7 @@ if [ "$do_G4_part" = true ] ; then
 	echo "/DetSys/gun/coneMaxPhi 330.0 deg" >> autodice.mac 
 
 	echo "/DetSys/world/TabMagneticField Field.txt" >> autodice.mac 
-	echo "/DetSys/world/SetFieldOffset 0 25 0 mm" >> autodice.mac 
+	echo "/DetSys/world/SetFieldOffset 0 30 0 mm" >> autodice.mac 
 	echo "/DetSys/world/SetFieldAntiMirror 1" >> autodice.mac 
 	echo "/DetSys/world/SetFieldMirror 2" >> autodice.mac 
 	echo "/DetSys/world/SetFieldAntiMirror 3" >> autodice.mac 
@@ -49,8 +49,8 @@ if [ "$do_G4_part" = true ] ; then
 	echo "/DetSys/det/AddBlocker true" >> autodice.mac 
 	
 	echo "/DetSys/app/SetDiceLength BeamDetY 60 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength MagMidOffset 25 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength ShieldMidBeamSep 15 mm" >> autodice.mac 
+	echo "/DetSys/app/SetDiceLength MagMidOffset 30 mm" >> autodice.mac 
+	echo "/DetSys/app/SetDiceLength ShieldMidBeamSep 20 mm" >> autodice.mac 
 	echo "/DetSys/app/SetDiceLength MagY -20 mm" >> autodice.mac 
 	echo "/DetSys/app/SetDiceLength MagGapMinHalf 10 mm" >> autodice.mac 
 	##echo "/DetSys/app/SetDiceLength PoleSepHalf 10 mm" >> autodice.mac 

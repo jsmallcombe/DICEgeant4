@@ -153,6 +153,8 @@ TabulatedMagneticField::TabulatedMagneticField(const char* filename) //called in
 	G4cout<<"\n ---> Dif values x,y,z (range): " 
 		<<fDx/cm<<" "<<fDy/cm<<" "<<fDz/cm<<" cm in z "
 		<<"\n-----------------------------------------------------------"<<std::endl;
+		
+	SetFieldMirrorPoint(G4ThreeVector(0,0,0));//Call needed to set dead zone correction
 }
 
 

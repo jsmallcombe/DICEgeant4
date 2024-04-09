@@ -303,11 +303,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
                         ChanThetaPhi[ei]->Fill(TPtheta,Phi,TPchan);
                         ThetaPhi[ei]->Fill(TPtheta,Phi);
                             
-                        // Only store 100 points or graph unreadable
-                        if(HitMap[ei]->GetN()<100){
-                            HitMap[ei]->SetPoint(HitMap[ei]->GetN(),pZ,pX);
-                        }
-                        
+                        HitMap[ei]->SetPoint(HitMap[ei]->GetN(),pZ,pX);
                     }
 				}
 			}
@@ -575,6 +571,29 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     
     // Create a TMultiGraph to hold TGraphs 
     TMultiGraph* multiGraph = new TMultiGraph();
+    
+    
+    // Only store 100 points or graph unreadable
+    // Incredibly inefficient, but because of the theta division of the geant part this was the best solution at the time
+    for(int e=0;e<20;e++){
+        int n=HitMap[e]->GetN()/100;
+        if(n>1){
+            TGraph *g=new TGraph;
+            for(int i=0;i<HitMap[e]->GetN();i++){
+                if(!(i%n)){
+                    double x,y;
+                    HitMap[e]->GetPoint(i,x,y);
+                    g->SetPoint(g->GetN(),x,y);
+                }
+            }
+            delete HitMap[e];
+            HitMap[e]=g;
+        }
+        
+        while(HitMap[e]->GetN()>100){
+            HitMap[e]->RemovePoint((int)(r.Uniform()*HitMap[e]->GetN()));
+        }
+    }
     
 	out.cd("HitMaps");
     

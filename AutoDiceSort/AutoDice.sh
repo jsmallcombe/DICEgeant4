@@ -123,7 +123,6 @@ if [ "$do_G4_part" = true ] ; then
 		mv g4out.root FilesAutoSort/deltatup.root	
 		rm -rf autodicedelta.mac
 
-
 		cat autodice.mac > autodicehigh.mac 
 		echo "/DetSys/gun/efficiencyEnergy 3000 keV" >> autodicehigh.mac 
 		echo "/run/beamOn $NumberOfPoints" >> autodicehigh.mac 
@@ -139,12 +138,6 @@ if [ "$do_G4_part" = true ] ; then
 		mv g4out.root FilesAutoSort/gammatup.root	
 		rm -rf autodicegamma.mac
 
-		cat autodice.mac >  autodicegamma.mac
-		echo "/DetSys/gun/efficiencyEnergy 511 keV" >> autodicegamma.mac 
-		echo "/run/beamOn $NumberOfPoints" >> autodicegamma.mac 
-		./DICE10 autodicegamma.mac 
-		mv g4out.root FilesAutoSort/gammatup.root	
-		rm -rf autodicegamma.mac
 		
 		if [ "$do_lifetime_part" = true ] ; then
 			rm -rf FilesAutoSort/TupleLife*.root 

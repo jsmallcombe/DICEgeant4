@@ -170,7 +170,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
             if(cryNumber==2&&e>100){
                 VETO2=true;
             }
-            if(cryNumber==0&&e>30){
+            if(cryNumber==0&&e>0.1){
                 if(detNumber>0&&detNumber<17){//0 is guard ring
                     Eaddback+=e;
                     detNumber--; // Shift to zero index
@@ -205,21 +205,23 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
         double Esumtmp=0;
         double Emax=0;
         int Seg=0;
-        for(unsigned int i=0;i<EventHolder.size();i++){
-            double e=EventHolder[i];
-            if(e>30){
-                Esumtmp+=e;
-				if(e>Emax){
-					Emax=e;
-					Seg=i;
+		if(Mult>1){
+			for(unsigned int i=0;i<EventHolder.size();i++){
+				double e=EventHolder[i];
+				if(e>30){
+					Esumtmp+=e;
+					if(e>Emax){
+						Emax=e;
+						Seg=i;
+					}
+				}else if(Esumtmp>0){ // So only segments neigbouring will be summed;
+					break;
 				}
-            }else if(Esumtmp>0){ // So only segments neigbouring will be summed;
-                break;
-            }
-        }
-        if(abs(Esumtmp-Eaddback)>5)Eaddback=0;
+			}
+			if(abs(Esumtmp-Eaddback)>5)Eaddback=0;
+		}
         
-		if(Eaddback>30) {
+		if(Eaddback>0.1) {
 
 			E_AddbackSum->Fill(Eaddback);
 			if(!(VETO1||VETO2)){

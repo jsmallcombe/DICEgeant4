@@ -311,9 +311,10 @@ G4LogicalVolume* ApparatusDICE::BuildBB34(){
 	// MakePlace ChipMetal in ChipMotherLog
     G4LogicalVolume* ChipMetalLog = new G4LogicalVolume(ChipAl, G4Material::GetMaterial("Aluminium"), "ChipMetalLog", 0,0,0);
 	ChipMetalLog->SetVisAttributes(vis_att_hid);
-	new G4PVPlacement(rotate,G4ThreeVector(0,0,fBB34Chip_HalfThickness+fBB34Chip_Al*0.5),ChipMetalLog, "ChipMetalVol",  ChipMotherLog, false, false,true);
-	new G4PVPlacement(rotate,G4ThreeVector(0,0,-fBB34Chip_HalfThickness-fBB34Chip_Al*0.5),ChipMetalLog, "ChipMetalVol",  ChipMotherLog, false, false,true);
+	new G4PVPlacement(rotate,G4ThreeVector(0,0,fBB34Chip_HalfThickness+fBB34Chip_Al*0.5),ChipMetalLog, "SiSegmentPhys0_4",  ChipMotherLog, false, false,true);
+	new G4PVPlacement(rotate,G4ThreeVector(0,0,-fBB34Chip_HalfThickness-fBB34Chip_Al*0.5),ChipMetalLog, "SiSegmentPhys0_4",  ChipMotherLog, false, false,true);
 	
+	// Metal given a detector name so that we can still record low energy electrons that wouldnt actually reach sensitive silicon
 	
 	// Place Guard Ring in ChipMotherLog
     std::stringstream tt;

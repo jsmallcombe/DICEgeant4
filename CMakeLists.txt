@@ -51,6 +51,8 @@ set(DICE10_SCRIPTS
 	AutoDiceSort/autovis.mac
 	AutoDiceSort/ExptEquivSort.C
 	AutoDiceSort/DiceEffScanCombinedSort.C
+	AutoDiceSort/EffOnly.C
+	AutoDiceSort/QuickAutoEff.sh
   )
   
 

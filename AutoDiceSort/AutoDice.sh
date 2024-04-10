@@ -1,3 +1,6 @@
+# # # #  For real final experimental cals, use the target and K160 code AND use the full 4pi gun!
+# # # #  Current settings are fast, but underestimate background
+
 energypoints="100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700"
 dE=100
 # energypoints="200 400 600 800 1000 1200 1400"
@@ -17,6 +20,8 @@ do_vischeck=true
 do_extras=true
 do_lifetime_part=true
 
+deltapoints="5 10 15 20 25 30 35 40"
+dd=5
 # extras = gammas,betas,deltas, and lifetimes
 
 mkdir FilesAutoSort
@@ -116,12 +121,18 @@ if [ "$do_G4_part" = true ] ; then
 	
 	if [ "$do_extras" = true ] ; then
 	
-		cat autodice.mac > autodicedelta.mac 
-		echo "/DetSys/gun/efficiencyEnergy 50 keV" >> autodicedelta.mac 
-		echo "/run/beamOn $NumberOfPoints" >> autodicedelta.mac 
-		./DICE10 autodicedelta.mac 
-		mv g4out.root FilesAutoSort/deltatup.root	
+		rm -rf FilesAutoSort/DeltaTuple*.root
+		for E in $deltapoints;
+		do
+			cat autodice.mac > autodicedelta.mac 
+			echo "/DetSys/gun/efficiencyEnergy $E keV" >> autodicedelta.mac 
+				echo "/run/beamOn $NumberOfBetaPoints" >> autodicedelta.mac 
+			./DICE10 autodicedelta.mac 
+			mv g4out.root FilesAutoSort/DeltaTuple$E.root
+		done
 		rm -rf autodicedelta.mac
+		
+		hadd -f FilesAutoSort/deltatup.root FilesAutoSort/DeltaTuple*.root
 
 		cat autodice.mac > autodicehigh.mac 
 		echo "/DetSys/gun/efficiencyEnergy 3000 keV" >> autodicehigh.mac 
@@ -171,6 +182,7 @@ if [ "$do_G4_part" = true ] ; then
 
 fi
 
+
 root -l -q AutoDiceSort/DiceEffScanCombinedSort.C"("$NumberOfPoints*3",\"SumDice.root\",\"FilesAutoSort/SumTuple.root\","$dE")"
 
 if [ ${#betapoints} -gt 0 ]; then
@@ -187,7 +199,7 @@ if [ "$do_extras" = true ] ; then
 
 	rm -rf FilesAutoSort/ExtraSorted.root
 
-	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Deltas\",0,\"FullDiceSort.root\",\"FilesAutoSort/deltatup.root\")"
+	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Deltas\",0,\"FullDiceSort.root\",\"FilesAutoSort/deltatup.root\","$NumberOfBetaPoints*3","$dE")"
 	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"HighE\",0,\"FullDiceSort.root\",\"FilesAutoSort/highetup.root\")"
 	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Gammas\",0,\"FullDiceSort.root\",\"FilesAutoSort/gammatup.root\")"
 
@@ -198,5 +210,4 @@ if [ "$do_extras" = true ] ; then
 		root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"LifetimeB\",0.1,\"FullDiceSort.root\",\"FilesAutoSort/TupleLifeB.root\","$NumberOfBetaPoints*3")"
 	fi
 fi
-
 

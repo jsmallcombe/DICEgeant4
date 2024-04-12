@@ -361,13 +361,15 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 		
 		for(int g=0;g<20;g++){
 			TH2* h1=AngleSeg[g];
-			for(int y=1;y<=h1->GetNbinsY();y++){
+            int nY=h1->GetNbinsY();
+            for(int y=1;y<=nY/2;y++){
+                int y2=nY+1-y;
 				int nX=h1->GetNbinsX();
 				for(int x=1;x<=nX;x++){
 					int x2=nX+1-x;
-					double symsum=h1->GetBinContent(x,y)+h1->GetBinContent(x2,y);
+					double symsum=h1->GetBinContent(x,y)+h1->GetBinContent(x2,y2);
 					h1->SetBinContent(x,y,symsum);
-					h1->SetBinContent(x2,y,symsum);
+					h1->SetBinContent(x2,y2,symsum);
 				}
 			}
 		}

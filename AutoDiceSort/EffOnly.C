@@ -78,13 +78,13 @@ void EffOnly(string Estring,int Nevent=0,const char * outfileName = "EffOnly.roo
 
 		TAxis* ax=Eff->GetXaxis();
 		for(int b=1;b<=ax->GetNbins();b++){
-			Eff->SetBinContent(b,Eff->GetBinContent(b)/Nevent);
+			Eff->SetBinContent(b,100*Eff->GetBinContent(b)/Nevent);
 			double Tt=HitRaw->GetBinContent(b);
 			if(Tt>0){
 				PeakTot->SetBinContent(b,PeakTot->GetBinContent(b)/Tt);
 			}
 			
-			EffG->SetPoint(b-1,centroids[b-1],Eff->GetBinContent(b)/Nevent);
+			EffG->SetPoint(b-1,centroids[b-1],Eff->GetBinContent(b));
 		}
 	}
 	

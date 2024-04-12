@@ -412,7 +412,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4double 	Orange_ShieldFrontHalfWidth=Orange_ShieldTanAngle*Orange_BeamShieldSep;
 	G4double 	Orange_ShieldMidDepth=Orange_ShieldMidBeamSep-Orange_BeamShieldSep;
 	G4double 	Orange_ShieldMidHalfWidth=Orange_ShieldFrontHalfWidth+Orange_ShieldTanAngle*(Orange_ShieldMidDepth);
-	G4double 	Orange_ShieldBottomDepth=18*mm-Orange_BeamShieldSep;
+	G4double 	Orange_ShieldBottomDepth=Orange_MagMidOffset-Orange_ShieldMidBeamSep;
 	
 	// Fixing unphysics geometry inputs
 	if(Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep>Orange_BeamDetY+SafetyGap){

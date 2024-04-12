@@ -102,13 +102,15 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 			}
 		}
 		
-		TH1 *Eff,*EffFit;
+		TH1 *Eff,*EffFit,*SigFit,*Metric;
 		if(Nevent>0){
 			Eff=(TH1*)DetDataFile.Get("Efficiency")->Clone("Eff");
-			EffFit=(TH1*)DetDataFile.Get("Efficiency")->Clone("EffFit");
-			
 			Eff->Reset();
-			EffFit->Reset();
+			EffFit=(TH1*)Eff->Clone("EffFit");
+			SigFit=(TH1*)Eff->Clone("SigFit");
+			SigFit->SetTitle("Fit Sigma;Electron Energy (keV);Sigma [keV]");
+			Metric=(TH1*)Eff->Clone("Metric");
+			Metric->SetTitle("Metric;Electron Energy (keV);Quality Metric");
 		}
 	gROOT->cd();//cd back into main session memory 
 	
@@ -147,7 +149,8 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
     double Theta=0;
     double Mult=0;
     double TMult=0;
-    
+    int Seg;
+	
     double pX,pZ;
 
 	TAxis* Ebinax=gdch->GetXaxis();
@@ -181,6 +184,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
                         pX=posx;
                         pZ=posz;
                     }
+                    Seg=detNumber;
                 }
             }
             Theta=primaryTheta;
@@ -204,7 +208,6 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 		
         double Esumtmp=0;
         double Emax=0;
-        int Seg=0;
 		if(Mult>1){
 			for(unsigned int i=0;i<EventHolder.size();i++){
 				double e=EventHolder[i];
@@ -301,7 +304,10 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 
 			TF1* fit=UserQuickSingleGausAutoFit(h,e,e-de,e+de,1);
 			h->GetListOfFunctions()->Add(fit);
-			EffFit->SetBinContent(b,2.5066*fit->GetParameter(0)*fit->GetParameter(2)*100/Nevent);
+			double ef=2.5066*fit->GetParameter(0)*fit->GetParameter(2)*100/Nevent;
+			EffFit->SetBinContent(b,ef);
+			SigFit->SetBinContent(b,fit->GetParameter(2));
+			Metric->SetBinContent(b,10*ef/fit->GetParameter(2));
 		}
 	}
 	

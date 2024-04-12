@@ -4,13 +4,13 @@
 
 ### Configure Apparatus To Build ###
 
-#/DetSys/world/TabMagneticField FieldExample.txt
+/DetSys/world/TabMagneticField FieldExample.txt
 #/DetSys/world/SetFieldMirrorPos 0 -22.5 0 mm
 ### SetFieldMirrorPos Is In the intrinsic frame of the field before offsetting
-#/DetSys/world/SetFieldOffset 0 22.5 0 mm
-#/DetSys/world/SetFieldAntiMirror 1
-#/DetSys/world/SetFieldMirror 2 
-#/DetSys/world/SetFieldAntiMirror 3  # regular setup
+/DetSys/world/SetFieldOffset 0 30 0 mm
+/DetSys/world/SetFieldAntiMirror 1
+/DetSys/world/SetFieldMirror 2 
+/DetSys/world/SetFieldAntiMirror 3  # regular setup
 ##/DetSys/world/SetFieldMirror 3       # pair production
 
 ### Set a uniform field between magnets
@@ -28,25 +28,25 @@
 # /DetSys/app/SetDiceLength PhiBlockThickness 1.5 mm
 
 ### Orange - Target <-> Magnet-Center Offset
-/DetSys/app/SetDiceLength MagMidOffset 22.5 mm
+/DetSys/app/SetDiceLength MagMidOffset 30 mm
 
 ### Detector Distance; Beam/Target <-> BB34
 /DetSys/app/SetDiceLength BeamDetY 60 mm
 
 ### Beam/Target <-> Shield-Widest-point Distance 
-/DetSys/app/SetDiceLength ShieldMidBeamSep 15 mm
+/DetSys/app/SetDiceLength ShieldMidBeamSep 20 mm
 
 ### TOTAL vertical Y height of the magnets (active direction)
 /DetSys/app/SetDiceLength MagY 20 mm
 
 ### Flare angle of the magnets
-/DetSys/app/SetDiceLength MagAng -5 degree
+#/DetSys/app/SetDiceLength MagAng -5 degree
 
 ### Distance from magnet to Z=0
-#/DetSys/app/SetDiceLength MagGapMinHalf 10 mm
+/DetSys/app/SetDiceLength MagGapMinHalf 10 mm
 	
 ### Override the automatic optimum seperation of magnet poles
-# /DetSys/app/SetDiceLength PoleSepHalf 10 mm
+/DetSys/app/SetDiceLength PoleSepHalf 16 mm
 
 /DetSys/app/addDiceDetector 1
 ### 1 Orange

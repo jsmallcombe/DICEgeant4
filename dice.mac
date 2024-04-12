@@ -7,10 +7,10 @@
 #/DetSys/det/RemoveShield true
 /DetSys/det/AddBlocker true
 
-/DetSys/app/SetDiceLength MagMidOffset 22.5 mm
+/DetSys/app/SetDiceLength MagMidOffset 30 mm
 /DetSys/app/SetDiceLength BeamDetY 60 mm
-/DetSys/app/SetDiceLength ShieldMidBeamSep 15 mm
-/DetSys/app/SetDiceLength MagY -20 mm
+/DetSys/app/SetDiceLength ShieldMidBeamSep 20 mm
+/DetSys/app/SetDiceLength MagY 20 mm
 
 /DetSys/app/addDiceDetector -1
 

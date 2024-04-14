@@ -102,18 +102,24 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 
 	fAdjNumber=4;
 	
+	
+	Orange_BeamShieldSep=10*mm;
+	SetNmLst.push_back("BeamShieldSep");
+	SetPtrLst.push_back(&Orange_BeamShieldSep);
+	
+	Orange_ShieldMidBeamSep=20*mm;  // Distance to the shield widest pointgb
+	SetNmLst.push_back("ShieldMidBeamSep");
+	SetPtrLst.push_back(&Orange_ShieldMidBeamSep);
+	
+	
 	    
-	Orange_MagMidOffset=15*mm; // Distance between center line of magnet and target
+	Orange_MagMidOffset=30*mm; // Distance between center line of magnet and target
 	SetNmLst.push_back("MagMidOffset");
 	SetPtrLst.push_back(&Orange_MagMidOffset);
 	
 	Orange_BeamDetY=60*mm; // Height of target vs BB34
 	SetNmLst.push_back("BeamDetY");
 	SetPtrLst.push_back(&Orange_BeamDetY);
-	
-	Orange_ShieldMidBeamSep=20*mm;  // Distance to the shield widest pointgb
-	SetNmLst.push_back("ShieldMidBeamSep");
-	SetPtrLst.push_back(&Orange_ShieldMidBeamSep);
 	
 	Orange_MagY=20*mm;  // Total vertical coverage/height of the magnet field region (variable gets halved after input)
 	SetNmLst.push_back("MagY");
@@ -123,10 +129,6 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	SetNmLst.push_back("MagAng");
 	SetPtrLst.push_back(&Orange_MagAng);
 
-	Orange_BeamShieldSep=8*mm;
-	SetNmLst.push_back("BeamShieldSep");
-	SetPtrLst.push_back(&Orange_BeamShieldSep);
-	
 	Orange_MagZ=60*mm; // Beam extent of magnets
 	SetNmLst.push_back("MagZ");
 	SetPtrLst.push_back(&Orange_MagZ);
@@ -490,84 +492,159 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	
 	if(!fRemoveShield){
 
-		// Define the shape of the insert
-		std::vector<G4TwoVector> OrangeShieldPoly(6);		
-        OrangeShieldPoly[0].set(Orange_ShieldFrontHalfWidth,Orange_ShieldMidDepth);
-        OrangeShieldPoly[1].set(Orange_ShieldMidHalfWidth,0);
-//         OrangeShieldPoly[2].set(0,-Orange_ShieldBottomDepth);
-        OrangeShieldPoly[2].set(Orange_ShieldMidHalfWidth,-Orange_ShieldBottomDepth);
-        OrangeShieldPoly[3].set(-Orange_ShieldMidHalfWidth,-Orange_ShieldBottomDepth);
-        OrangeShieldPoly[4].set(-Orange_ShieldMidHalfWidth,0);
-        OrangeShieldPoly[5].set(-Orange_ShieldFrontHalfWidth,Orange_ShieldMidDepth);
-        
-		// Extrude the solid
-        G4VSolid* ShieldBox = new G4ExtrudedSolid("Box1", OrangeShieldPoly, Orange_InsertHalfX, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
-		
-		// Cut the notch for target ladder 
-		if(Orange_BeamShieldSep<Orange_TargetWardingY){
-			G4Box* CutBoxS = new G4Box("CutBoxS",Orange_TargetWardingZ, Orange_TargetWardingY, Orange_ShieldHalfX+SafetyGap);
-			ShieldBox = new G4SubtractionSolid("Box2", ShieldBox, CutBoxS,0,G4ThreeVector(0,0,0));
-		}
-		
-		// Make the logical volume, with FORBID tag for pretty pictures
-		G4LogicalVolume *ShieldBoxL = new G4LogicalVolume(ShieldBox, ShieldInMat,"ShieldBoxL_FORBID",0,0,0);
-		G4RotationMatrix* rotate1 = new G4RotationMatrix;
-		rotate1->rotateZ(Zbar);
-		rotate1->rotateY(90*deg);
-		ShieldBoxL->SetVisAttributes(OneVisAtt);
-		new G4PVPlacement(rotate1,rotZbar*G4ThreeVector(0,0,0), ShieldBoxL,"ShieldInsert", expHallLog,false,0); 
-	
-		// Extend the poly very slightly before making a cut box
-		for(unsigned int i=0;i<OrangeShieldPoly.size();i++)OrangeShieldPoly[i]*=1.01;
-		// Extrude the slightly bigger shape to use as a cutout in other parts (field region and xray block)
-        ShieldCutBox = new G4ExtrudedSolid("CutBox1", OrangeShieldPoly, Orange_InsertHalfX*1.01, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
-		
-		
-		// Build and place the new under-shield x-ray block
-		
-		G4double XrayHW=Orange_ShieldMidHalfWidth;
-		if(Orange_ShieldMidHalfWidth>MStart){XrayHW=MStart;}
-		// Z-Width only goes as far as the magnets
-		
-		G4double XrayHH=std::abs(Orange_ShieldMidBeamSep-LowestPointOfMagnet);
-		if(Orange_ShieldBottomDepth>=XrayHH)XrayHH=Orange_ShieldBottomDepth; 
-		XrayHH/=2;
-		//Goes to EITHER the bottom of the magnets OR a little under the shield.
-		
-		G4VSolid* XrayBox = new G4Box("XrayBox",Orange_ShieldHalfX,XrayHH,XrayHW-KaptonThickness);
-		G4VSolid* XrayCover = new G4Box("XrayBox",Orange_ShieldHalfX-0.1*mm,XrayHH,XrayHW);
-		
-		
-		G4RotationMatrix* subtrarot = new G4RotationMatrix;
-		subtrarot->rotateY(90*deg); //ShieldCutBox is the wrong way as G4ExtrudedSolid in Z-axis by default
-		XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, XrayBox,0,G4ThreeVector(0,KaptonThickness,0));
-		XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH+KaptonThickness,0));
-        XrayBox = new G4SubtractionSolid("XrayShape", XrayBox, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH,0));
-		
-		
-		G4LogicalVolume *XrayLog = new G4LogicalVolume(XrayBox, XrayMat,"XrayLog_FORBID",0,0,0);
-		G4RotationMatrix* rotateblock = new G4RotationMatrix;
-		rotateblock->rotateZ(Zbar);
-		new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-XrayHH-Orange_ShieldMidBeamSep,0), XrayLog,"XrayBlock", expHallLog,false,0);
-		
-		G4LogicalVolume *XrayCoverLog = new G4LogicalVolume(XrayCover, KapMat,"XrayCoverLog_FORBID",0,0,0);
-		XrayCoverLog->SetVisAttributes(FiveVisAtt);
-		new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-XrayHH-Orange_ShieldMidBeamSep-KaptonThickness,0), XrayCoverLog,"XrayBlockCover", expHallLog,false,0);
-		
-
-		// Place carbon blocker
-		
-		if(fAddBlocker){
+		if(2>1){
+					
+					
+			std::vector<G4TwoVector> TaPolyTot(10);		
+			TaPolyTot[0].set(3,-16);
+			TaPolyTot[1].set(3,-10);
+			TaPolyTot[2].set(9.3415,-10);
+			TaPolyTot[3].set(19,-23.65);
+			TaPolyTot[4].set(19,-30);
 			
-			G4double HalfBlockGap=0.5*(Orange_BeamDetY-2.95*mm-(XrayHH*2+Orange_ShieldMidBeamSep+KaptonThickness));
+			std::vector<G4TwoVector> BrassPolyTot(10);
+			BrassPolyTot[0].set(13.585,-16);
+			BrassPolyTot[1].set(19,-23.65);
+			BrassPolyTot[2].set(19,-36);
+			BrassPolyTot[3].set(1.1,-44);
+			BrassPolyTot[4].set(1.1,-40);
+			for(int i=4;i>=0;i--){
+				BrassPolyTot[9-i].set(-BrassPolyTot[i].x(),BrassPolyTot[i].y());
+				TaPolyTot[9-i].set(-TaPolyTot[i].x(),TaPolyTot[i].y());
+			}
+			
+			std::vector<G4TwoVector> KapPol(8);	
+			KapPol[0].set(9.3415+0.01,-10);
+			KapPol[1].set(19+0.01,-23.65);
+			KapPol[2].set(19+0.01,-36);
+			KapPol[3].set(1.1+0.01,-44);
+			for(int i=3;i>=0;i--){
+				KapPol[7-i].set(KapPol[i].x()+KaptonThickness,KapPol[i].y());
+			}
+			
+			G4double PoleGap=16*mm;
+			G4double MagGap=10*mm;
+			G4double YokeGap=21*mm;
+			G4double TaGap=12.5*mm;
+			G4double CutL=20*mm;
+			
+			G4VSolid* BrassS = new G4ExtrudedSolid("BrassS", BrassPolyTot, YokeGap+5, G4TwoVector(0,0), 1, G4TwoVector(0,0), 1);
+			
+			G4Box* CutBoxS = new G4Box("CutBoxS",CutL,CutL,CutL);
+			
+			for(int i=-1;i<2;i+=2){
+				BrassS = new G4SubtractionSolid("BrassS", BrassS, CutBoxS,0,G4ThreeVector(0,-20-CutL,i*(YokeGap+CutL)));//CutForYokes
+				for(int j=-1;j<2;j+=2){
+					BrassS = new G4SubtractionSolid("BrassS", BrassS, CutBoxS,0,G4ThreeVector(j*(MagGap+CutL),-20-CutL,i*(CutL+TaGap-0.01)));
+				}
+			}
+			
+			G4Box* CutBoxT = new G4Box("CutBoxT",CutL,30.01,TaGap+0.01);
+			BrassS = new G4SubtractionSolid("BrassS", BrassS, CutBoxT,0,G4ThreeVector(0,0,0));
+			
+			G4LogicalVolume *BrassLog = new G4LogicalVolume(BrassS, XrayMat,"BrassLog_FORBID",0,0,0);
+			G4RotationMatrix* rotateblock = new G4RotationMatrix;
+			rotateblock->rotateZ(Zbar);
+			rotateblock->rotateY(90*deg);
+			new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,0,0), BrassLog,"XrayBlock", expHallLog,false,0);
+			
+			G4VSolid* TaS = new G4ExtrudedSolid("TaS", TaPolyTot,TaGap, G4TwoVector(0,0), 1, G4TwoVector(0,0), 1);
+			
+			G4LogicalVolume *ShieldBoxL = new G4LogicalVolume(TaS, ShieldInMat,"ShieldBoxL_FORBID",0,0,0);
+			ShieldBoxL->SetVisAttributes(OneVisAtt);
+			new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,0,0), ShieldBoxL,"ShieldInsert", expHallLog,false,0); 
+			
+			G4VSolid* KapS = new G4ExtrudedSolid("kapS", KapPol,TaGap, G4TwoVector(0,0), 1, G4TwoVector(0,0), 1);
+			G4LogicalVolume *XrayCoverLog = new G4LogicalVolume(KapS, KapMat,"KaptonCoverLog_FORBID",0,0,0);
+			XrayCoverLog->SetVisAttributes(FiveVisAtt);
+			
+			new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,0,0), XrayCoverLog,"XrayBlockCover", expHallLog,false,0);
+			G4RotationMatrix* rotate1 = new G4RotationMatrix;
+			rotate1->rotateZ(Zbar);
+			rotate1->rotateY(-90*deg);
+			new G4PVPlacement(rotate1,rotZbar*G4ThreeVector(0,0,0), XrayCoverLog,"XrayBlockCover", expHallLog,false,0);
+			
+		}else{
+		
+			// Define the shape of the insert
+			std::vector<G4TwoVector> OrangeShieldPoly(6);		
+			OrangeShieldPoly[0].set(Orange_ShieldFrontHalfWidth,Orange_ShieldMidDepth);
+			OrangeShieldPoly[1].set(Orange_ShieldMidHalfWidth,0);
+	//         OrangeShieldPoly[2].set(0,-Orange_ShieldBottomDepth);
+			OrangeShieldPoly[2].set(Orange_ShieldMidHalfWidth,-Orange_ShieldBottomDepth);
+			OrangeShieldPoly[3].set(-Orange_ShieldMidHalfWidth,-Orange_ShieldBottomDepth);
+			OrangeShieldPoly[4].set(-Orange_ShieldMidHalfWidth,0);
+			OrangeShieldPoly[5].set(-Orange_ShieldFrontHalfWidth,Orange_ShieldMidDepth);
+			
+			// Extrude the solid
+			G4VSolid* ShieldBox = new G4ExtrudedSolid("Box1", OrangeShieldPoly, Orange_InsertHalfX, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
+			
+			// Cut the notch for target ladder 
+			if(Orange_BeamShieldSep<Orange_TargetWardingY){
+				G4Box* CutBoxS = new G4Box("CutBoxS",Orange_TargetWardingZ, Orange_TargetWardingY, Orange_ShieldHalfX+SafetyGap);
+				ShieldBox = new G4SubtractionSolid("Box2", ShieldBox, CutBoxS,0,G4ThreeVector(0,0,0));
+			}
+			
+			// Make the logical volume, with FORBID tag for pretty pictures
+			G4LogicalVolume *ShieldBoxL = new G4LogicalVolume(ShieldBox, ShieldInMat,"ShieldBoxL_FORBID",0,0,0);
+			G4RotationMatrix* rotate1 = new G4RotationMatrix;
+			rotate1->rotateZ(Zbar);
+			rotate1->rotateY(90*deg);
+			ShieldBoxL->SetVisAttributes(OneVisAtt);
+			new G4PVPlacement(rotate1,rotZbar*G4ThreeVector(0,0,0), ShieldBoxL,"ShieldInsert", expHallLog,false,0); 
+		
+			// Extend the poly very slightly before making a cut box
+			for(unsigned int i=0;i<OrangeShieldPoly.size();i++)OrangeShieldPoly[i]*=1.01;
+			// Extrude the slightly bigger shape to use as a cutout in other parts (field region and xray block)
+			ShieldCutBox = new G4ExtrudedSolid("CutBox1", OrangeShieldPoly, Orange_InsertHalfX*1.01, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1, G4TwoVector(0,-Orange_ShieldMidBeamSep), 1);
+			
+			
+			// Build and place the new under-shield x-ray block
+			
+			G4double XrayHW=Orange_ShieldMidHalfWidth;
+			if(Orange_ShieldMidHalfWidth>MStart){XrayHW=MStart;}
+			// Z-Width only goes as far as the magnets
+			
+			G4double XrayHH=std::abs(Orange_ShieldMidBeamSep-LowestPointOfMagnet);
+			if(Orange_ShieldBottomDepth>=XrayHH)XrayHH=Orange_ShieldBottomDepth; 
+			XrayHH/=2;
+			//Goes to EITHER the bottom of the magnets OR a little under the shield.
+			
+			G4VSolid* XrayBox = new G4Box("XrayBox",Orange_ShieldHalfX,XrayHH,XrayHW-KaptonThickness);
+			G4VSolid* XrayCover = new G4Box("XrayBox",Orange_ShieldHalfX-0.1*mm,XrayHH,XrayHW);
+			
+			
+			G4RotationMatrix* subtrarot = new G4RotationMatrix;
+			subtrarot->rotateY(90*deg); //ShieldCutBox is the wrong way as G4ExtrudedSolid in Z-axis by default
+			XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, XrayBox,0,G4ThreeVector(0,KaptonThickness,0));
+			XrayCover = new G4SubtractionSolid("XrayShape", XrayCover, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH+KaptonThickness,0));
+			XrayBox = new G4SubtractionSolid("XrayShape", XrayBox, ShieldCutBox,subtrarot,G4ThreeVector(0,Orange_ShieldMidBeamSep+XrayHH,0));
+			
+			
+			G4LogicalVolume *XrayLog = new G4LogicalVolume(XrayBox, XrayMat,"XrayLog_FORBID",0,0,0);
+			G4RotationMatrix* rotateblock = new G4RotationMatrix;
+			rotateblock->rotateZ(Zbar);
+			new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-XrayHH-Orange_ShieldMidBeamSep,0), XrayLog,"XrayBlock", expHallLog,false,0);
+			
+			G4LogicalVolume *XrayCoverLog = new G4LogicalVolume(XrayCover, KapMat,"XrayCoverLog_FORBID",0,0,0);
+			XrayCoverLog->SetVisAttributes(FiveVisAtt);
+			new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-XrayHH-Orange_ShieldMidBeamSep-KaptonThickness,0), XrayCoverLog,"XrayBlockCover", expHallLog,false,0);
+			
 
-			if(HalfBlockGap>SafetyGap*1.5){
-				G4Box* ElectronBlockerBox = new G4Box("ElectronBlockerBox",fBB34Chip_HalfLength,HalfBlockGap,CrossBlockHalfThickness);
-				G4LogicalVolume *ElectronBlockerLog = new G4LogicalVolume(ElectronBlockerBox, BlockerMat,"ElectronBlockerLog_FORBID",0,0,0);
-				ElectronBlockerLog->SetVisAttributes(ThreeVisAtt);
-				new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-HalfBlockGap-XrayHH*2-Orange_ShieldMidBeamSep-KaptonThickness,0), ElectronBlockerLog,"ElectronBlocker", expHallLog,false,0);
-			}else{
-				G4cout<<G4endl<<"NO ROOM FOR ELECTRON BLOCKER";
+			// Place carbon blocker
+			
+			if(fAddBlocker){
+				
+				G4double HalfBlockGap=0.5*(Orange_BeamDetY-2.95*mm-(XrayHH*2+Orange_ShieldMidBeamSep+KaptonThickness));
+
+				if(HalfBlockGap>SafetyGap*1.5){
+					G4Box* ElectronBlockerBox = new G4Box("ElectronBlockerBox",fBB34Chip_HalfLength,HalfBlockGap,CrossBlockHalfThickness);
+					G4LogicalVolume *ElectronBlockerLog = new G4LogicalVolume(ElectronBlockerBox, BlockerMat,"ElectronBlockerLog_FORBID",0,0,0);
+					ElectronBlockerLog->SetVisAttributes(ThreeVisAtt);
+					new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-HalfBlockGap-XrayHH*2-Orange_ShieldMidBeamSep-KaptonThickness,0), ElectronBlockerLog,"ElectronBlocker", expHallLog,false,0);
+				}else{
+					G4cout<<G4endl<<"NO ROOM FOR ELECTRON BLOCKER";
+				}
 			}
 		}
 	}
@@ -647,14 +724,9 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     
 //     for(unsigned int i=0;i<MagPolygon.size();i++)MagPolygon[i]+=G4TwoVector(0,-Orange_MagMidOffset);
 
-	G4VSolid* fFieldBox = new G4ExtrudedSolid("FieldVolBox", MagPolygon, PoleSepHalf, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 	G4VSolid* fMagBox = new G4ExtrudedSolid("MagBox", MagPolygon, Orange_MagHalfThick, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 	G4VSolid* fMagKap = new G4ExtrudedSolid("MagKap", MagPolygon, KaptonThickness*0.5, G4TwoVector(0,-Orange_MagMidOffset), 1, G4TwoVector(0,-Orange_MagMidOffset), 1);
 
-	
-    if((Orange_MagGapMinHalf<Orange_ShieldMidHalfWidth)&&!fRemoveShield){
-        fFieldBox = new G4SubtractionSolid("FieldVolBoxCut", fFieldBox, ShieldCutBox,0,G4ThreeVector(0,0,0));
-    }
     
 	std::vector<G4TwoVector> YokePolygon(8);
 	
@@ -680,23 +752,13 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4LogicalVolume *MagKapL = new G4LogicalVolume(fMagKap, KapMat,"MagKapL_FORBID",0,0,0);
 	G4LogicalVolume *YokeL = new G4LogicalVolume(fYokeBox, YokeMat,"YokeL_FORBID",0,0,0);
 	MagKapL->SetVisAttributes(FiveVisAtt);
-	YokeL->SetVisAttributes(vis_att_hid); 
+// 	YokeL->SetVisAttributes(vis_att_hid); 
     
     for(int i=-1;i<2;i+=2){
 		G4RotationMatrix* rotmag = new G4RotationMatrix;
 		rotmag->rotateZ(Zbar);
 		rotmag->rotateY(i*90*deg);
-		
-        if(fUniformFieldOn){
-			G4UniformMagField* magField = new G4UniformMagField(rotZbar*G4ThreeVector(i*fFieldStength,0.,0.));
-			G4FieldManager* localFieldManager=new G4FieldManager(magField);
-			localFieldManager->CreateChordFinder(magField);
-			G4LogicalVolume* fOrangeFieldVolume = new G4LogicalVolume(fFieldBox, matWorld, "FieldBoxLog", localFieldManager, 0, 0);
-			fOrangeFieldVolume->SetVisAttributes(vis_att_hid); 
-        
-			new G4PVPlacement(rotmag,rotZbar*G4ThreeVector(0,0,0),fOrangeFieldVolume,"Field",expHallLog,false,0);
-		}
-        
+
         for(int j=-1;j<2;j+=2){
 			int cn=0;;
 			if(SetMagCopyNum)cn=i+j*0.5+2;

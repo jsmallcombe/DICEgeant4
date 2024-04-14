@@ -13,8 +13,8 @@ betapoints="0.2"
 
 lifeepoints="500 1000"
 
-NumberOfPoints=1000000
-NumberOfBetaPoints=100000
+NumberOfPoints=500000
+NumberOfBetaPoints=50000
 do_G4_part=false
 do_vischeck=true
 do_extras=true

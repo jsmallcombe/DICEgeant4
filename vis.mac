@@ -75,6 +75,9 @@
 /vis/set/touchable World 0 ISOK 0
 /vis/touchable/set/forceWireframe
 /vis/touchable/set/colour 0 0 0 2
+/vis/set/touchable World 0 Yoke 0
+/vis/touchable/set/forceWireframe
+/vis/touchable/set/colour 0 0 0 2
 
 ### Required ### 
 /vis/drawVolume 

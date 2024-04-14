@@ -69,20 +69,21 @@ int main(int argc, char** argv)
 	 runManager->SetUserInitialization(new ActionInitialization(detector));
 
 	 // We don't initialize the G4 kernel at run time so the physics list can be changed!
+	 // Also the number of threads in MT
 
 	 // Get the pointer to the User Interface manager
 	 G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
-	 G4VisManager* visManager = new G4VisExecutive;
-	 visManager->Initialize();
-
+	 
+	G4VisManager* visManager = new G4VisExecutive;
+	visManager->Initialize();
+	 
 	G4String command = "/control/execute ";
 	G4String fileName="vis.mac";
 	if(argc==2)fileName = argv[1];
 	else if(argc>2)fileName = argv[2];
 		
 	 if(argc!=2){
-        // local interactive mode : define visualization and UI terminal
         G4UIExecutive* ui = new G4UIExecutive(argc, argv);
         UImanager->ApplyCommand(command+fileName);
         ui->SessionStart();
@@ -91,15 +92,8 @@ int main(int argc, char** argv)
         UImanager->ApplyCommand(command+fileName);
 	}
 	 
-// 	 else { // remote interactive mode : define visualization and UI terminal
-// 		G4UIExecutive* ui = new G4UIExecutive(argc, argv, "tcsh");
-// 		UImanager->ApplyCommand("/control/execute remote_vis.mac");
-// 		ui->SessionStart();
-// 		delete ui;	 
-// 	 }
-	 
-	 delete visManager;
-
+	delete visManager;
+	
 	 // Job termination
 	 delete runManager;
 

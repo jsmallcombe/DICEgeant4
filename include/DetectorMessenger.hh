@@ -88,7 +88,8 @@ private:
 	G4UIcmdWithAString*        fAddApparatusDiceDetectorCmd;
 	G4UIcmdWithADoubleAndUnit* fApparatusDiceFieldCmd;
 	G4UIcmdWithAString*        fApparatusDiceSetCmd;
-	G4UIcmdWithAnInteger*	   fApparatusDiceIntCmd;
+	G4UIcmdWithAString*        fApparatusDiceIntCmd;
+	G4UIcmdWithAString*        fApparatusDiceBoolCmd;
 
 };
 

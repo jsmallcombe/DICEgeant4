@@ -135,11 +135,13 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 	fApparatusDiceSetCmd->SetGuidance("Choose DICE detector length to set");
 	fApparatusDiceSetCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 	
-	fApparatusDiceIntCmd = new G4UIcmdWithAnInteger("/DetSys/app/SetDiceN",this);
+	fApparatusDiceIntCmd = new G4UIcmdWithAString("/DetSys/app/SetDiceN",this);
 	fApparatusDiceIntCmd->SetGuidance("Set DICE Int N");
 	fApparatusDiceIntCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-    
+	fApparatusDiceBoolCmd = new G4UIcmdWithAString("/DetSys/app/SetDiceBool",this);
+	fApparatusDiceBoolCmd->SetGuidance("Set DICE bool by name");
+	fApparatusDiceBoolCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -171,6 +173,7 @@ DetectorMessenger::~DetectorMessenger()
 	delete fApparatusDiceFieldCmd;
 	delete fApparatusDiceSetCmd;
 	delete fApparatusDiceIntCmd;
+	delete fApparatusDiceBoolCmd;
 	
 }
 
@@ -238,10 +241,6 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 		fDetector->SetDiceFieldStrength(fApparatusDiceFieldCmd->GetNewDoubleValue(newValue));
 	}
 	
-	if(command == fApparatusDiceIntCmd) {
-		fDetector->SetDiceInt(fApparatusDiceIntCmd->GetNewIntValue(newValue));
-	}
-	
 	if(command == fApparatusDiceSetCmd) {
 		G4String Name,Val,Unit;
 		std::istringstream is(newValue);
@@ -249,6 +248,21 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 		Val+=" "+Unit;
 		fDetector->DiceSetParam(Name,G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(Val));
 	}
+	
+	if(command == fApparatusDiceIntCmd) {
+		G4String Name,Val;
+		std::istringstream is(newValue);
+		is>>Name>>Val;
+		fDetector->DiceSetParam(Name,G4UIcmdWithAnInteger::GetNewIntValue(Val));
+	}
+	
+	if(command == fApparatusDiceBoolCmd) {
+		G4String Name,Val;
+		std::istringstream is(newValue);
+		is>>Name>>Val;
+		fDetector->DiceSetParam(Name,G4UIcmdWithABool::GetNewBoolValue(Val));
+	}
+	
 	
 }
 

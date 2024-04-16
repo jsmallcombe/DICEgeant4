@@ -76,7 +76,6 @@
 	fEffDirection = G4ThreeVector(0.0*mm,0.0*mm,0.0*mm);
 	fEffDirectionBool = false;//initialises bools, if command entered will go to true and loops below entered
 	fEffPositionBool = false;
-	fEffParticleBool = false;
 	fEffGunBetaZ = 0;
 	fEffGunLifetime = 0;
     
@@ -88,6 +87,7 @@
     
 	fBeamSpotSigma = 0.*mm;
 
+	SetEfficiencyParticle("e-");
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -100,33 +100,32 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
+
+void PrimaryGeneratorAction::SetEfficiencyParticle(G4String EffParticle)
 {
 
-	bool pairs=false;
-	
-	// Changed so that most grsi "/Detsys/gun/" commands still effect gun when using
-	// Underlying geant4 commands such as '/gun/particle ion" & "/gun/ion"
-	G4double m0=0;
-	if(fEffParticleBool) {
-		G4ParticleDefinition* effPart;
-		
-		if(fEffParticle == "pp" || fEffParticle == "PP"|| fEffParticle == "Pairs"|| fEffParticle == "pairs") {
-			effPart = G4ParticleTable::GetParticleTable()->FindParticle("e-");
-			pairs=true;
-		}else if(fEffParticle == "electron" || fEffParticle == "e-") {
-			effPart = G4ParticleTable::GetParticleTable()->FindParticle("e-");
-		} else if(fEffParticle == "positron" || fEffParticle == "e+") {
-			effPart = G4ParticleTable::GetParticleTable()->FindParticle("e+");
-		} else if(fEffParticle == "neutron"){
-			effPart = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
-		} else {
-			effPart = G4ParticleTable::GetParticleTable()->FindParticle("gamma");
-		}
-		
-		fParticleGun->SetParticleDefinition(effPart);
-		m0=effPart->GetPDGMass();
+    fPairProduction=false;
+
+	if(EffParticle == "pp" || EffParticle == "PP"|| EffParticle == "Pairs"|| EffParticle == "pairs") {
+		fParticle = G4ParticleTable::GetParticleTable()->FindParticle("e-");
+		fPairProduction=true;
+	}else if(EffParticle == "electron" || EffParticle == "e-") {
+		fParticle = G4ParticleTable::GetParticleTable()->FindParticle("e-");
+	} else if(EffParticle == "positron" || EffParticle == "e+") {
+		fParticle = G4ParticleTable::GetParticleTable()->FindParticle("e+");
+	} else if(EffParticle == "neutron"){
+		fParticle = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
+	} else {
+		fParticle = G4ParticleTable::GetParticleTable()->FindParticle("gamma");
 	}
+	
+	fParticleGun->SetParticleDefinition(fParticle);
+	m0=fParticle->GetPDGMass();
+	fDetector->fParticle=fParticle;
+}
+
+void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
+{
 
 	G4double RandTheta, effRandCosTheta, effRandSinTheta, effRandPhi;
 	G4ThreeVector effdirection,secdirection;
@@ -200,7 +199,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	G4double EofSec=0;
 	
 	// If pair production, adjust energy and create correlated direction
-	if(pairs){
+	if(fPairProduction){
 		EofPrim=std::abs(fEffEnergy-1022*keV);
 		EofSec=EofPrim*G4UniformRand();
 		EofPrim-=EofSec;
@@ -245,7 +244,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	fParticleGun->GeneratePrimaryVertex(anEvent);
 
 	// Generate the second paticle if pair production 
-	if(pairs){
+	if(fPairProduction){
 		
 		// If there is a beam beta boost, apply it
 		if(fEffGunBetaZ>0){

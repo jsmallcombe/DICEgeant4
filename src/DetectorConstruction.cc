@@ -322,7 +322,15 @@ ApparatusDICE* DetectorConstruction::GetDice(){
 }
 
 void DetectorConstruction::DiceSetParam(G4String N,G4double input){
-		fAppDICE->SetParam(N,input);
+		fAppDICE->SetParamD(N,input);
 }
+void DetectorConstruction::DiceSetParam(G4String N,G4int input){
+		fAppDICE->SetParamI(N,input);
+}
+	
+void DetectorConstruction::DiceSetParam(G4String N,G4bool input){
+		fAppDICE->SetParamB(N,input);
+}
+	
 	
 	

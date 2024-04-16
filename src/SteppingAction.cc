@@ -62,7 +62,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep) {
 	
 	
 	if(fEventAction->fHistoManager->PrettyHitsOnly){
-		if (aStep->GetTrack()->GetParticleDefinition() == G4Gamma::Gamma()){
+// 		if (aStep->GetTrack()->GetParticleDefinition() == G4Gamma::Gamma()){
+		if (aStep->GetTrack()->GetParticleDefinition() != fDetector->fParticle){
 			// When we are using our fake pretty setting, kill all gammas immediatly.
 			// avoids registering an "exit volume" when doing pairs
 			aStep->GetTrack()->SetTrackStatus(fStopAndKill);

@@ -1,17 +1,4 @@
-void EffOnly(string Estring,int Nevent=0,const char * outfileName = "EffOnly.root", const char *ntuplefileName = "g4out.root"){
-	
-	stringstream pointsstream;
-	pointsstream<<Estring;
-	double Epoint;
-	int N=0;
-	vector<double> centroids;
-	vector<double> binedge;
-	while(pointsstream>>Epoint){centroids.push_back(Epoint);N++;}
-	if(N<2)return;
-	binedge.push_back(centroids[0]-0.5*(centroids[1]-centroids[0]));
-	binedge.push_back(centroids[0]+0.5*(centroids[1]-centroids[0]));
-	for(int i=1;i<N;i++)binedge.push_back(centroids[i]+0.5*(centroids[i]-centroids[i-1]));
-
+void RawSort(const char * outfileName = "RawSort.root", const char *ntuplefileName = "g4out.root", string folder= ""){
 	
     // Load the input file
     TFile *ntuplefile = new TFile(ntuplefileName,"READ");
@@ -22,12 +9,15 @@ void EffOnly(string Estring,int Nevent=0,const char * outfileName = "EffOnly.roo
 
 
 	TFile out(outfileName,"UPDATE");
+	if(folder.size()){
+		out.mkdir(folder.c_str());
+		out.cd(folder.c_str());
+	}
 	
-		TH1F* HitRaw=new TH1F("HitRaw","HitRaw;Electron Energy (keV);Counts",N,&binedge[0]);
-		TH1F* Eff=new TH1F("EffRawSingle","EffRawSingle;Electron Energy (keV);Counts",N,&binedge[0]);
-		TH1F* PeakTot=new TH1F("PeakTot","PeakTot;Electron Energy (keV);Counts",N,&binedge[0]);
-		TH1F* ERaw=new TH1F("ERaw","ERaw;Electron Energy (keV);Counts",2000,0,2000);
-		TGraph* EffG=new TGraph();
+		TH1F* HitSiRaw=new TH1F("HitSiRaw","HitSiRaw;Electron Energy (keV);Counts",2000,0,2000);
+		TH1F* HitGuardRaw=new TH1F("HitGuard","HitGuard;Electron Energy (keV);Counts",2000,0,2000);
+		TH1F* HitRawTot=new TH1F("HitRawTot","HitRawTot;Electron Energy (keV);Counts",2000,0,2000);
+		TH2F* HitRawTotVTrue=new TH2F("ERawTrue","ERawTrue;Electron Energy (keV);Gun Energy",2000,0,2000,200,0,2000);
 
 	gROOT->cd();//cd back into main session memory 
 	
@@ -35,7 +25,6 @@ void EffOnly(string Estring,int Nevent=0,const char * outfileName = "EffOnly.roo
 	// First we get the length of the list and output it
 	long nentries = newtree->GetEntries();
 	cout<<endl<<"nentries "<<nentries<<endl;
-
 
 	int detNumber,cryNumber;
 	double depEnergy,primaryE;
@@ -57,39 +46,22 @@ void EffOnly(string Estring,int Nevent=0,const char * outfileName = "EffOnly.roo
 		newtree->GetEntry(jentry);
 
 		if(cryNumber==4){
-			HitRaw->Fill(primaryE);
+			HitRawTot->Fill(primaryE);
 		}
 		if(cryNumber==0){
 			if(detNumber>0&&detNumber<17){//0 is guard ring
-				detNumber--; // Shift to zero index
-				ERaw->Fill(depEnergy);
-				if(primaryE-depEnergy<5){
-					Eff->Fill(primaryE);
-					PeakTot->Fill(primaryE);
-				}
+				HitSiRaw->Fill(depEnergy);
+				HitRawTot->Fill(depEnergy);
+				HitRawTotVTrue->Fill(depEnergy,primaryE);
+			}else if(detNumber==0){
+				HitGuardRaw->Fill(depEnergy);
+				HitRawTot->Fill(depEnergy);
+				HitRawTotVTrue->Fill(depEnergy,primaryE);
 			}
 		}
 
 	}
 	
-	
-	// Efficiency calc
-	if(Nevent>0){
-
-		TAxis* ax=Eff->GetXaxis();
-		for(int b=1;b<=ax->GetNbins();b++){
-			Eff->SetBinContent(b,100*Eff->GetBinContent(b)/Nevent);
-			double Tt=HitRaw->GetBinContent(b);
-			if(Tt>0){
-				PeakTot->SetBinContent(b,PeakTot->GetBinContent(b)/Tt);
-			}
-			
-			EffG->SetPoint(b-1,centroids[b-1],Eff->GetBinContent(b));
-		}
-	}
-	
-	out.cd();
-	EffG->Write("EffGraph");
     out.Write();
     out.Close();	
     delete ntuplefile; // Delete the variable holding the input file, which also closes it

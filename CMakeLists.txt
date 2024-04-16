@@ -53,6 +53,7 @@ set(DICE10_SCRIPTS
 	AutoDiceSort/DiceEffScanCombinedSort.C
 	AutoDiceSort/EffOnly.C
 	AutoDiceSort/QuickAutoEff.sh
+	AutoDiceSort/RawSort.C
   )
   
 

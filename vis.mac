@@ -48,6 +48,14 @@
 ### Override the automatic optimum seperation of magnet poles
 /DetSys/app/SetDiceLength PoleSepHalf 16 mm
 
+  
+#/DetSys/app/SetDiceBool UseNewShield false
+
+#/DetSys/app/SetDiceLength ShieldFrontZ 9.3415 mm 
+#/DetSys/app/SetDiceLength ShieldFrontY 10 mm
+#/DetSys/app/SetDiceLength ShieldMidZ 19 mm
+#/DetSys/app/SetDiceLength ShieldMidY 23.65 mm
+
 /DetSys/app/addDiceDetector 1
 ### 1 Orange
 ### 2 Orange Double
@@ -127,9 +135,9 @@
 # /DetSys/gun/SetLifetime 1 ns
 
 ### Create a particle filter. Configure to pass only gammas. Then invert to pass anything other than gammas.
-/vis/filtering/trajectories/create/particleFilter
-/vis/filtering/trajectories/particleFilter-0/add gamma
-/vis/filtering/trajectories/particleFilter-0/invert true
+#/vis/filtering/trajectories/create/particleFilter
+#/vis/filtering/trajectories/particleFilter-0/add gamma
+#/vis/filtering/trajectories/particleFilter-0/invert true
 
 ### Run And View Events ### 
 # /vis/scene/endOfEventAction accumulate 500

@@ -41,6 +41,7 @@
 #include "globals.hh"
 #include "G4ThreeVector.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4ParticleDefinition.hh"
 
 #include "PrimaryGeneratorMessenger.hh"
 #include "DetectorConstruction.hh"
@@ -71,7 +72,7 @@ public:
     void PassEfficiencyPosition(G4ThreeVector num);
     void SetEfficiencyPosition(G4ThreeVector num) { fEffPosition = num; fEffPositionBool = true; PassEfficiencyPosition(fEffPosition); }
     
-    void SetEfficiencyParticle(G4String val) { fEffParticle = val; fEffParticleBool = true; }
+    void SetEfficiencyParticle(G4String EffParticle);
     void SetConeMaxAngle(G4double num1) { fAngleInit = num1; fConeAngleBool = true; fEffDirectionBool = true; }
     void SetConeMinAngle(G4double num1) { fAngleMinInit = num1;  fConeAngleBool = true; fEffDirectionBool = true;}
     void SetConeMinPhi(G4double num1) { fPhiMin = num1; fConeAngleBool = true; fEffDirectionBool = true; }
@@ -92,8 +93,6 @@ private:
     G4ThreeVector fEffPosition;
     G4bool fEffDirectionBool;
     G4bool fEffPositionBool;
-    G4String fEffParticle;
-    G4bool fEffParticleBool;
 	
 	G4double fEffGunBetaZ;	
 	G4double fEffGunLifetime;	
@@ -103,7 +102,13 @@ private:
     G4double fAngleMinInit;
     G4double fPhiMin;
     G4double fPhiMax;
-    G4double fBeamSpotSigma;      
+    G4double fBeamSpotSigma;    
+    
+    
+    
+    G4ParticleDefinition* fParticle;
+	G4double m0;
+	bool fPairProduction;
     
 };
 

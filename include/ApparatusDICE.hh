@@ -63,7 +63,9 @@ public:
 	bool fAddBlocker;
 	bool fUniformFieldOn;
 	
-    void SetParam(G4String,G4double);
+    void SetParamD(G4String,G4double);
+    void SetParamI(G4String,G4int);
+    void SetParamB(G4String,G4bool);
 	
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
@@ -107,23 +109,29 @@ private:
 	G4double 	Orange_ShieldMidBeamSep;
 	G4double 	Orange_MagY;
 	G4double 	Orange_MagAng;
-	G4double Orange_BeamShieldSep;
-	G4double Orange_MagZ;
-	G4double Orange_MagHalfThick;
-	G4double Orange_MagGapMinHalf;
-	G4double PoleSepHalf;
+	G4double 	Orange_BeamShieldSep;
+	G4double 	Orange_MagZ;
+	G4double 	Orange_MagHalfThick;
+	G4double 	Orange_MagGapMinHalf;
+	G4double 	PoleSepHalf;
 	
 	G4double PhiBlockThickness;
 	
-	std::vector<G4double*> SetPtrLst;
-	std::vector<G4String> SetNmLst;
+	std::vector<G4double*> SetPtrLstD;
+	std::vector<G4int*> SetPtrLstI;
+	std::vector<G4bool*> SetPtrLstB;
+	std::vector<G4String> SetNmLstD,SetNmLstI,SetNmLstB;
 	
 private:
 	//////////////////////////////////////////////////////
 	// internal methods and functions in ApparatusDICE::Build()
 	//////////////////////////////////////////////////////
+	
+	
+	G4double gD(G4String str);
+	G4int gI(G4String str);
+	G4bool gB(G4String str);
 
-	// methods
 	void BuildPlaceBasicTest(G4LogicalVolume*);
 	
 	void BuildPlaceTargetLadder(G4LogicalVolume*);
@@ -135,5 +143,8 @@ private:
 	void BuildPlaceFlatOrange(G4LogicalVolume*,G4double);
 
 	G4LogicalVolume* BuildISOK160Cross();
+	
+	
+	void ListParam();
 };
 #endif

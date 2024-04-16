@@ -45,6 +45,7 @@
 #include "G4MagneticField.hh"
 #include "NonUniformMagneticField.hh"
 #include "TabulatedMagneticField.hh"
+#include "G4ParticleDefinition.hh"
 
 class G4Box;
 class G4LogicalVolume;
@@ -135,7 +136,12 @@ public:
 	void SetFieldMirror(int,bool);
 	void SetFieldMirrorPoint(G4ThreeVector);
 	void SetFieldOffsetVec(G4ThreeVector);
+	
 	void DiceSetParam(G4String,G4double);
+	void DiceSetParam(G4String,G4int);
+	void DiceSetParam(G4String,G4bool);
+	
+    G4ParticleDefinition* fParticle;
 	
 private:
 	bool CheckVolumeName(G4String volumeName);

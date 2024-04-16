@@ -104,51 +104,61 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	
 	
 	Orange_BeamShieldSep=10*mm;
-	SetNmLst.push_back("BeamShieldSep");
-	SetPtrLst.push_back(&Orange_BeamShieldSep);
+	SetNmLstD.push_back("BeamShieldSep");
+	SetPtrLstD.push_back(&Orange_BeamShieldSep);
 	
 	Orange_ShieldMidBeamSep=20*mm;  // Distance to the shield widest pointgb
-	SetNmLst.push_back("ShieldMidBeamSep");
-	SetPtrLst.push_back(&Orange_ShieldMidBeamSep);
-	
+	SetNmLstD.push_back("ShieldMidBeamSep");
+	SetPtrLstD.push_back(&Orange_ShieldMidBeamSep);
 	
 	    
 	Orange_MagMidOffset=30*mm; // Distance between center line of magnet and target
-	SetNmLst.push_back("MagMidOffset");
-	SetPtrLst.push_back(&Orange_MagMidOffset);
+	SetNmLstD.push_back("MagMidOffset");
+	SetPtrLstD.push_back(&Orange_MagMidOffset);
 	
 	Orange_BeamDetY=60*mm; // Height of target vs BB34
-	SetNmLst.push_back("BeamDetY");
-	SetPtrLst.push_back(&Orange_BeamDetY);
+	SetNmLstD.push_back("BeamDetY");
+	SetPtrLstD.push_back(&Orange_BeamDetY);
 	
 	Orange_MagY=20*mm;  // Total vertical coverage/height of the magnet field region (variable gets halved after input)
-	SetNmLst.push_back("MagY");
-	SetPtrLst.push_back(&Orange_MagY);
+	SetNmLstD.push_back("MagY");
+	SetPtrLstD.push_back(&Orange_MagY);
 	
 	Orange_MagAng=0*deg; // Flare angle of the magnets
-	SetNmLst.push_back("MagAng");
-	SetPtrLst.push_back(&Orange_MagAng);
+	SetNmLstD.push_back("MagAng");
+	SetPtrLstD.push_back(&Orange_MagAng);
 
 	Orange_MagZ=60*mm; // Beam extent of magnets
-	SetNmLst.push_back("MagZ");
-	SetPtrLst.push_back(&Orange_MagZ);
+	SetNmLstD.push_back("MagZ");
+	SetPtrLstD.push_back(&Orange_MagZ);
 	
 	Orange_MagHalfThick=2.5*mm; // Perpendicular Half Thickness of the magnets 
-	SetNmLst.push_back("MagHalfThick");
-	SetPtrLst.push_back(&Orange_MagHalfThick);
+	SetNmLstD.push_back("MagHalfThick");
+	SetPtrLstD.push_back(&Orange_MagHalfThick);
 	
 	Orange_MagGapMinHalf=-1; // Min Half Gap between magnet halves (at side of shield)
-	SetNmLst.push_back("MagGapMinHalf");
-	SetPtrLst.push_back(&Orange_MagGapMinHalf);
+	SetNmLstD.push_back("MagGapMinHalf");
+	SetPtrLstD.push_back(&Orange_MagGapMinHalf);
 	
 	PoleSepHalf=-1;
-	SetNmLst.push_back("PoleSepHalf");
-	SetPtrLst.push_back(&PoleSepHalf);
+	SetNmLstD.push_back("PoleSepHalf");
+	SetPtrLstD.push_back(&PoleSepHalf);
 	
 	PhiBlockThickness=-1;
-	SetNmLst.push_back("PhiBlockThickness");
-	SetPtrLst.push_back(&PhiBlockThickness);
+	SetNmLstD.push_back("PhiBlockThickness");
+	SetPtrLstD.push_back(&PhiBlockThickness);
+	
+	SetParamB("UseNewShield",true);
+	
+	SetParamD("ShieldFrontY",10);
+	SetParamD("ShieldFrontZ",8.43);
+	SetParamD("ShieldMidY",19.7);
+	SetParamD("ShieldMidZ",15);
 
+	SetParamB("IncludeBB34Clamp",true);
+	SetParamD("BB34ClampX",20);
+	SetParamD("BB34ClampZ",40);
+	SetParamD("BB34ClampY",0.75);
 	///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////
 	
@@ -160,18 +170,92 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 
 ApparatusDICE::~ApparatusDICE()
 {
+	//we should delete stuff properly, but who cares program is ending
 } // end ~ApparatusDICE
 
+///////////////////////////////////////
 
-void ApparatusDICE::SetParam(G4String str,G4double input){
-	for(unsigned int i=0;i<SetNmLst.size();i++){
-		if(SetNmLst[i]==str){
-			*SetPtrLst[i]=input;
+void ApparatusDICE::SetParamD(G4String str,G4double input){
+	for(unsigned int i=0;i<SetNmLstD.size();i++){
+		if(SetNmLstD[i]==str){
+			*SetPtrLstD[i]=input;
 			return;
 		}
 	}
-	
+	SetNmLstD.push_back(str);
+	SetPtrLstD.push_back(new G4double(input));
+
 }
+void ApparatusDICE::SetParamI(G4String str,G4int input){
+	for(unsigned int i=0;i<SetNmLstI.size();i++){
+		if(SetNmLstI[i]==str){
+			*SetPtrLstI[i]=input;
+			return;
+		}
+	}
+	SetNmLstI.push_back(str);
+	SetPtrLstI.push_back(new G4int(input));
+}
+void ApparatusDICE::SetParamB(G4String str,G4bool input){
+	for(unsigned int i=0;i<SetNmLstB.size();i++){
+		if(SetNmLstB[i]==str){
+			*SetPtrLstB[i]=input;
+			return;
+		}
+	}
+	SetNmLstB.push_back(str);
+	SetPtrLstB.push_back(new G4bool(input));
+}
+
+G4double ApparatusDICE::gD(G4String str){
+	for(unsigned int i=0;i<SetNmLstD.size();i++){
+		if(SetNmLstD[i]==str){
+			return *SetPtrLstD[i];
+		}
+	}
+	return 0;
+}
+G4int ApparatusDICE::gI(G4String str){
+	for(unsigned int i=0;i<SetNmLstI.size();i++){
+		if(SetNmLstI[i]==str){
+			return *SetPtrLstI[i];
+		}
+	}
+	return 0;
+}
+G4bool ApparatusDICE::gB(G4String str){
+	for(unsigned int i=0;i<SetNmLstB.size();i++){
+		if(SetNmLstB[i]==str){
+			return *SetPtrLstB[i];
+		}
+	}
+	return 0;
+}
+
+
+void ApparatusDICE::ListParam(){
+	std::cout<<std::endl<<"DiceDoubles :"<<std::flush;
+	G4cout<<G4endl<<"DiceDoubles :";
+	for(unsigned int i=0;i<SetNmLstD.size();i++){
+		std::cout<<std::endl<<SetNmLstD[i]<<" = "<<*SetPtrLstD[i]<<std::flush;
+		G4cout<<G4endl<<SetNmLstD[i]<<" = "<<*SetPtrLstD[i];
+	}
+	std::cout<<std::endl<<"DiceInts :"<<std::flush;
+	G4cout<<G4endl<<"DiceInts :";
+	for(unsigned int i=0;i<SetNmLstI.size();i++){
+		std::cout<<std::endl<<SetNmLstI[i]<<" = "<<*SetPtrLstI[i]<<std::flush;
+		G4cout<<G4endl<<SetNmLstI[i]<<" = "<<*SetPtrLstI[i];
+	}
+	std::cout<<std::endl<<"DiceBools :"<<std::flush;
+	G4cout<<G4endl<<"DiceBools :";
+	for(unsigned int i=0;i<SetNmLstB.size();i++){
+		std::cout<<std::endl<<SetNmLstB[i]<<" = "<<*SetPtrLstB[i]<<std::flush;
+		G4cout<<G4endl<<SetNmLstB[i]<<" = "<<*SetPtrLstB[i];
+	}
+	std::cout<<std::endl;
+	G4cout<<G4endl;
+}
+
 
 ///////////////////////////////////////
 // build and place components        //
@@ -206,7 +290,7 @@ void ApparatusDICE::Build(G4LogicalVolume* expHallLog,G4String Options)
 		BuildPlaceTargetLadder(World);
 	}
 	
-	
+	ListParam();
 } 
 
 ////////////////////////////////////////////////////
@@ -384,9 +468,9 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 
 	G4cout<<"DICE SetableParameters :"<<G4endl;
 	std::cout<<"DICE SetableParameters :"<<std::endl;
-	for(unsigned int i=0;i<SetNmLst.size();i++){
-		G4cout<<SetNmLst[i]<<" "<<*SetPtrLst[i]<<G4endl;
-		std::cout<<SetNmLst[i]<<" "<<*SetPtrLst[i]<<std::endl;
+	for(unsigned int i=0;i<SetNmLstD.size();i++){
+		G4cout<<SetNmLstD[i]<<" "<<*SetPtrLstD[i]<<G4endl;
+		std::cout<<SetNmLstD[i]<<" "<<*SetPtrLstD[i]<<std::endl;
 	}
 	G4cout<<"Fin."<<G4endl;
 	std::cout<<"Fin."<<std::endl;
@@ -414,7 +498,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4double 	Orange_ShieldFrontHalfWidth=Orange_ShieldTanAngle*Orange_BeamShieldSep;
 	G4double 	Orange_ShieldMidDepth=Orange_ShieldMidBeamSep-Orange_BeamShieldSep;
 	G4double 	Orange_ShieldMidHalfWidth=Orange_ShieldFrontHalfWidth+Orange_ShieldTanAngle*(Orange_ShieldMidDepth);
-	G4double 	Orange_ShieldBottomDepth=Orange_MagMidOffset-Orange_ShieldMidBeamSep;
+	G4double 	Orange_ShieldBottomDepth=std::abs(Orange_MagMidOffset)-Orange_ShieldMidBeamSep;
 	
 	// Fixing unphysics geometry inputs
 	if(Orange_ShieldBottomDepth+Orange_ShieldMidBeamSep>Orange_BeamDetY+SafetyGap){
@@ -492,20 +576,23 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	
 	if(!fRemoveShield){
 
-		if(2>1){
-					
-					
+		if(gB("UseNewShield")){
+
 			std::vector<G4TwoVector> TaPolyTot(10);		
 			TaPolyTot[0].set(3,-16);
-			TaPolyTot[1].set(3,-10);
-			TaPolyTot[2].set(9.3415,-10);
-			TaPolyTot[3].set(19,-23.65);
-			TaPolyTot[4].set(19,-30);
+			TaPolyTot[1].set(3,-gD("ShieldFrontY"));
+			TaPolyTot[2].set(gD("ShieldFrontZ"),-gD("ShieldFrontY"));
+			TaPolyTot[3].set(gD("ShieldMidZ"),-gD("ShieldMidY"));
+			TaPolyTot[4].set(gD("ShieldMidZ"),-30);
+			
+			G4double BrassFrontZ=((16-gD("ShieldFrontY"))*((gD("ShieldMidZ")-gD("ShieldFrontZ"))/(gD("ShieldMidY")-gD("ShieldFrontY"))))+gD("ShieldFrontZ");
+			
+			G4double BrassMidY=((gD("ShieldMidZ")-1.1)*(4/8.9))-44;
 			
 			std::vector<G4TwoVector> BrassPolyTot(10);
-			BrassPolyTot[0].set(13.585,-16);
-			BrassPolyTot[1].set(19,-23.65);
-			BrassPolyTot[2].set(19,-36);
+			BrassPolyTot[0].set(BrassFrontZ,-16);
+			BrassPolyTot[1].set(gD("ShieldMidZ"),-gD("ShieldMidY"));
+			BrassPolyTot[2].set(gD("ShieldMidZ"),BrassMidY);
 			BrassPolyTot[3].set(1.1,-44);
 			BrassPolyTot[4].set(1.1,-40);
 			for(int i=4;i>=0;i--){
@@ -514,10 +601,10 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 			}
 			
 			std::vector<G4TwoVector> KapPol(8);	
-			KapPol[0].set(9.3415+0.01,-10);
-			KapPol[1].set(19+0.01,-23.65);
-			KapPol[2].set(19+0.01,-36);
-			KapPol[3].set(1.1+0.01,-44);
+			KapPol[0].set(TaPolyTot[2].x()+0.01,TaPolyTot[2].y());
+			KapPol[1].set(TaPolyTot[3].x()+0.01,TaPolyTot[3].y());
+			KapPol[2].set(BrassPolyTot[2].x()+0.01,BrassPolyTot[2].y());
+			KapPol[3].set(BrassPolyTot[3].x()+0.01,BrassPolyTot[3].y());
 			for(int i=3;i>=0;i--){
 				KapPol[7-i].set(KapPol[i].x()+KaptonThickness,KapPol[i].y());
 			}
@@ -543,6 +630,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 			BrassS = new G4SubtractionSolid("BrassS", BrassS, CutBoxT,0,G4ThreeVector(0,0,0));
 			
 			G4LogicalVolume *BrassLog = new G4LogicalVolume(BrassS, XrayMat,"BrassLog_FORBID",0,0,0);
+			BrassLog->SetVisAttributes(new G4VisAttributes(G4Colour(0.6,0.471,0.059)));
+			
 			G4RotationMatrix* rotateblock = new G4RotationMatrix;
 			rotateblock->rotateZ(Zbar);
 			rotateblock->rotateY(90*deg);
@@ -563,6 +652,18 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 			rotate1->rotateZ(Zbar);
 			rotate1->rotateY(-90*deg);
 			new G4PVPlacement(rotate1,rotZbar*G4ThreeVector(0,0,0), XrayCoverLog,"XrayBlockCover", expHallLog,false,0);
+			
+			
+			if(fAddBlocker){
+				
+				G4double HalfBlockGap=0.5*(Orange_BeamDetY-2.95*mm-40);
+				G4Box* ElectronBlockerBox = new G4Box("ElectronBlockerBox",fBB34Chip_HalfLength,HalfBlockGap-0.1*mm,CrossBlockHalfThickness);
+				G4LogicalVolume *ElectronBlockerLog = new G4LogicalVolume(ElectronBlockerBox, BlockerMat,"ElectronBlockerLog_FORBID",0,0,0);
+				ElectronBlockerLog->SetVisAttributes(ThreeVisAtt);
+				new G4PVPlacement(new G4RotationMatrix,rotZbar*G4ThreeVector(0,-HalfBlockGap-40,0), ElectronBlockerLog,"ElectronBlocker", expHallLog,false,0);
+				
+			}
+			
 			
 		}else{
 		
@@ -622,6 +723,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 			
 			
 			G4LogicalVolume *XrayLog = new G4LogicalVolume(XrayBox, XrayMat,"XrayLog_FORBID",0,0,0);
+			XrayLog->SetVisAttributes(new G4VisAttributes(G4Colour(0.6,0.471,0.059)));
 			G4RotationMatrix* rotateblock = new G4RotationMatrix;
 			rotateblock->rotateZ(Zbar);
 			new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-XrayHH-Orange_ShieldMidBeamSep,0), XrayLog,"XrayBlock", expHallLog,false,0);
@@ -772,8 +874,41 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 //     fOrangeFieldVolume->SetFieldManager(localFieldManager1, true);
 	
 	
+	// MakeClamp
 	
-    
+	if(gB("IncludeBB34Clamp")){
+		
+// 		G4double CutRad=3*mm; //Including the curves slows things down, so leave out for now
+		G4double CutRad=0*mm;
+		G4double X=gD("BB34ClampX");
+		G4double Y=gD("BB34ClampY");
+		G4double Z=gD("BB34ClampZ");
+		
+		G4VSolid* Clamp = new G4Box("BB34ClampBox",fBB34PCB_HalfALength,Y,fBB34PCB_HalfWidth+15*mm);
+		G4Box* ClampCut = new G4Box("ClampCut",X-CutRad,Y*2,Z);
+		Clamp = new G4SubtractionSolid("BB34ClampBoxc", Clamp, ClampCut,0,G4ThreeVector(0,0,0));
+		ClampCut = new G4Box("ClampCut",fBB34PCB_HalfALength+1*mm,0.51*mm,1.01*mm);
+		Clamp = new G4SubtractionSolid("BB34ClampBoxcc", Clamp, ClampCut,0,G4ThreeVector(0,Y,0));
+
+		if(CutRad>0){
+		ClampCut = new G4Box("ClampCut",X,Y*2,Z-CutRad);
+		Clamp = new G4SubtractionSolid("BB34ClampBoxC", Clamp, ClampCut,0,G4ThreeVector(0,0,0));
+		G4Tubs* RadTub = new G4Tubs("RadTub", 0,CutRad,Y*2, 0,360*CLHEP::deg);
+		G4RotationMatrix* rottub = new G4RotationMatrix;
+		rottub->rotateX(90*deg);
+		for(int i=-1;i<2;i+=2){
+	        for(int j=-1;j<2;j+=2){
+				Clamp = new G4SubtractionSolid("BB34ClampBoxCC", Clamp, RadTub,rottub,G4ThreeVector((X-CutRad)*i,0,(Z-CutRad)*j));
+ 
+        }}}
+		
+		G4LogicalVolume* BB34ClampLog = new G4LogicalVolume(Clamp, G4Material::GetMaterial("Aluminium"), "BB34ClampLog_FORBID", 0,0,0);
+		BB34ClampLog->SetVisAttributes(new G4VisAttributes(G4Colour(0.21,0.22,0.41)));
+
+		new G4PVPlacement(new G4RotationMatrix,G4ThreeVector(0,-Orange_BeamDetY+fBB34PCB_HalfThickness+Y+0.01*mm,0),BB34ClampLog, "",  expHallLog, false, 0);
+	}
+	
+
     G4cout<<G4endl;
 }
 

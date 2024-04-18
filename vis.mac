@@ -48,7 +48,6 @@
 ### Override the automatic optimum seperation of magnet poles
 /DetSys/app/SetDiceLength PoleSepHalf 16 mm
 
-  
 #/DetSys/app/SetDiceBool UseNewShield false
 
 #/DetSys/app/SetDiceLength ShieldFrontZ 9.3415 mm 
@@ -92,7 +91,6 @@
 
 ### Camera setting ###
 #/vis/viewer/set/targetPoint 0 0 40 mm
-#/vis/viewer/set/viewpointThetaPhi 120 45 deg 
 /vis/viewer/set/upVector 0 1 0
 /vis/viewer/set/viewpointThetaPhi -80 -25 deg
 #/vis/viewer/set/viewpointVector 1 1 -1  ### Same fuction as viewpointThetaPhi
@@ -100,8 +98,7 @@
 
 #/vis/viewer/addCutawayPlane 0 0 0 mm 1 0 0 ## Useful for viewing inside tight geometries
 
-### To visualise the magnetic field ###
-### Doesnt seem with tracks. ###
+### To visualise the magnetic field ### Doesnt work with tracks. ###
 #/vis/scene/add/magneticField 15
 
 ### Particle Tracks Options ###
@@ -115,14 +112,6 @@
 /DetSys/gun/position 0.0 0.0 0.0 mm
 /DetSys/gun/particle e-
 /DetSys/gun/efficiencyEnergy 800 keV
-#/DetSys/gun/particle pp
-#/DetSys/gun/efficiencyEnergy 2500 keV
-
-### Nucleus ### 
-#/gun/particle ion
-#/gun/ion 83 207 0 0.0
-#/grdm/nucleusLimits 207 207 83 82
-#/DetSys/gun/efficiencyEnergy 400 MeV
 
 ### Set Particle Generator Extras ### 
 #/DetSys/gun/direction 0 1 1
@@ -152,5 +141,3 @@
 /vis/enable
 /vis/scene/endOfEventAction accumulate 
 /vis/viewer/flush
-#####/vis/viewer/rebuild
-##### Uses "/vis/reviewKeptEvents" and "continue" to review one at a time

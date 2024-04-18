@@ -150,10 +150,14 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	
 	SetParamB("UseNewShield",true);
 	
+// 	SetParamD("ShieldFrontY",10);
+// 	SetParamD("ShieldFrontZ",8.43);
+// 	SetParamD("ShieldMidY",19.7);
+// 	SetParamD("ShieldMidZ",15);
 	SetParamD("ShieldFrontY",10);
-	SetParamD("ShieldFrontZ",8.43);
-	SetParamD("ShieldMidY",19.7);
-	SetParamD("ShieldMidZ",15);
+	SetParamD("ShieldFrontZ",8.435);
+	SetParamD("ShieldMidY",20);
+	SetParamD("ShieldMidZ",16.8);
 
 	SetParamB("IncludeBB34Clamp",true);
 	SetParamD("BB34ClampX",20);
@@ -577,6 +581,11 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	if(!fRemoveShield){
 
 		if(gB("UseNewShield")){
+			
+			// Temorary rules which should match current design constraints in fusion 18/4/24
+			SetParamD("ShieldFrontZ",(41.5/(Orange_BeamDetY+1.5))*(gD("ShieldFrontY")+2.5));
+			SetParamD("ShieldMidY",20);
+			SetParamD("ShieldMidZ",((38.5/(Orange_BeamDetY+2.9))*(gD("ShieldMidY")+5))+1.5);
 
 			std::vector<G4TwoVector> TaPolyTot(10);		
 			TaPolyTot[0].set(3,-16);

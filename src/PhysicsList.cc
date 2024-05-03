@@ -110,7 +110,7 @@ PhysicsList::PhysicsList() :
 	fScintProcess = new G4Scintillation();
 	fScintProcess->SetScintillationYieldFactor(1.);
 	fScintProcess->SetTrackSecondariesFirst(true);
-
+	
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -133,6 +133,7 @@ PhysicsList::~PhysicsList()
 void PhysicsList::ConstructParticle()
 {
 	fParticleList->ConstructParticle();
+	
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -153,6 +154,7 @@ void PhysicsList::ConstructProcess()
 	}
 	if(fHadPhysicsList) fHadPhysicsList->ConstructProcess();
 	G4cout<<"### PhysicsList::ConstructProcess is done"<<G4endl;
+	SetStepper(true);
 
 }
 
@@ -197,6 +199,8 @@ void PhysicsList::SelectPhysicsList(const G4String& name)
 		G4cout<<"PhysicsList WARNING wrong or unknown <"
 			<< name<<"> Physics "<<G4endl;
 	}
+	
+	
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -103,19 +103,7 @@ private:
 	G4double 	fBB34Chip_Dead;
 	G4double 	fBB34Chip_DeadAngle;
 	G4double 	fBB34Chip_Al;
-	
-	G4double 	Orange_MagMidOffset;
-	G4double 	Orange_BeamDetY;
-	G4double 	Orange_ShieldMidBeamSep;
-	G4double 	Orange_MagY;
-	G4double 	Orange_MagAng;
-	G4double 	Orange_BeamShieldSep;
-	G4double 	Orange_MagZ;
-	G4double 	Orange_MagHalfThick;
-	G4double 	Orange_MagGapMinHalf;
-	G4double 	PoleSepHalf;
-	
-	G4double PhiBlockThickness;
+
 	
 	std::vector<G4double*> SetPtrLstD;
 	std::vector<G4int*> SetPtrLstI;

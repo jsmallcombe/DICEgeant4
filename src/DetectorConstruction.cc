@@ -156,6 +156,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
 	//  worldVisAtt->SetVisibility(worldVis);
 	//  fLogicWorld->SetVisAttributes(worldVisAtt);
 	//  fLogicWorld = fLogicWorld;
+	
+	SetWorldStepLimit(20*mm);
 
 	return fPhysiWorld;
 }

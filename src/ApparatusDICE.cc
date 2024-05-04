@@ -46,8 +46,6 @@
 #define CU_COL 1.0, 1.0, 0.0
 #define PB_COL 0.6, 0.1, 0.1
 
-G4double ApparatusDICE::fFieldStength = 0.065*CLHEP::tesla;	
-//
 
 ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 {
@@ -109,6 +107,7 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	
 	SetParamD("PoleGapZH",10);
 	SetParamD("YokeGapH",21);
+	SetParamD("YokeDepth",4);
 	
 	SetParamD("ShieldTaThickH",12.5);
 	SetParamD("ShieldFrontY",10);
@@ -444,7 +443,6 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
     rotZbar.rotateZ(-Zbar);	
 
 	G4double SafetyGap=2*mm;
-	G4double YokeThickH=4*mm; // Perpendicular Half Thickness of the Yoke 
 	G4double TargetWardingY=16*mm; // Half Gap Target Ladder Needs
 	G4double TargetWardingZ=3*mm; // Half Gap Target Ladder Needs (Beamward)
     G4double ScintThick=1*mm; //half
@@ -461,6 +459,7 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	G4double MagBottom=gD("MagYPos")+MagHH;
 	G4double YokeGap=gD("YokeGapH");
 	G4double TaGap=gD("ShieldTaThickH");
+	G4double YokeThickH=gD("YokeDepth")*0.5;
 	
 	G4double MagAng=gD("MagFlare");
 	if(MagAng>0)ShieldMidY-=(gD("ShieldMidZ")-MStart)*tan(MagAng);

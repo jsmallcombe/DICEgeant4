@@ -233,12 +233,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	}
 	
 	// Record primary info for viewing in rootfile
-	if(fDetector->RecordingGun()){
-		fHistoManager->BeamEnergy(EofPrim);	
-		fHistoManager->BeamTheta(effdirection.theta());
-		fHistoManager->BeamPhi(effdirection.phi());
-		fHistoManager->BeamPos(thisEffPosition);
-	}
+	fHistoManager->BeamEnergy(EofPrim);	
+	fHistoManager->BeamTheta(effdirection.theta());
+	fHistoManager->BeamPhi(effdirection.phi());
+	fHistoManager->BeamPos(thisEffPosition);
 
 	// create vertex
 	fParticleGun->GeneratePrimaryVertex(anEvent);

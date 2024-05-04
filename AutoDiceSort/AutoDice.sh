@@ -42,31 +42,15 @@ if [ "$do_G4_part" = true ] ; then
 	echo "/DetSys/gun/coneMaxPhi 330.0 deg" >> autodice.mac 
 
 	echo "/DetSys/world/TabMagneticField Field.txt" >> autodice.mac 
-	echo "/DetSys/world/SetFieldOffset 0 30 0 mm" >> autodice.mac 
-	echo "/DetSys/world/SetFieldAntiMirror 1" >> autodice.mac 
-	echo "/DetSys/world/SetFieldMirror 2" >> autodice.mac 
-	echo "/DetSys/world/SetFieldAntiMirror 3" >> autodice.mac 
+	# # # # echo "/DetSys/World/ScaleField -0.75 tesla" >> autodice.mac 
 
-	# # # # Will scale field if used with TabMagneticField
-	# # # # echo "/DetSys/app/SetDiceField 0.18 tesla" >> autodice.mac 
-
-	# # # # echo "DetSys/det/RemoveShield true" >> autodice.mac 
-	echo "/DetSys/det/AddBlocker true" >> autodice.mac 
-	
-	echo "/DetSys/app/SetDiceLength BeamDetY 60 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength MagMidOffset 30 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength ShieldMidBeamSep 20 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength MagY -20 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength MagGapMinHalf 10 mm" >> autodice.mac 
-	##echo "/DetSys/app/SetDiceLength PoleSepHalf 10 mm" >> autodice.mac 
+# 	echo "/DetSys/det/SetDiceBool AddBlocker false" >> autodice.mac 
+# 	echo "/DetSys/app/SetDiceLength MagThickA 5 mm" >> autodice.mac 
+# 	echo "/DetSys/app/SetDiceLength MagThickB 5 mm" >> autodice.mac 
+# 	echo "/DetSys/app/SetDiceLength YokeDepth 8 mm" >> autodice.mac 
 
 	# # # # Set negative to add a target foil and ISOK160 chamber
 	echo "/DetSys/app/addDiceDetector 1" >> autodice.mac 
-
-	# # # # Must be included when using real field. Automatic step determination is wrong for the complex field. 
-	# # # # StepLimit = 20 mm optimum speed. StepLimit<=2mm *tiny* difference, but massive computation cost. 
-	echo "/DetSys/phys/SetStepper 1" >> autodice.mac 
-	echo "/DetSys/world/StepLimit 20 mm" >> autodice.mac 
 
 	if [ "$do_vischeck" = true ] ; then
 		cat autodice.mac > autovis.mac 

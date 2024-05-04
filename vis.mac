@@ -5,55 +5,20 @@
 ### Configure Apparatus To Build ###
 
 /DetSys/world/TabMagneticField FieldExample.txt
-#/DetSys/world/SetFieldMirrorPos 0 -22.5 0 mm
-### SetFieldMirrorPos Is In the intrinsic frame of the field before offsetting
-/DetSys/world/SetFieldOffset 0 30 0 mm
-/DetSys/world/SetFieldAntiMirror 1
-/DetSys/world/SetFieldMirror 2 
-/DetSys/world/SetFieldAntiMirror 3  # regular setup
+
+#/DetSys/world/SetFieldAntiMirror 3  # regular symetric setup
 ##/DetSys/world/SetFieldMirror 3       # pair production
 
-### Set a uniform field between magnets
-### If called *after* TabMagneticField, the field is scaled.
-### If negative input, uses relative scaling -1 tesla = 100%
-#/DetSys/app/SetDiceField 0.25 tesla
+### Scale the magnetic field *after* caling TabMagneticField
+### If negative input, uses relative scaling: -1 tesla = 100%
+#/DetSys/World/ScaleField 0.25 tesla
 
-### Remove photon shield entirely
-#/DetSys/det/RemoveShield true
-
-### Add the under shield graphit electron blocker
-/DetSys/det/AddBlocker true
-
-### Add the magnet phi shrouds to block the funny field region
-# /DetSys/app/SetDiceLength PhiBlockThickness 1.5 mm
-
-### Orange - Target <-> Magnet-Center Offset
-/DetSys/app/SetDiceLength MagMidOffset 30 mm
-
-### Detector Distance; Beam/Target <-> BB34
-/DetSys/app/SetDiceLength BeamDetY 60 mm
-
-### Beam/Target <-> Shield-Widest-point Distance 
-/DetSys/app/SetDiceLength ShieldMidBeamSep 20 mm
-
-### TOTAL vertical Y height of the magnets (active direction)
-/DetSys/app/SetDiceLength MagY 20 mm
-
-### Flare angle of the magnets
-#/DetSys/app/SetDiceLength MagAng -5 degree
-
-### Distance from magnet to Z=0
-/DetSys/app/SetDiceLength MagGapMinHalf 10 mm
-	
-### Override the automatic optimum seperation of magnet poles
-/DetSys/app/SetDiceLength PoleSepHalf 16 mm
-
-#/DetSys/app/SetDiceBool UseNewShield false
-
-#/DetSys/app/SetDiceLength ShieldFrontZ 9.3415 mm 
-#/DetSys/app/SetDiceLength ShieldFrontY 10 mm
-#/DetSys/app/SetDiceLength ShieldMidZ 19 mm
-#/DetSys/app/SetDiceLength ShieldMidY 23.65 mm
+# /DetSys/det/SetDiceBool RemoveShield true
+# /DetSys/det/SetDiceBool AddBlocker false
+# /DetSys/det/SetDiceBool IncludeBB34Clamp false
+# /DetSys/app/SetDiceLength MagThickA 5 mm
+# /DetSys/app/SetDiceLength MagThickB 5 mm
+# /DetSys/app/SetDiceLength YokeDepth 8 mm
 
 /DetSys/app/addDiceDetector 1
 ### 1 Orange
@@ -65,7 +30,6 @@
 /vis/open OGL
 /vis/viewer/set/background 1 1 1 1
 # /vis/viewer/set/globalLineWidthScale 2
-
 
 ### Choose Drawing Style ###
 /vis/viewer/set/style surface

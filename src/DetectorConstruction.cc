@@ -101,8 +101,6 @@ DetectorConstruction::DetectorConstruction() :
 	
 	fAppDICE= new ApparatusDICE();
 
-    fRecordGun = false;
-    fRecordBB34Pentration = false;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -184,7 +182,6 @@ void DetectorConstruction::SetWorldStepLimit(G4double step) {
 void DetectorConstruction::SetTabMagneticField(G4String PathAndTableName)
 {
 	//const char * c = PathAndTableName.c_str();///conversion attempt using .c_str() (a string member function)
-	fAppDICE->fUniformFieldOn=false;
 	fGlobalField = new NonUniformMagneticField(PathAndTableName);
 }
 
@@ -279,8 +276,6 @@ void DetectorConstruction::AddApparatusDiceDetector(G4String Options){
 }
 
 void DetectorConstruction::SetDiceFieldStrength(G4double Field){
-	ApparatusDICE::fFieldStength=Field;
-	
 	if(GetField()){
 		GetField()->SetField(Field);
 // 		UpdateField();
@@ -313,12 +308,7 @@ void DetectorConstruction::SetFieldOffsetVec(G4ThreeVector Mpoint){
 void DetectorConstruction::SetDiceInt(G4int N){
 	fAppDICE->fAdjNumber=N;
 }
-void DetectorConstruction::RemoveShield(G4bool input){
-	fAppDICE->fRemoveShield=input;
-}
-void DetectorConstruction::AddBlocker(G4bool input){
-	fAppDICE->fAddBlocker=input;
-}
+
 ApparatusDICE* DetectorConstruction::GetDice(){
 	return fAppDICE;
 }

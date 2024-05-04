@@ -107,27 +107,14 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
     fTabMagneticFieldAntiMirrorCmd = new G4UIcmdWithAnInteger("/DetSys/world/SetFieldAntiMirror",this);
 	fTabMagneticFieldAntiMirrorCmd->SetGuidance("Field xyz 123 field anti mirror.");
 	fTabMagneticFieldAntiMirrorCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-	
-   	fRecordGunCmd = new G4UIcmdWithABool("/DetSys/det/RecordGun",this);
-	fRecordGunCmd->SetGuidance("Record the particle for each event in the tree");
-	fRecordGunCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
+
     
-   	fRecordPentrationCmd = new G4UIcmdWithABool("/DetSys/det/RecordPentration",this);
-	fRecordPentrationCmd->SetGuidance("Record the BB34 penetation");
-	fRecordPentrationCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
-	
-   	fRemoveShieldCmd = new G4UIcmdWithABool("/DetSys/det/RemoveShield",this);
-	fRemoveShieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
-    
-   	fAddBlockerCmd = new G4UIcmdWithABool("/DetSys/det/AddBlocker",this);
-	fAddBlockerCmd->AvailableForStates(G4State_PreInit,G4State_Idle); 
-	
 	fAddApparatusDiceDetectorCmd = new G4UIcmdWithAString("/DetSys/app/addDiceDetector",this);
 	fAddApparatusDiceDetectorCmd->SetGuidance("Add DICE geometry");
 	fAddApparatusDiceDetectorCmd->AvailableForStates(G4State_Idle);
 	
-	fApparatusDiceFieldCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/app/SetDiceField",this);
-	fApparatusDiceFieldCmd->SetGuidance("Set magentic field strength of DICE.");
+	fApparatusDiceFieldCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/World/ScaleField",this);
+	fApparatusDiceFieldCmd->SetGuidance("Scale the magentic field");
 	fApparatusDiceFieldCmd->SetUnitCategory("Magnetic flux density");
 	fApparatusDiceFieldCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 	
@@ -162,12 +149,6 @@ DetectorMessenger::~DetectorMessenger()
 	delete fTabMagneticFieldOffsetCmd;
 	delete fTabMagneticFieldMirrorCmd;
 	delete fTabMagneticFieldAntiMirrorCmd;
-
-	delete fRecordGunCmd;
-	delete fRecordPentrationCmd;
-    
-    delete fRemoveShieldCmd;
-    delete fAddBlockerCmd;
 	
 	delete fAddApparatusDiceDetectorCmd;
 	delete fApparatusDiceFieldCmd;
@@ -218,22 +199,7 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 		fDetector->SetFieldMirror(fTabMagneticFieldAntiMirrorCmd->GetNewIntValue(newValue),true);
 	}
 	
-	if(command == fRecordGunCmd) {
-		fDetector->RecordGun(fRecordGunCmd->GetNewBoolValue(newValue));
-	}
-	
-	if(command == fRecordPentrationCmd) {
-		fDetector->RecordBB34Penetration(fRecordPentrationCmd->GetNewBoolValue(newValue));
-	}
-	
-	if(command == fRemoveShieldCmd) {
-		fDetector->RemoveShield(fRemoveShieldCmd->GetNewBoolValue(newValue));
-	}
-	
-	if(command == fAddBlockerCmd) {
-		fDetector->AddBlocker(fAddBlockerCmd->GetNewBoolValue(newValue));
-	}
-	
+
 	if(command == fAddApparatusDiceDetectorCmd) {
 		fDetector->AddApparatusDiceDetector(newValue);
 	}

@@ -50,8 +50,6 @@ public:
     
 	void Build(G4LogicalVolume*,G4String);
     
-	static G4double fFieldStength;
-
 	///////////////////////////////////////////////////////
 	////// Controlled by DetectorConstruction class ///////
 	///////////////////////////////////////////////////////
@@ -59,9 +57,6 @@ public:
     G4int fBuildOption;
 
 	G4int    fAdjNumber;
-	bool fRemoveShield;
-	bool fAddBlocker;
-	bool fUniformFieldOn;
 	
     void SetParamD(G4String,G4double);
     void SetParamI(G4String,G4int);

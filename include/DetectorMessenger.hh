@@ -79,12 +79,6 @@ private:
 	G4UIcmdWithAnInteger* 	   fTabMagneticFieldMirrorCmd;
 	G4UIcmdWithAnInteger*	   fTabMagneticFieldAntiMirrorCmd;
 
-	G4UIcmdWithABool*           fRecordGunCmd;
-	G4UIcmdWithABool*           fRecordPentrationCmd;
-    G4UIcmdWithABool*           fRemoveShieldCmd;
-    G4UIcmdWithABool*           fAddBlockerCmd;
-    
-	
 	G4UIcmdWithAString*        fAddApparatusDiceDetectorCmd;
 	G4UIcmdWithADoubleAndUnit* fApparatusDiceFieldCmd;
 	G4UIcmdWithAString*        fApparatusDiceSetCmd;

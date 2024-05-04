@@ -90,12 +90,6 @@ public:
 	G4VPhysicalVolume* Construct();
 
 	void UpdateGeometry();
-
-	void RecordGun( G4bool input ){fRecordGun = input;};
-	G4bool RecordingGun(){return fRecordGun;};
-	
-	void RecordBB34Penetration( G4bool input ){fRecordBB34Pentration = input;};
-	G4bool RecordingBB34Penetration(){return fRecordBB34Pentration;};
 	
 	bool HasProperties(G4VPhysicalVolume* vol) { return fPropertiesMap.find(vol) != fPropertiesMap.end(); }
 	DetectorProperties GetProperties(G4VPhysicalVolume* vol) { return fPropertiesMap.at(vol); }
@@ -104,10 +98,7 @@ public:
 
 	void Print();
 	void PrintRecursive(G4LogicalVolume* vol);
-	
-	void RemoveShield( G4bool input );
-	void AddBlocker( G4bool input );
-    
+
 	void AddApparatusDiceDetector(G4String Options);
 	void SetDiceFieldStrength(G4double Field);
 	
@@ -150,11 +141,6 @@ private:
 	G4double  fWorldSizeX;
 	G4double  fWorldSizeY;
 	G4double  fWorldSizeZ;
-
-    G4bool    fRecordGun;  
-    G4bool    fRecordBB34Pentration;  
-    G4bool    fRemoveShield;
-    G4bool    fAddBlocker;
 
 	// Box
 	G4String           fBoxMat;

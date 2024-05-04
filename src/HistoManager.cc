@@ -100,27 +100,22 @@ void HistoManager::Book() {
 		fNtColIdHit[13] = analysisManager->CreateNtupleDColumn("time");
 		fNtColIdHit[14] = analysisManager->CreateNtupleIColumn("targetZ");
         
-		int col=14;
-        if(GetDetectorConstruction()->RecordingGun()){
-            fNtColIdHit[15] = analysisManager->CreateNtupleDColumn("primaryE");
-            fNtColIdHit[16] = analysisManager->CreateNtupleDColumn("primaryTheta");
-            fNtColIdHit[17] = analysisManager->CreateNtupleDColumn("primaryPhi");
-            fNtColIdHit[18] = analysisManager->CreateNtupleDColumn("originX");
-            fNtColIdHit[19] = analysisManager->CreateNtupleDColumn("originY");
-            fNtColIdHit[20] = analysisManager->CreateNtupleDColumn("originZ");
-			col=20;
-        }
-        
-		if(GetDetectorConstruction()->RecordingBB34Penetration()){
-            fNtColIdHit[col+1] = analysisManager->CreateNtupleDColumn("BB34PenDX");
-            fNtColIdHit[col+2] = analysisManager->CreateNtupleDColumn("BB34PenDY");
-            fNtColIdHit[col+3] = analysisManager->CreateNtupleDColumn("BB34PenDZ");
-            fNtColIdHit[col+4] = analysisManager->CreateNtupleDColumn("BB34PenX");
-            fNtColIdHit[col+5] = analysisManager->CreateNtupleDColumn("BB34PenY");
-            fNtColIdHit[col+6] = analysisManager->CreateNtupleDColumn("BB34PenZ");
-			col+=6;
-		}
-        
+	
+		fNtColIdHit[15] = analysisManager->CreateNtupleDColumn("primaryE");
+		fNtColIdHit[16] = analysisManager->CreateNtupleDColumn("primaryTheta");
+		fNtColIdHit[17] = analysisManager->CreateNtupleDColumn("primaryPhi");
+		fNtColIdHit[18] = analysisManager->CreateNtupleDColumn("originX");
+		fNtColIdHit[19] = analysisManager->CreateNtupleDColumn("originY");
+		fNtColIdHit[20] = analysisManager->CreateNtupleDColumn("originZ");
+		
+		
+		fNtColIdHit[21] = analysisManager->CreateNtupleDColumn("BB34PenDX");
+		fNtColIdHit[22] = analysisManager->CreateNtupleDColumn("BB34PenDY");
+		fNtColIdHit[23] = analysisManager->CreateNtupleDColumn("BB34PenDZ");
+		fNtColIdHit[24] = analysisManager->CreateNtupleDColumn("BB34PenX");
+		fNtColIdHit[25] = analysisManager->CreateNtupleDColumn("BB34PenY");
+		fNtColIdHit[26] = analysisManager->CreateNtupleDColumn("BB34PenZ");
+	
 		analysisManager->FinishNtuple();
 	}
 
@@ -180,26 +175,23 @@ void HistoManager::FillHitNtuple(G4int eventNumber, G4int trackID, G4int parentI
 		analysisManager->FillNtupleDColumn(fNtColIdHit[12], posz);
 		analysisManager->FillNtupleDColumn(fNtColIdHit[13], time);
 		analysisManager->FillNtupleIColumn(fNtColIdHit[14], targetZ);
-        
-		int col=14;
-        if(GetDetectorConstruction()->RecordingGun()){
-            analysisManager->FillNtupleDColumn(fNtColIdHit[15], BeamEnergy());
-            analysisManager->FillNtupleDColumn(fNtColIdHit[16], BeamTheta());
-            analysisManager->FillNtupleDColumn(fNtColIdHit[17], BeamPhi());
-            analysisManager->FillNtupleDColumn(fNtColIdHit[18], BeamPos().x());
-            analysisManager->FillNtupleDColumn(fNtColIdHit[19], BeamPos().y());
-            analysisManager->FillNtupleDColumn(fNtColIdHit[20], BeamPos().z());
-			col=20;
-        }
-        
-		if(GetDetectorConstruction()->RecordingBB34Penetration()){
-            analysisManager->FillNtupleDColumn(fNtColIdHit[col+1], BB34dir.x());
-            analysisManager->FillNtupleDColumn(fNtColIdHit[col+2], BB34dir.y());
-            analysisManager->FillNtupleDColumn(fNtColIdHit[col+3], BB34dir.z());
-            analysisManager->FillNtupleDColumn(fNtColIdHit[col+4], BB34pos.x());
-            analysisManager->FillNtupleDColumn(fNtColIdHit[col+5], BB34pos.y());
-            analysisManager->FillNtupleDColumn(fNtColIdHit[col+6], BB34pos.z());
-		}
+
+		
+		analysisManager->FillNtupleDColumn(fNtColIdHit[15], BeamEnergy());
+		analysisManager->FillNtupleDColumn(fNtColIdHit[16], BeamTheta());
+		analysisManager->FillNtupleDColumn(fNtColIdHit[17], BeamPhi());
+		analysisManager->FillNtupleDColumn(fNtColIdHit[18], BeamPos().x());
+		analysisManager->FillNtupleDColumn(fNtColIdHit[19], BeamPos().y());
+		analysisManager->FillNtupleDColumn(fNtColIdHit[20], BeamPos().z());
+
+		
+		analysisManager->FillNtupleDColumn(fNtColIdHit[21], BB34dir.x());
+		analysisManager->FillNtupleDColumn(fNtColIdHit[22], BB34dir.y());
+		analysisManager->FillNtupleDColumn(fNtColIdHit[23], BB34dir.z());
+		analysisManager->FillNtupleDColumn(fNtColIdHit[24], BB34pos.x());
+		analysisManager->FillNtupleDColumn(fNtColIdHit[25], BB34pos.y());
+		analysisManager->FillNtupleDColumn(fNtColIdHit[26], BB34pos.z());
+			
         
         analysisManager->AddNtupleRow();
 	}
@@ -230,18 +222,14 @@ void HistoManager::FillStepNtuple(G4int eventNumber, G4int trackID, G4int parent
 
 
 void HistoManager::SetBB34Penetrate(const G4ThreeVector& dir, const G4ThreeVector& pos){
-	if(GetDetectorConstruction()->RecordingBB34Penetration()){
-		if(!BB34dir.x()){
-			BB34dir=dir;
-			BB34pos=pos;
-		}
+	if(!BB34dir.x()){
+		BB34dir=dir;
+		BB34pos=pos;
 	}
 }
 void HistoManager::ResetBB34Penetrate(){
-	if(GetDetectorConstruction()->RecordingBB34Penetration()){
-		BB34dir.set(0,0,0);
-		BB34pos.set(0,0,0);
-	}
+	BB34dir.set(0,0,0);
+	BB34pos.set(0,0,0);
 }
 
 

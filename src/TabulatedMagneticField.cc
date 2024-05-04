@@ -6,7 +6,7 @@
 #include <algorithm> //for max_element
 
 TabulatedMagneticField::TabulatedMagneticField(const char* filename) //called in 'nonuniformfield'
-: fMaxbx(0),fMaxby(0),fMaxbz(0),fMaxM(0), fInvertXIndex(false), fInvertYIndex(false), fInvertZIndex(false), MirrorXField(false), MirrorYField(false), MirrorZField(false),MirrorFieldXInverse(false), MirrorFieldYInverse(false), MirrorFieldZInverse(false), MirrorLineX(0), MirrorLineY(0), MirrorLineZ(0), MirrorDeadX(0), MirrorDeadY(0), MirrorDeadZ(0), fOffx(0), fOffy(0), fOffz(0)
+: fMaxbx(0),fMaxby(0),fMaxbz(0),fMaxM(0), fInvertXIndex(false), fInvertYIndex(false), fInvertZIndex(false), MirrorXField(true), MirrorYField(true), MirrorZField(false),MirrorFieldXInverse(true), MirrorFieldYInverse(false), MirrorFieldZInverse(false), MirrorLineX(0), MirrorLineY(0), MirrorLineZ(0), MirrorDeadX(0), MirrorDeadY(0), MirrorDeadZ(0), fOffx(0), fOffy(30*mm), fOffz(0)
 {    
 	
 	//////////////////////////

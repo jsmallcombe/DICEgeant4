@@ -3,20 +3,15 @@
 /DetSys/world/material Vacuum
 
 ### Choose Apparatus To Build ### 
-/DetSys/app/SetDiceField 0.25 tesla
-#/DetSys/det/RemoveShield true
-/DetSys/det/AddBlocker true
+/DetSys/world/TabMagneticField Field.txt
+#/DetSys/World/ScaleField 0.25 tesla
 
-/DetSys/app/SetDiceLength MagMidOffset 30 mm
-/DetSys/app/SetDiceLength BeamDetY 60 mm
-/DetSys/app/SetDiceLength ShieldMidBeamSep 20 mm
-/DetSys/app/SetDiceLength MagY 20 mm
+# /DetSys/det/SetDiceBool AddBlocker false
+# /DetSys/app/SetDiceLength MagThickA 5 mm
+# /DetSys/app/SetDiceLength MagThickB 5 mm
+# /DetSys/app/SetDiceLength YokeDepth 8 mm
 
 /DetSys/app/addDiceDetector -1
-
-## Record the initial beam data ###
-/DetSys/det/RecordGun 1
-/DetSys/det/RecordPentration 1
 
 ### Must be included when using real field. Automatic step determination is wrong for the complex field. 
 ### StepLimit = 20 mm optimum speed is hard coded default, only call command if smaller needed.
@@ -29,16 +24,11 @@
 /DetSys/gun/particle e-
 /DetSys/gun/efficiencyEnergy 400 keV
 
-### Nucleus ### 
-#/gun/particle ion
-#/gun/ion 83 207 0 0.0
-#/grdm/nucleusLimits 207 207 83 82
-
 ### Set Particle Generator Extras ### 
 #/DetSys/gun/direction 0 0 1
 #/DetSys/gun/coneMinAngle 10.0 deg
 #/DetSys/gun/coneMaxAngle 80.0 deg
-/DetSys/gun/BeamSpot 2 mm
+/DetSys/gun/BeamSpot 1 mm
 #/DetSys/gun/SetBeta 0.05
 #/DetSys/gun/SetLifetime 1 ns
 

@@ -20,19 +20,13 @@ if [ "$do_G4_part" = true ] ; then
 
 	echo "/DetSys/world/TabMagneticField Field.txt" >> autodice.mac 
 	
-	echo "/DetSys/world/SetFieldOffset 0 30 0 mm" >> autodice.mac 
-	echo "/DetSys/world/SetFieldAntiMirror 1" >> autodice.mac 
-	echo "/DetSys/world/SetFieldMirror 2" >> autodice.mac 
-	echo "/DetSys/world/SetFieldAntiMirror 3" >> autodice.mac 
-	# # # # echo "/DetSys/app/SetDiceField -0.5 tesla" >> autodice.mac 
-	echo "/DetSys/det/AddBlocker true" >> autodice.mac 
-	
-	echo "/DetSys/app/SetDiceLength BeamDetY 60 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength MagMidOffset 30 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength ShieldMidBeamSep 20 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength MagY 20 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength MagGapMinHalf 10 mm" >> autodice.mac 
-	echo "/DetSys/app/SetDiceLength PoleSepHalf 16 mm" >> autodice.mac 
+	echo "/DetSys/world/TabMagneticField Field.txt" >> autodice.mac 
+	# # # # echo "/DetSys/World/ScaleField -0.75 tesla" >> autodice.mac 
+
+# 	echo "/DetSys/det/SetDiceBool AddBlocker false" >> autodice.mac 
+# 	echo "/DetSys/app/SetDiceLength MagThickA 5 mm" >> autodice.mac 
+# 	echo "/DetSys/app/SetDiceLength MagThickB 5 mm" >> autodice.mac 
+# 	echo "/DetSys/app/SetDiceLength YokeDepth 8 mm" >> autodice.mac 
 
 	echo "/DetSys/app/addDiceDetector 1" >> autodice.mac 
 

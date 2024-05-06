@@ -566,6 +566,21 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 			G4LogicalVolume *ElectronBlockerLog = new G4LogicalVolume(ElectronBlockerBox, BlockerMat,"ElectronBlockerLog_FORBID",0,0,0);
 			ElectronBlockerLog->SetVisAttributes(ThreeVisAtt);
 			new G4PVPlacement(new G4RotationMatrix,rotZbar*G4ThreeVector(0,-HalfBlockGap-MagBottom,0), ElectronBlockerLog,"ElectronBlocker", expHallLog,false,0);
+			
+			std::vector<G4TwoVector> AddOnPol(4);	
+			AddOnPol[0].set(1.1,5);
+			AddOnPol[1].set(9.01,5);
+			AddOnPol[2].set(9.01-(5/tan(35*deg)),0);
+			AddOnPol[3].set(1.1,0);
+
+			G4VSolid* AddOnS = new G4ExtrudedSolid("AddOnS", AddOnPol,YokeGap+YokeThickH*2, G4TwoVector(0,0), 1, G4TwoVector(0,0), 1);
+			G4LogicalVolume *AddOnLog = new G4LogicalVolume(AddOnS, BlockerMat,"AddOnLog_FORBID",0,0,0);
+			AddOnLog->SetVisAttributes(ThreeVisAtt);
+			
+			new G4PVPlacement(rotateblock,rotZbar*G4ThreeVector(0,-gD("BeamDetTop")+1.55,0), AddOnLog,"ElectronBlocker", expHallLog,false,0);
+			new G4PVPlacement(rotate1,rotZbar*G4ThreeVector(0,-gD("BeamDetTop")+1.55,0), AddOnLog,"ElectronBlocker", expHallLog,false,0);
+			
+			
 		}
 	}
 

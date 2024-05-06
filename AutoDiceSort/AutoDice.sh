@@ -32,8 +32,6 @@ if [ "$do_G4_part" = true ] ; then
 	echo "/run/initialize" > autodice.mac 
 	echo "/DetSys/world/material Vacuum" >> autodice.mac 
 	echo "/DetSys/gun/BeamSpot 0.5 mm" >> autodice.mac 
-	echo "/DetSys/det/RecordGun 1" >> autodice.mac 
-	echo "/DetSys/det/RecordPentration 1" >> autodice.mac 
 	echo "/DetSys/gun/position 0.0 0.0 0.0 mm " >> autodice.mac 
 
 	echo "/DetSys/gun/particle e-" >> autodice.mac 

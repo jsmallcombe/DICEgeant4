@@ -115,6 +115,19 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
                 nn<<dE*(e+1)<<"_ThetaPhi";
                 ThetaPhi[e]=new TH2F(nn.str().c_str(),(nn.str()+";Emission Angle Theta #theta [Rad.];Emission Angle Phi #theta [Rad.]").c_str(),180,0,3.14159,180,0,3.14159);
             }
+            
+        out.mkdir("Angles/PenAngle");
+        out.cd("Angles/PenAngle");
+	
+			TH2F* PenThetaTot=new TH2F("PenThetaTot","PenThetaTot;Pen Angle Theta #theta [Rad.];Hit Segment",180,0,3.14159,16,0,16);
+			TH2F* PenTheta[20];
+            for(int e=0;e<20;e++){
+                stringstream nn;
+                nn<<dE*(e+1)<<"_ChanPenTheta";
+                PenTheta[e]=new TH2F(nn.str().c_str(),(nn.str()+";Pen Angle Theta #theta [Rad.];Hit Segment").c_str(),180,0,3.14159,8,0,8);
+            }
+		
+            
 	out.cd("");
         
     TGraph* HitMap[20];
@@ -146,6 +159,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 	int detNumber,cryNumber;
 	double depEnergy,primaryTheta,primaryPhi,primaryE;
 	double posx,posz;
+	double BB34PenDX,BB34PenDY,BB34PenDZ;
 	
         
 	// Define the link between the "columns" of the list and the local variables we want to read them into
@@ -159,6 +173,9 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 	newtree->SetBranchAddress("primaryTheta",&primaryTheta);
 	newtree->SetBranchAddress("primaryPhi",&primaryPhi);
 	newtree->SetBranchAddress("primaryE",&primaryE);
+	newtree->SetBranchAddress("BB34PenDX",&BB34PenDX);
+	newtree->SetBranchAddress("BB34PenDY",&BB34PenDY);
+	newtree->SetBranchAddress("BB34PenDZ",&BB34PenDZ);
 
 	// As each detector within one physical event is stored as a new "line/row" in our list we have to collect them first
 	// Thes variabls to help with assembling the events
@@ -177,6 +194,8 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
     
     double pX,pZ;
 
+    double ThetaPen=0;
+	
 	// A loop over every line of the input data in sequence
 	for(long jentry=0;jentry<nentries;jentry++){
 		
@@ -211,6 +230,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
                 }
             }
             Theta=primaryTheta;
+			ThetaPen=TVector3(BB34PenDX,BB34PenDY,BB34PenDZ).Theta();
             Phi=std::abs(primaryPhi);// -pi to pi
             TMult++;
             
@@ -225,6 +245,7 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 		// The loop only continues beyond here if we have collected all rows of an entire event
 		if(jentry==(nentries-1))EndOfEvent=true;
 		if(!EndOfEvent) continue; 
+		
 		
         /////////////////////////
         ////  Now we have collected a complete event and can analyse the event
@@ -283,23 +304,30 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
                     HitMapTot->Fill(pZ,pX);
                     
                     
+					PenThetaTot->Fill(ThetaPen,chan);
 					unsigned int TPchan=chan;
 					double TPtheta=Theta;
+					double TPthetapen=ThetaPen;
 					if(TPchan>7){ //To double up the statistics for symetric configuration by flip across centre, irrespecive of symmetrize
 						TPchan=15-TPchan;
 					}else{
 						TPtheta=TMath::Pi()-Theta;
+						TPthetapen=TMath::Pi()-ThetaPen;
                     }
                     
 					if(TPchan<8){
 						EThetaPhi[TPchan]->Fill(TPtheta,Phi,primaryE);
                     }
+                    
+                    
 					
                     unsigned int ei=round(primaryE/dE)-1; //Determine energy bin, dE is the steps in sim
                     if(ei<20){ // only histograms for first 20 E steps 
                         
                         AngleSeg[ei]->Fill(Theta,Seg);
                         
+						PenTheta[ei]->Fill(TPthetapen,TPchan);
+						
                         ChanThetaPhi[ei]->Fill(TPtheta,Phi,TPchan);
                         ThetaPhi[ei]->Fill(TPtheta,Phi);
                             

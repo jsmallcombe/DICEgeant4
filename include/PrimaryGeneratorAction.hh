@@ -73,8 +73,8 @@ public:
     void SetEfficiencyPosition(G4ThreeVector num) { fEffPosition = num; fEffPositionBool = true; PassEfficiencyPosition(fEffPosition); }
     
     void SetEfficiencyParticle(G4String EffParticle);
-    void SetConeMaxAngle(G4double num1) { fAngleInit = num1; fConeAngleBool = true; fEffDirectionBool = true; }
-    void SetConeMinAngle(G4double num1) { fAngleMinInit = num1;  fConeAngleBool = true; fEffDirectionBool = true;}
+    void SetConeMaxAngle(G4double num1) {if(num1<0){fConeSymBool=true;} fAngleInit = std::abs(num1); fConeAngleBool = true; fEffDirectionBool = true; }
+    void SetConeMinAngle(G4double num1) {if(num1<0){fConeSymBool=true;} fAngleMinInit = std::abs(num1);  fConeAngleBool = true; fEffDirectionBool = true;}
     void SetConeMinPhi(G4double num1) { fPhiMin = num1; fConeAngleBool = true; fEffDirectionBool = true; }
     void SetConeMaxPhi(G4double num1) { fPhiMax = num1; fConeAngleBool = true; fEffDirectionBool = true; }
     void SetBeamSpotSigma(G4double num1) { fBeamSpotSigma = num1; }
@@ -98,6 +98,7 @@ private:
 	G4double fEffGunLifetime;	
     
     G4bool fConeAngleBool;
+    G4bool fConeSymBool;
     G4double fAngleInit;
     G4double fAngleMinInit;
     G4double fPhiMin;

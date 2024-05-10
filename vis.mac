@@ -5,9 +5,7 @@
 ### Configure Apparatus To Build ###
 
 /DetSys/world/TabMagneticField FieldExample.txt
-
 #/DetSys/world/SetFieldAntiMirror 3  # regular symetric setup
-##/DetSys/world/SetFieldMirror 3       # pair production
 
 ### Scale the magnetic field *after* caling TabMagneticField
 ### If negative input, uses relative scaling: -1 tesla = 100%

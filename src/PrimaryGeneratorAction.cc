@@ -88,6 +88,9 @@
 	fBeamSpotSigma = 0.*mm;
 
 	SetEfficiencyParticle("e-");
+	
+	fConeAngleBool= false;
+	fConeSymBool= false;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -175,6 +178,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 			G4double CosTheta = G4UniformRand()*abs(cmax-cmin);
 			if(cmin<cmax)CosTheta+=cmin;
 			else CosTheta+=cmax;
+			
+			if(fConeSymBool){
+				if(G4UniformRand()>0.5)CosTheta=-CosTheta;
+			}
 
 			// 	      G4cout<<asin(SinTheta)<<G4endl;
 			G4double SinTheta = sqrt(1. - pow(CosTheta, 2.0));

@@ -40,6 +40,7 @@ if [ "$do_G4_part" = true ] ; then
 	echo "/DetSys/gun/coneMaxPhi 330.0 deg" >> autodice.mac 
 
 	echo "/DetSys/world/TabMagneticField Field.txt" >> autodice.mac 
+# 	echo "/DetSys/world/SetFieldAntiMirror 3" >> autodice.mac 
 	# # # # echo "/DetSys/World/ScaleField -0.75 tesla" >> autodice.mac 
 
 # 	echo "/DetSys/det/SetDiceBool AddBlocker false" >> autodice.mac 

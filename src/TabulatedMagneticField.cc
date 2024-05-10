@@ -341,7 +341,7 @@ void TabulatedMagneticField::GetFieldValue(const G4double point[4], G4double* Bf
 		
 		// Full 3-dimensional version
 		Bfield[0] =
-			fXField[xindex  ][yindex  ][yindex  ] * (1-xlocal) * (1-ylocal) * (1-zlocal) +
+			fXField[xindex  ][yindex  ][zindex  ] * (1-xlocal) * (1-ylocal) * (1-zlocal) +
 			fXField[xindex  ][yindex  ][zindex+1] * (1-xlocal) * (1-ylocal) *    zlocal  +
 			fXField[xindex  ][yindex+1][zindex  ] * (1-xlocal) *    ylocal  * (1-zlocal) +
 			fXField[xindex  ][yindex+1][zindex+1] * (1-xlocal) *    ylocal  *    zlocal  +

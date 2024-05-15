@@ -8,7 +8,6 @@ if [ "$do_G4_part" = true ] ; then
 
 	echo "/run/initialize" > autodice.mac 
 	echo "/DetSys/world/material Vacuum" >> autodice.mac 
-# 	echo "/DetSys/det/RecordGun 1" >> autodice.mac 
 # 	echo "/DetSys/gun/BeamSpot 0.5 mm" >> autodice.mac 
 	echo "/DetSys/gun/position 0.0 0.0 0.0 mm " >> autodice.mac 
 	echo "/DetSys/gun/particle e-" >> autodice.mac 
@@ -19,7 +18,7 @@ if [ "$do_G4_part" = true ] ; then
 # 	echo "/DetSys/world/SetFieldAntiMirror 3" >> autodice.mac 
 	# # # # echo "/DetSys/World/ScaleField -0.75 tesla" >> autodice.mac 
 
-# 	echo "/DetSys/det/SetDiceBool AddBlocker false" >> autodice.mac 
+# 	echo "/DetSys/app/SetDiceBool AddBlocker false" >> autodice.mac 
 # 	echo "/DetSys/app/SetDiceLength MagThickA 5 mm" >> autodice.mac 
 # 	echo "/DetSys/app/SetDiceLength MagThickB 5 mm" >> autodice.mac 
 # 	echo "/DetSys/app/SetDiceLength YokeDepth 8 mm" >> autodice.mac 

@@ -11,9 +11,9 @@
 ### If negative input, uses relative scaling: -1 tesla = 100%
 #/DetSys/World/ScaleField 0.25 tesla
 
-# /DetSys/det/SetDiceBool RemoveShield true
-# /DetSys/det/SetDiceBool AddBlocker false
-# /DetSys/det/SetDiceBool IncludeBB34Clamp false
+# /DetSys/app/SetDiceBool RemoveShield true
+# /DetSys/app/SetDiceBool AddBlocker false
+# /DetSys/app/SetDiceBool IncludeBB34Clamp false
 # /DetSys/app/SetDiceLength MagThickA 5 mm
 # /DetSys/app/SetDiceLength MagThickB 5 mm
 # /DetSys/app/SetDiceLength YokeDepth 8 mm

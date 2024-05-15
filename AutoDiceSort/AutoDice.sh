@@ -1,28 +1,24 @@
 # # # #  For real final experimental cals, use the target and K160 code AND use the full 4pi gun!
 # # # #  Current settings are fast, but underestimate background
-
-energypoints="100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700"
-dE=100
-# energypoints="200 400 600 800 1000 1200 1400"
-# dE=200
-# # energypoints="400 800 1200"
-# # dE=400
-
-# betapoints="0.05 0.1 0.2 .5"
-betapoints="0.2"
-
-lifeepoints="500 1000"
-
-NumberOfPoints=500000
-NumberOfBetaPoints=50000
-do_G4_part=false
+do_G4_part=true
 do_vischeck=true
-do_extras=true
-do_lifetime_part=true
 
-deltapoints="5 10 15 20 25 30 35 40"
-dd=5
-# extras = gammas,betas,deltas, and lifetimes
+	energypoints="100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600"
+	dE=100
+	NumberOfPoints=500000
+
+	betapoints="0.2"
+	NumberOfBetaPoints=50000
+
+	do_extras=true
+
+		EffPoints="5 10 15 20 30 40 50 75 100 150 200 300 500 700 1000 1500 2000"
+		NumberOfEffPoints=100000
+
+		NumGamPoints=2000000
+
+		do_lifetime_part=false
+			lifeepoints="500 1000"
 
 mkdir FilesAutoSort
 
@@ -40,14 +36,13 @@ if [ "$do_G4_part" = true ] ; then
 	echo "/DetSys/gun/coneMaxPhi 330.0 deg" >> autodice.mac 
 
 	echo "/DetSys/world/TabMagneticField Field.txt" >> autodice.mac 
-# 	echo "/DetSys/world/SetFieldAntiMirror 3" >> autodice.mac 
-	# # # # echo "/DetSys/World/ScaleField -0.75 tesla" >> autodice.mac 
+ 	echo "/DetSys/world/SetFieldAntiMirror 3" >> autodice.mac 
 
-# 	echo "/DetSys/det/SetDiceBool AddBlocker false" >> autodice.mac 
-# 	echo "/DetSys/app/SetDiceLength MagThickA 5 mm" >> autodice.mac 
-# 	echo "/DetSys/app/SetDiceLength MagThickB 5 mm" >> autodice.mac 
-# 	echo "/DetSys/app/SetDiceLength YokeDepth 8 mm" >> autodice.mac 
+ 	echo "/DetSys/app/SetDiceLength MagThickA 5 mm" >> autodice.mac 
+ 	echo "/DetSys/app/SetDiceLength MagThickB 5 mm" >> autodice.mac 
 
+ 	cat autodice.mac > effonly.mac 
+ 	
 	# # # # Set negative to add a target foil and ISOK160 chamber
 	echo "/DetSys/app/addDiceDetector 1" >> autodice.mac 
 
@@ -58,6 +53,8 @@ if [ "$do_G4_part" = true ] ; then
 		rm -rf autovis.mac
 	fi
 	
+# # # 		Main
+
 	# 	With the new thata/shield gap we dont get the full background but its twice as fast
 	CorrectedN=$(($NumberOfPoints / 4))
 	# 	Phi range = 1/3, Theta range = 1/2 (2x 1/4)
@@ -84,6 +81,10 @@ if [ "$do_G4_part" = true ] ; then
 	rm -rf autodice_main.mac
 	
 	hadd -f FilesAutoSort/SumTuple.root FilesAutoSort/Tuple*.root
+	
+# # # 		Main
+
+# # # 		Betas
 
 	rm -rf FilesAutoSort/betadata*.root
 	for B in $betapoints;
@@ -100,22 +101,40 @@ if [ "$do_G4_part" = true ] ; then
 		
 		hadd -f FilesAutoSort/BetaData$B.root FilesAutoSort/betadata"$B"_*.root
 	done
-
 	
+# # # 		Betas
+
+# # # 		Extras
 	if [ "$do_extras" = true ] ; then
 	
-		rm -rf FilesAutoSort/DeltaTuple*.root
-		for E in $deltapoints;
+# # # 		Efficiency
+		echo "/DetSys/gun/coneMinPhi 180.0 deg" >> effonly.mac 
+		echo "/DetSys/gun/coneMaxPhi 360.0 deg" >> effonly.mac 
+			
+		rm -rf FilesAutoSort/EffTuple*.root
+		for E in $EffPoints;
 		do
-			cat autodice.mac > autodicedelta.mac 
-			echo "/DetSys/gun/efficiencyEnergy $E keV" >> autodicedelta.mac 
-				echo "/run/beamOn $NumberOfBetaPoints" >> autodicedelta.mac 
-			./DICE10 autodicedelta.mac 
-			mv g4out.root FilesAutoSort/DeltaTuple$E.root
+			cat effonly.mac > effone.mac 
+			cat effonly.mac > efftwo.mac 
+			echo "/DetSys/app/SetDiceBool AddBlocker false" >> efftwo.mac 
+			echo "/DetSys/app/addDiceDetector 1" >> effone.mac 
+			echo "/DetSys/app/addDiceDetector 1" >> efftwo.mac 
+			echo "/DetSys/gun/efficiencyEnergy $E keV" >> effone.mac 
+			echo "/DetSys/gun/efficiencyEnergy $E keV" >> efftwo.mac 
+			echo "/run/beamOn $NumberOfEffPoints" >> effone.mac 
+			echo "/run/beamOn $NumberOfEffPoints" >> efftwo.mac 
+			./DICE10 effone.mac 
+			mv g4out.root FilesAutoSort/EffTupleOne$E.root
+			./DICE10 efftwo.mac 
+			mv g4out.root FilesAutoSort/EffTupleTwo$E.root
 		done
-		rm -rf autodicedelta.mac
+		rm -rf eff*.mac
 		
-		hadd -f FilesAutoSort/deltatup.root FilesAutoSort/DeltaTuple*.root
+		hadd -f FilesAutoSort/EffSumTupleOne.root FilesAutoSort/EffTupleOne*.root
+		hadd -f FilesAutoSort/EffSumTupleTwo.root FilesAutoSort/EffTupleTwo*.root
+
+# # # 		Efficiency
+# # # 		High E electrons (Betas)
 
 		cat autodice.mac > autodicehigh.mac 
 		echo "/DetSys/gun/efficiencyEnergy 3000 keV" >> autodicehigh.mac 
@@ -124,14 +143,39 @@ if [ "$do_G4_part" = true ] ; then
 		mv g4out.root FilesAutoSort/highetup.root	
 		rm -rf autodicehigh.mac
 
-		cat autodice.mac > autodicegamma.mac 
-		echo "/DetSys/gun/particle gamma" >> autodicegamma.mac 
-		echo "/DetSys/gun/efficiencyEnergy 511 keV" >> autodicegamma.mac 
-		echo "/run/beamOn $NumberOfPoints" >> autodicegamma.mac 
-		./DICE10 autodicegamma.mac 
-		mv g4out.root FilesAutoSort/gammatup.root	
-		rm -rf autodicegamma.mac
+# # # 		High E electrons (Betas)		
+# # # 		Gamma
+		
+		rm -rf	FilesAutoSort/gammatup*.root
+		
+		cat autodice.mac > autogam.mac 
+		echo "/DetSys/gun/particle gamma" >> autogam.mac 
+		echo "/DetSys/gun/position 0.0 5.0 0.0 mm " >> autogam.mac 
+		echo "/DetSys/gun/BeamSpot 2.5 mm" >> autogam.mac 
+		
+		cat autogam.mac > autogamA.mac 
+		cat autogam.mac > autogamB.mac 
+		cat autogam.mac > autogamC.mac 
+		
+		echo "/DetSys/gun/efficiencyEnergy 10 keV" >> autogamA.mac 
+		echo "/DetSys/gun/efficiencyEnergy 100 keV" >> autogamB.mac 
+		echo "/DetSys/gun/efficiencyEnergy 511 keV" >> autogamC.mac 
+		echo "/run/beamOn $NumGamPoints" >> autogamA.mac 
+		echo "/run/beamOn $NumGamPoints" >> autogamB.mac 
+		echo "/run/beamOn $NumGamPoints" >> autogamC.mac 
+		
+		./DICE10 autogamA.mac 
+		mv g4out.root FilesAutoSort/gammatupA.root	
+		./DICE10 autogamB.mac 
+		mv g4out.root FilesAutoSort/gammatupB.root	
+		./DICE10 autogamC.mac 
+		mv g4out.root FilesAutoSort/gammatupC.root	
+		rm -rf autoga*.mac
+			
+		hadd -f FilesAutoSort/gammatup.root FilesAutoSort/gammatup*.root
 
+# # # 		Gamma
+# # # 		Lifetime
 		
 		if [ "$do_lifetime_part" = true ] ; then
 			rm -rf FilesAutoSort/TupleLife*.root 
@@ -159,6 +203,9 @@ if [ "$do_G4_part" = true ] ; then
 			hadd -f FilesAutoSort/TupleLifeB.root FilesAutoSort/TupleLifeB*.root
 			rm -rf autodicelife.mac
 		fi
+# # # 		Lifetime
+
+# # # 		Extras
 	fi
 	
 	rm -rf autodice.mac
@@ -176,21 +223,34 @@ if [ ${#betapoints} -gt 0 ]; then
 	done
 	
 	hadd -f FullDiceSort.root SumDice.root FilesAutoSort/DiceBetaSort.root
+else
+	cp SumDice.root FullDiceSort.root
 fi
 
 if [ "$do_extras" = true ] ; then
 
 	rm -rf FilesAutoSort/ExtraSorted.root
 
-	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Deltas\",0,\"FullDiceSort.root\",\"FilesAutoSort/deltatup.root\","$NumberOfBetaPoints*3","$dE")"
+	root -l -q AutoDiceSort/EffOnly.C"(\"$EffPoints\","$NumberOfEffPoints*2",\"FullDiceSort.root\",\"FilesAutoSort/EffSumTupleOne.root\",\"Eff\")"
+	root -l -q AutoDiceSort/EffOnly.C"(\"$EffPoints\","$NumberOfEffPoints*2",\"FullDiceSort.root\",\"FilesAutoSort/EffSumTupleTwo.root\",\"EffSansBlock\")"
+	
 	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"HighE\",0,\"FullDiceSort.root\",\"FilesAutoSort/highetup.root\")"
 	root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"Gammas\",0,\"FullDiceSort.root\",\"FilesAutoSort/gammatup.root\")"
-
 
 	if [ "$do_lifetime_part" = true ] ; then
 		rm -rf FilesAutoSort/Lifetime.root
 		root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"LifetimeA\",0.1,\"FullDiceSort.root\",\"FilesAutoSort/TupleLifeA.root\","$NumberOfBetaPoints*3")"
 		root -l -q AutoDiceSort/ExptEquivSort.C"(\"SumDice.root\",\"LifetimeB\",0.1,\"FullDiceSort.root\",\"FilesAutoSort/TupleLifeB.root\","$NumberOfBetaPoints*3")"
 	fi
+
 fi
 
+
+
+
+
+
+
+
+	
+	

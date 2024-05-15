@@ -1,4 +1,4 @@
-void EffOnly(string Estring,int Nevent=0,const char * outfileName = "EffOnly.root", const char *ntuplefileName = "g4out.root"){
+void EffOnly(string Estring,int Nevent=0,const char * outfileName = "EffOnly.root", const char *ntuplefileName = "g4out.root",const char *HistFolder = "Eff" ){
 	
 	stringstream pointsstream;
 	pointsstream<<Estring;
@@ -22,11 +22,14 @@ void EffOnly(string Estring,int Nevent=0,const char * outfileName = "EffOnly.roo
 
 
 	TFile out(outfileName,"UPDATE");
+	out.mkdir(HistFolder);
+	out.cd(HistFolder);
 	
 		TH1F* HitRaw=new TH1F("HitRaw","HitRaw;Electron Energy (keV);Counts",N,&binedge[0]);
 		TH1F* Eff=new TH1F("EffRawSingle","EffRawSingle;Electron Energy (keV);Counts",N,&binedge[0]);
 		TH1F* PeakTot=new TH1F("PeakTot","PeakTot;Electron Energy (keV);Counts",N,&binedge[0]);
 		TH1F* ERaw=new TH1F("ERaw","ERaw;Electron Energy (keV);Counts",2000,0,2000);
+		TH2F* ETrueE=new TH2F("ETrueE","ETrueE;Electron Gun Energy (keV);Electron Detect Energy (keV);Counts",N,&binedge[0],2000,0,2000);
 		TGraph* EffG=new TGraph();
 
 	gROOT->cd();//cd back into main session memory 
@@ -67,6 +70,7 @@ void EffOnly(string Estring,int Nevent=0,const char * outfileName = "EffOnly.roo
 					Eff->Fill(primaryE);
 					PeakTot->Fill(primaryE);
 				}
+				ETrueE->Fill(primaryE,depEnergy);
 			}
 		}
 
@@ -88,7 +92,7 @@ void EffOnly(string Estring,int Nevent=0,const char * outfileName = "EffOnly.roo
 		}
 	}
 	
-	out.cd();
+	out.cd(HistFolder);
 	EffG->Write("EffGraph");
     out.Write();
     out.Close();	

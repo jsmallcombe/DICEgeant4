@@ -6,7 +6,7 @@
 /DetSys/world/TabMagneticField Field.txt
 #/DetSys/World/ScaleField 0.25 tesla
 
-# /DetSys/det/SetDiceBool AddBlocker false
+# /DetSys/app/SetDiceBool AddBlocker false
 # /DetSys/app/SetDiceLength MagThickA 5 mm
 # /DetSys/app/SetDiceLength MagThickB 5 mm
 # /DetSys/app/SetDiceLength YokeDepth 8 mm

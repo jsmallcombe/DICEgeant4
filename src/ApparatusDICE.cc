@@ -677,8 +677,8 @@ void ApparatusDICE::BuildPlaceFlatOrange(G4LogicalVolume* expHallLog,G4double Zb
 	MagKapL->SetVisAttributes(FiveVisAtt);
 // 	YokeL->SetVisAttributes(vis_att_hid); 
     
-	G4LogicalVolume* ML[2]={MagBoxAL,MagBoxBL};
-	G4double MX[2]={MTA,MTB};	
+	G4LogicalVolume* ML[2]={MagBoxBL,MagBoxAL};
+	G4double MX[2]={MTB,MTA};	
 
 	
     for(int i=-1;i<2;i+=2){

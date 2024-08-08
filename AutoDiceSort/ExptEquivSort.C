@@ -19,7 +19,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 	gROOT->cd();
 	
 	TGraph* AngleExpt[16][4];
-	if(beta>0){
+	if(std::abs(beta)>0){
 		for(int b=0;b<16;b++){
 			for(int m=0;m<4;m++){
 				stringstream ss;
@@ -73,7 +73,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 		TH1* FitHist;
 		TH2F* E_CorrGrid;
 		TH2F* CoMExptGrid[16];
-		if(beta>0){
+		if(std::abs(beta)>0){
 			E_Corr[0]=new TH1F("E_CorrMean","E_CorrMean;Electron Energy (keV);Counts",2000,0,2000);
 			E_Corr[1]=new TH1F("E_CorrMode","E_CorrMode;Electron Energy (keV);Counts",2000,0,2000);
 			E_Corr[2]=new TH1F("E_CorrMeanStrict","E_CorrMeanStrict;Electron Energy (keV);Counts",2000,0,2000);
@@ -236,7 +236,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 				
 					EGridGated->Fill(Eaddback);
 				
-					if(beta>0){
+					if(std::abs(beta)>0){
 						
 						for(int m=0;m<4;m++){
 							if(GdTH[m]->GetBinContent(Ebin,Seg+1)>0){
@@ -281,7 +281,7 @@ void ExptEquivSort(const char * DetDataFileName,const char * HistFolder,double b
 	// Efficiency fitting
 	if(Nevent>0){
 		TH1* h=EGridGated;
-		if(beta>0) h=E_Corr[0];
+		if(std::abs(beta)>0) h=E_Corr[0];
 		
 		out.cd(HistFolder);
 			FitHist=(TH1*)h->Clone("FitHist");

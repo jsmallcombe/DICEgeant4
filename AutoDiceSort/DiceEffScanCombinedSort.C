@@ -1,4 +1,4 @@
-void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const char *rootin = "g4out.root",double dE=100,bool symmetrize=true) {
+void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const char *rootin = "g4out.root",double dE=100,bool symmetrize=false) {
 	
     double grid_eff_cut=0.0001; // Minimum fraction of good events to leave channel enabled
     
@@ -101,10 +101,10 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
             for(int e=0;e<20;e++){
                 stringstream nn;
                 nn<<dE*(e+1)<<"_ChanThetaPhi";
-                ChanThetaPhi[e]=new TH3F(nn.str().c_str(),(nn.str()+";Emission Angle Theta #theta [Rad.];Emission Angle Phi #theta [Rad.];Hit Segment").c_str(),180,0,3.14159,180,0,3.14159,8,0,8);
+                ChanThetaPhi[e]=new TH3F(nn.str().c_str(),(nn.str()+";Emission Angle Theta #theta [Rad.];Emission Angle Phi #theta [Rad.];Hit Segment").c_str(),180,0,3.14159,180,0,3.14159,16,0,16);
             }
-            TH3F* EThetaPhi[8];
-            for(int e=0;e<8;e++){
+            TH3F* EThetaPhi[16];
+            for(int e=0;e<16;e++){
                 stringstream nn;
                 nn<<"Chan"<<e<<"_EThetaPhi";
                 EThetaPhi[e]=new TH3F(nn.str().c_str(),(nn.str()+";Emission Angle Theta #theta [Rad.];Emission Angle Phi #theta [Rad.];Beam Energy").c_str(),180,0,3.14159,180,0,3.14159,Ebin,EbinMin,EbinMax);
@@ -308,14 +308,17 @@ void DiceEffScanCombinedSort(double SimmN=1000000,string rootout = "", const cha
 					unsigned int TPchan=chan;
 					double TPtheta=Theta;
 					double TPthetapen=ThetaPen;
-					if(TPchan>7){ //To double up the statistics for symetric configuration by flip across centre, irrespecive of symmetrize
-						TPchan=15-TPchan;
-					}else{
-						TPtheta=TMath::Pi()-Theta;
-						TPthetapen=TMath::Pi()-ThetaPen;
+                    
+                    if(symmetrize){
+                        if(TPchan>7){
+                            TPchan=15-TPchan;
+                        }else{
+                            TPtheta=TMath::Pi()-Theta;
+                            TPthetapen=TMath::Pi()-ThetaPen;
+                        }
                     }
                     
-					if(TPchan<8){
+					if(TPchan<16){
 						EThetaPhi[TPchan]->Fill(TPtheta,Phi,primaryE);
                     }
                     

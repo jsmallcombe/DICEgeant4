@@ -54,7 +54,8 @@ ApparatusDICE::ApparatusDICE()//parameter chooses which lens is in place.
 	fMagnetMaterial = "NdFeB"; 
 	fYokeMaterial = "Iron"; 
 	fWaferMaterial   = "Silicon";
-	fShieldMaterial   = "WTa";
+// 	fShieldMaterial   = "WTa";
+	fShieldMaterial   = "WNiCu";
 // 	fShieldMaterial   = "Hevimetal";
 	fScintMaterial   = "EJ212";
 // 	fScintMaterial   = "G4_BGO";

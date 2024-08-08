@@ -277,6 +277,13 @@ void DetectorConstruction::DefineMaterials()
     WTa->AddElement(elW, 80.*perCent);
     WTa->AddElement(elTa, 20.*perCent);
     myMaterials.push_back(WTa);
+    
+
+    G4Material* WNiCu = new G4Material("WNiCu",density = 18460*kg/m3, ncomponents=3 );
+    WNiCu->AddElement(elW, 98.5*perCent);
+    WNiCu->AddElement(elNi, 1.0*perCent);
+    WNiCu->AddElement(elCu, 1.5*perCent);
+    myMaterials.push_back(WNiCu);
 
     G4Material* Kapton = new G4Material("Kapton",density = 1.43*g/cm3, ncomponents=4);
     Kapton->AddElement(elC,natoms=22);

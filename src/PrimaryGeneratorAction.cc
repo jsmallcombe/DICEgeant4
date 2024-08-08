@@ -227,7 +227,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	
 	
 	// If there is a beam beta boost, apply it
-	if(fEffGunBetaZ>0){
+	if(std::abs(fEffGunBetaZ)>0){
 		effdirection.setMag(sqrt(pow(m0+EofPrim,2)-m0*m0));
 		G4LorentzVector LorVec=G4LorentzVector(effdirection,m0+EofPrim);
 		LorVec.boostZ(fEffGunBetaZ);
@@ -252,7 +252,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	if(fPairProduction){
 		
 		// If there is a beam beta boost, apply it
-		if(fEffGunBetaZ>0){
+		if(std::abs(fEffGunBetaZ)>0){
 			secdirection.setMag(sqrt(pow(m0+EofSec,2)-m0*m0));
 			G4LorentzVector LorVec=G4LorentzVector(secdirection,m0+EofSec);
 			LorVec.boostZ(fEffGunBetaZ);

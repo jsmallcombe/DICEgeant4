@@ -112,6 +112,10 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 	fAddApparatusDiceDetectorCmd = new G4UIcmdWithAString("/DetSys/app/addDiceDetector",this);
 	fAddApparatusDiceDetectorCmd->SetGuidance("Add DICE geometry");
 	fAddApparatusDiceDetectorCmd->AvailableForStates(G4State_Idle);
+
+	fAddApparatusCdTeDetectorCmd = new G4UIcmdWithAString("/DetSys/app/addCdTeDetector",this);
+	fAddApparatusCdTeDetectorCmd->SetGuidance("Add cubic CdTe detector geometry");
+	fAddApparatusCdTeDetectorCmd->AvailableForStates(G4State_Idle);
 	
 	fApparatusDiceFieldCmd = new G4UIcmdWithADoubleAndUnit("/DetSys/World/ScaleField",this);
 	fApparatusDiceFieldCmd->SetGuidance("Scale the magentic field");
@@ -129,6 +133,10 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 	fApparatusDiceBoolCmd = new G4UIcmdWithAString("/DetSys/app/SetDiceBool",this);
 	fApparatusDiceBoolCmd->SetGuidance("Set DICE bool by name");
 	fApparatusDiceBoolCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+	fApparatusCdTeSetCmd = new G4UIcmdWithAString("/DetSys/app/SetCdTeLength",this);
+	fApparatusCdTeSetCmd->SetGuidance("Set CdTe detector parameter (Size value unit)");
+	fApparatusCdTeSetCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -151,10 +159,12 @@ DetectorMessenger::~DetectorMessenger()
 	delete fTabMagneticFieldAntiMirrorCmd;
 	
 	delete fAddApparatusDiceDetectorCmd;
+	delete fAddApparatusCdTeDetectorCmd;
 	delete fApparatusDiceFieldCmd;
 	delete fApparatusDiceSetCmd;
 	delete fApparatusDiceIntCmd;
 	delete fApparatusDiceBoolCmd;
+	delete fApparatusCdTeSetCmd;
 	
 }
 
@@ -203,6 +213,9 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 	if(command == fAddApparatusDiceDetectorCmd) {
 		fDetector->AddApparatusDiceDetector(newValue);
 	}
+	if(command == fAddApparatusCdTeDetectorCmd) {
+		fDetector->AddApparatusCdTeDetector(newValue);
+	}
 	if(command == fApparatusDiceFieldCmd) {
 		fDetector->SetDiceFieldStrength(fApparatusDiceFieldCmd->GetNewDoubleValue(newValue));
 	}
@@ -227,6 +240,14 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 		std::istringstream is(newValue);
 		is>>Name>>Val;
 		fDetector->DiceSetParam(Name,G4UIcmdWithABool::GetNewBoolValue(Val));
+	}
+
+	if(command == fApparatusCdTeSetCmd) {
+		G4String name, value, unit;
+		std::istringstream is(newValue);
+		is >> name >> value >> unit;
+		value += " " + unit;
+		fDetector->CdTeSetParam(name, G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(value));
 	}
 	
 	

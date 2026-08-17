@@ -141,6 +141,12 @@ void DetectorConstruction::DefineMaterials()
     
     G4Element* elPd = new G4Element(name="Palladium", symbol="Pd", z=46., a=106.42    *g/mole);
     myElements.push_back(elPd);
+
+    G4Element* elCd = new G4Element(name="Cadmium", symbol="Cd", z=48., a=112.414*g/mole);
+    myElements.push_back(elCd);
+
+    G4Element* elTe = new G4Element(name="Tellurium", symbol="Te", z=52., a=127.60*g/mole);
+    myElements.push_back(elTe);
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -213,6 +219,11 @@ void DetectorConstruction::DefineMaterials()
 
     G4Material* Ge = new G4Material(name="Germanium", z=32., a= 72.64*g/mole, density=5.323 *g/cm3);
     myMaterials.push_back(Ge);
+
+    G4Material* CdTe = new G4Material("CdTe", density=5.85*g/cm3, ncomponents=2);
+    CdTe->AddElement(elCd, natoms=1);
+    CdTe->AddElement(elTe, natoms=1);
+    myMaterials.push_back(CdTe);
 
     G4Material* Hevimetal = new G4Material("Hevimetal", density=19.0*g/cm3, nelements=3);
     Hevimetal->AddElement(elTa, 80*perCent);

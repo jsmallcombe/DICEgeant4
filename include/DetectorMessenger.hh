@@ -80,14 +80,15 @@ private:
 	G4UIcmdWithAnInteger*	   fTabMagneticFieldAntiMirrorCmd;
 
 	G4UIcmdWithAString*        fAddApparatusDiceDetectorCmd;
+	G4UIcmdWithAString*        fAddApparatusCdTeDetectorCmd;
 	G4UIcmdWithADoubleAndUnit* fApparatusDiceFieldCmd;
 	G4UIcmdWithAString*        fApparatusDiceSetCmd;
 	G4UIcmdWithAString*        fApparatusDiceIntCmd;
 	G4UIcmdWithAString*        fApparatusDiceBoolCmd;
+	G4UIcmdWithAString*        fApparatusCdTeSetCmd;
 
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-

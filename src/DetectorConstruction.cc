@@ -66,6 +66,7 @@
 #include "G4TransportationManager.hh"
 
 #include "ApparatusDICE.hh"
+#include "ApparatusCdTe.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -100,6 +101,7 @@ DetectorConstruction::DetectorConstruction() :
 	//expHallMagField = new MagneticField(); // Global field is set to zero
 	
 	fAppDICE= new ApparatusDICE();
+	fAppCdTe = new ApparatusCdTe();
 
 }
 
@@ -108,6 +110,7 @@ DetectorConstruction::DetectorConstruction() :
 DetectorConstruction::~DetectorConstruction() {	
 	delete fDetectorMessenger;
 	delete fAppDICE;
+	delete fAppCdTe;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -242,6 +245,7 @@ void DetectorConstruction::PrintRecursive(G4LogicalVolume* vol){
 
 bool DetectorConstruction::CheckVolumeName(G4String volumeName) {
 	if(volumeName.find("SiSegmentPhys") != G4String::npos) return true;
+	if(volumeName.find("CdTeSegmentPhys") != G4String::npos) return true;
 	if(volumeName.find("TrificGasCell") != G4String::npos) return true;
 	return false;
 }
@@ -263,6 +267,15 @@ DetectorProperties DetectorConstruction::ParseVolumeName(G4String volumeName) {
 		return result;
 	}
 
+	if(volumeName.find("CdTeSegmentPhys") != G4String::npos) {
+		std::string tmpString = volumeName.substr(volumeName.find("CdTeSegmentPhys") + 15);
+		std::replace(tmpString.begin(), tmpString.end(), '_', ' ');
+		std::istringstream is(tmpString);
+		is >> result.detectorNumber >> result.crystalNumber;
+		result.systemID = 11;
+		return result;
+	}
+
 	return result;
 }
 
@@ -273,6 +286,10 @@ DetectorProperties DetectorConstruction::ParseVolumeName(G4String volumeName) {
 
 void DetectorConstruction::AddApparatusDiceDetector(G4String Options){
 	fAppDICE->Build(fLogicWorld,Options);
+}
+
+void DetectorConstruction::AddApparatusCdTeDetector(G4String Options){
+	fAppCdTe->Build(fLogicWorld,Options);
 }
 
 void DetectorConstruction::SetDiceFieldStrength(G4double Field){
@@ -322,6 +339,10 @@ void DetectorConstruction::DiceSetParam(G4String N,G4int input){
 	
 void DetectorConstruction::DiceSetParam(G4String N,G4bool input){
 		fAppDICE->SetParamB(N,input);
+}
+
+void DetectorConstruction::CdTeSetParam(G4String N,G4double input){
+		fAppCdTe->SetParamD(N,input);
 }
 	
 	

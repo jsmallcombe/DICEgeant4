@@ -54,6 +54,7 @@ class G4Material;
 class DetectorMessenger;
 
 class ApparatusDICE;
+class ApparatusCdTe;
 
 //class MagneticField;
 
@@ -100,6 +101,7 @@ public:
 	void PrintRecursive(G4LogicalVolume* vol);
 
 	void AddApparatusDiceDetector(G4String Options);
+	void AddApparatusCdTeDetector(G4String Options);
 	void SetDiceFieldStrength(G4double Field);
 	
 	void SetDiceInt(G4int N);
@@ -131,6 +133,7 @@ public:
 	void DiceSetParam(G4String,G4double);
 	void DiceSetParam(G4String,G4int);
 	void DiceSetParam(G4String,G4bool);
+	void CdTeSetParam(G4String,G4double);
 	
     G4ParticleDefinition* fParticle;
 	
@@ -168,6 +171,7 @@ private:
 	G4ThreeVector fDetEffPosition;
 
 	ApparatusDICE *fAppDICE;
+	ApparatusCdTe *fAppCdTe;
 	
 	NonUniformMagneticField *fGlobalField; 
 	
@@ -179,5 +183,4 @@ private:
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
 

@@ -19,8 +19,10 @@
 
 ApparatusCdTe::ApparatusCdTe() :
 	fSize(10.0 * mm),
+	fShieldThickness(1.5 * mm),
 	fBuildOption(1),
-	fCdTeQuadNumber(0)
+	fCdTeQuadNumber(0),
+	fShieldNumber(0)
 {
 }
 
@@ -32,6 +34,9 @@ void ApparatusCdTe::SetParamD(G4String name, G4double value)
 {
 	if(name == "Size" && value > 0.0) {
 		fSize = value;
+	}
+	if(name == "T" && value > 0.0) {
+		fShieldThickness = value;
 	}
 }
 
@@ -46,14 +51,21 @@ void ApparatusCdTe::Build(G4LogicalVolume* motherVolume, G4String options)
 		return;
 	}
 
-	const G4ThreeVector nominalSurfacePosition(0.0, 0.0, 0.0 * mm);
-	G4RotationMatrix positiveRotation;
-	positiveRotation.rotateX(30.0 * deg);
-	BuildCdTeQuad(motherVolume, nominalSurfacePosition, positiveRotation);
+	PlaceCdTe(motherVolume,35);
+	PlaceCdTe(motherVolume,65);
+	PlaceCdTe(motherVolume,-35);
+	PlaceCdTe(motherVolume,-65);
 
-	// G4RotationMatrix negativeRotation;
-	// negativeRotation.rotateX(-30.0 * deg);
-	// BuildCdTeQuad(motherVolume, nominalSurfacePosition, negativeRotation);
+}
+
+void ApparatusCdTe::PlaceCdTe(G4LogicalVolume* motherVolume, G4double Angle, G4double Z){
+
+	const G4ThreeVector nominalSurfacePosition(0.0, 0.0, Z * mm);
+	G4RotationMatrix positiveRotation;
+	positiveRotation.rotateX(Angle * deg);
+	BuildCdTeQuad(motherVolume, nominalSurfacePosition, positiveRotation);
+	BuildShield(motherVolume, nominalSurfacePosition, positiveRotation);
+
 }
 
 void ApparatusCdTe::BuildCdTeQuad(G4LogicalVolume* motherVolume, G4ThreeVector surfacePosition,
@@ -150,7 +162,33 @@ void ApparatusCdTe::BuildCdTeQuad(G4LogicalVolume* motherVolume, G4ThreeVector s
 		"CdTeQuadPCBPhys", assemblyLogical, false, quadNumber);
 
 
-	const G4ThreeVector assemblyCentre = rotation * (surfacePosition + G4ThreeVector(0.0, 0.0, 48.25+28 * mm));
-	new G4PVPlacement(new G4RotationMatrix(rotation), assemblyCentre, assemblyLogical,
+	// G4PVPlacement stores a frame rotation, whereas the placed body uses its
+	// inverse as the object rotation.  Use that object rotation for the pivot
+	// translation so the local -Z axis passes through surfacePosition.
+	const G4ThreeVector rotationPointInAssembly(0.0, 0.0, -76.25 * mm);
+	const G4RotationMatrix objectRotation = rotation.inverse();
+	const G4ThreeVector assemblyTranslation = surfacePosition - objectRotation * rotationPointInAssembly;
+	new G4PVPlacement(new G4RotationMatrix(rotation), assemblyTranslation, assemblyLogical,
 		"CdTeQuadAssemblyPhys", motherVolume, false, quadNumber);
+}
+
+void ApparatusCdTe::BuildShield(G4LogicalVolume* motherVolume, G4ThreeVector surfacePosition,
+	const G4RotationMatrix& rotation)
+{
+	G4Material* aluminiumMaterial = G4Material::GetMaterial("Aluminium");
+	if(!aluminiumMaterial) {
+		G4cerr << "Aluminium material is not defined; CdTe shield was not built." << G4endl;
+		return;
+	}
+
+	G4Box* shieldSolid = new G4Box("CdTeShieldSolid", 15.0 * mm, 6.0 * mm, fShieldThickness / 2.0);
+	G4LogicalVolume* shieldLogical = new G4LogicalVolume(shieldSolid, aluminiumMaterial, "CdTeShieldLogical");
+	shieldLogical->SetVisAttributes(new G4VisAttributes(G4Colour(0.45, 0.48, 0.55)));
+
+	const G4ThreeVector shieldCentreRelativeToPivot(0.0, 0.0, 26.0 * mm - fShieldThickness / 2.0);
+	const G4RotationMatrix objectRotation = rotation.inverse();
+	const G4ThreeVector shieldTranslation = surfacePosition
+		+ objectRotation * shieldCentreRelativeToPivot;
+	new G4PVPlacement(new G4RotationMatrix(rotation), shieldTranslation, shieldLogical,
+		"CdTeShieldPhys", motherVolume, false, fShieldNumber++);
 }

@@ -135,7 +135,7 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 	fApparatusDiceBoolCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
 	fApparatusCdTeSetCmd = new G4UIcmdWithAString("/DetSys/app/SetCdTeLength",this);
-	fApparatusCdTeSetCmd->SetGuidance("Set CdTe detector parameter (Size value unit)");
+	fApparatusCdTeSetCmd->SetGuidance("Set CdTe detector parameter (T value unit)");
 	fApparatusCdTeSetCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 }
 

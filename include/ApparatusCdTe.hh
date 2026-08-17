@@ -17,8 +17,12 @@ public:
 	// Construction option 1 builds a CdTe quad at its default position.
 	void Build(G4LogicalVolume* motherVolume, G4String options);
 
+	void PlaceCdTe(G4LogicalVolume* motherVolume, G4double Angle, G4double Z=0);
+
 	// Place a quad whose unrotated front (-Z) surface is at surfacePosition.
 	void BuildCdTeQuad(G4LogicalVolume* motherVolume, G4ThreeVector surfacePosition,
+		const G4RotationMatrix& rotation);
+	void BuildShield(G4LogicalVolume* motherVolume, G4ThreeVector surfacePosition,
 		const G4RotationMatrix& rotation);
 
 	// Supported parameter: Size (the full edge length of the cube).
@@ -26,8 +30,10 @@ public:
 
 private:
 	G4double fSize;
+	G4double fShieldThickness;
 	G4int fBuildOption;
 	G4int fCdTeQuadNumber;
+	G4int fShieldNumber;
 };
 
 #endif

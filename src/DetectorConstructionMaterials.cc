@@ -147,6 +147,9 @@ void DetectorConstruction::DefineMaterials()
 
     G4Element* elTe = new G4Element(name="Tellurium", symbol="Te", z=52., a=127.60*g/mole);
     myElements.push_back(elTe);
+
+    G4Element* elU = new G4Element(name="Uranium", symbol="U", z=92., a=238.02891*g/mole);
+    myElements.push_back(elU);
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -224,6 +227,11 @@ void DetectorConstruction::DefineMaterials()
     CdTe->AddElement(elCd, natoms=1);
     CdTe->AddElement(elTe, natoms=1);
     myMaterials.push_back(CdTe);
+
+    G4Material* UO2 = new G4Material("UO2", density=10.97*g/cm3, ncomponents=2);
+    UO2->AddElement(elU, natoms=1);
+    UO2->AddElement(elO, natoms=2);
+    myMaterials.push_back(UO2);
 
     G4Material* Hevimetal = new G4Material("Hevimetal", density=19.0*g/cm3, nelements=3);
     Hevimetal->AddElement(elTa, 80*perCent);

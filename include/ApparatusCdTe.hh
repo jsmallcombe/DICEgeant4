@@ -24,6 +24,7 @@ public:
 		const G4RotationMatrix& rotation);
 	void BuildShield(G4LogicalVolume* motherVolume, G4ThreeVector surfacePosition,
 		const G4RotationMatrix& rotation);
+	void TargetWheel(G4LogicalVolume* motherVolume);
 
 	// Supported parameter: Size (the full edge length of the cube).
 	void SetParamD(G4String name, G4double value);

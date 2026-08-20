@@ -10,6 +10,7 @@
 #include "G4PVPlacement.hh"
 #include "G4RotationMatrix.hh"
 #include "G4SubtractionSolid.hh"
+#include "G4Tubs.hh"
 #include "G4UnionSolid.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4ThreeVector.hh"
@@ -51,10 +52,13 @@ void ApparatusCdTe::Build(G4LogicalVolume* motherVolume, G4String options)
 		return;
 	}
 
-	PlaceCdTe(motherVolume,35);
-	PlaceCdTe(motherVolume,65);
-	PlaceCdTe(motherVolume,-35);
-	PlaceCdTe(motherVolume,-65);
+	G4double Zoff=1.0;
+
+	PlaceCdTe(motherVolume,35,Zoff);
+	PlaceCdTe(motherVolume,65,Zoff);
+	PlaceCdTe(motherVolume,-35,Zoff);
+	PlaceCdTe(motherVolume,-65,Zoff);
+	TargetWheel(motherVolume);
 
 }
 
@@ -181,14 +185,63 @@ void ApparatusCdTe::BuildShield(G4LogicalVolume* motherVolume, G4ThreeVector sur
 		return;
 	}
 
-	G4Box* shieldSolid = new G4Box("CdTeShieldSolid", 15.0 * mm, 6.0 * mm, fShieldThickness / 2.0);
+	G4Box* shieldSolid = new G4Box("CdTeShieldSolid", 18.25 * mm, 6.0 * mm, fShieldThickness / 2.0);
 	G4LogicalVolume* shieldLogical = new G4LogicalVolume(shieldSolid, aluminiumMaterial, "CdTeShieldLogical");
 	shieldLogical->SetVisAttributes(new G4VisAttributes(G4Colour(0.45, 0.48, 0.55)));
 
-	const G4ThreeVector shieldCentreRelativeToPivot(0.0, 0.0, 26.0 * mm - fShieldThickness / 2.0);
+	const G4ThreeVector shieldCentreRelativeToPivot(0.0, 0.0, 24.1 * mm + fShieldThickness / 2.0);
 	const G4RotationMatrix objectRotation = rotation.inverse();
 	const G4ThreeVector shieldTranslation = surfacePosition
 		+ objectRotation * shieldCentreRelativeToPivot;
 	new G4PVPlacement(new G4RotationMatrix(rotation), shieldTranslation, shieldLogical,
 		"CdTeShieldPhys", motherVolume, false, fShieldNumber++);
+}
+
+void ApparatusCdTe::TargetWheel(G4LogicalVolume* motherVolume)
+{
+	G4Material* aluminiumMaterial = G4Material::GetMaterial("Aluminium");
+	G4Material* uraniumDioxideMaterial = G4Material::GetMaterial("UO2");
+	if(!aluminiumMaterial || !uraniumDioxideMaterial) {
+		G4cerr << "Target-wheel material is not defined; target wheel was not built." << G4endl;
+		return;
+	}
+
+	G4VSolid* wheelSolid = new G4Tubs("TargetWheelCylinder", 0.0, 43.0 * mm, 0.8 * mm, 0.0, 360.0 * deg);
+	G4Box* wheelExtension = new G4Box("TargetWheelExtension", 8.0 * mm, 17.0 * mm, 0.8 * mm);
+	wheelSolid = new G4UnionSolid("TargetWheelWithExtension", wheelSolid, wheelExtension,
+		nullptr, G4ThreeVector(0.0, 23.861 * mm, 0.4 * mm));
+
+	G4Tubs* largeCut = new G4Tubs("TargetWheelLargeCut", 0.0, 8.0 * mm, 0.9 * mm, 0.0, 360.0 * deg);
+	wheelSolid = new G4SubtractionSolid("TargetWheelCutTop", wheelSolid, largeCut,
+		nullptr, G4ThreeVector(0.0, 23.861 * mm, -0.2 * mm));
+	wheelSolid = new G4SubtractionSolid("TargetWheelCutRight", wheelSolid, largeCut,
+		nullptr, G4ThreeVector(17.5 * mm, 16.219 * mm, 0.0));
+	wheelSolid = new G4SubtractionSolid("TargetWheelCutLeft", wheelSolid, largeCut,
+		nullptr, G4ThreeVector(-17.5 * mm, 16.219 * mm, 0.0));
+
+	G4Tubs* smallCut = new G4Tubs("TargetWheelSmallCut", 0.0, 5.0 * mm, 1.4 * mm, 0.0, 360.0 * deg);
+	wheelSolid = new G4SubtractionSolid("TargetWheelSolid", wheelSolid, smallCut,
+		nullptr, G4ThreeVector(0.0, 23.861 * mm, 0.0));
+
+	G4LogicalVolume* wheelLogical = new G4LogicalVolume(wheelSolid, aluminiumMaterial, "TargetWheelLogical");
+	wheelLogical->SetVisAttributes(new G4VisAttributes(G4Colour(0.70, 0.72, 0.75)));
+
+	G4RotationMatrix* wheelRotation = new G4RotationMatrix;
+	wheelRotation->rotateZ(225.0 * deg);
+	new G4PVPlacement(wheelRotation, G4ThreeVector(16.872 * mm, 16.872 * mm, -1.0 * mm),
+		wheelLogical, "TargetWheelPhys", motherVolume, false, 0);
+
+	G4Tubs* targetHolderSolid = new G4Tubs("TargetHolderSolid", 0.0, 4.99 * mm, 0.003679 * mm / 2.0,
+		0.0, 360.0 * deg);
+	G4LogicalVolume* targetHolderLogical = new G4LogicalVolume(targetHolderSolid, aluminiumMaterial, "TargetHolderLogical");
+	targetHolderLogical->SetVisAttributes(new G4VisAttributes(G4Colour(0.55, 0.57, 0.60)));
+
+	G4Tubs* uo2TargetSolid = new G4Tubs("UO2TargetSolid", 0.0, 4.0 * mm, 0.0002825 * mm / 2.0,
+		0.0, 360.0 * deg);
+	G4LogicalVolume* uo2TargetLogical = new G4LogicalVolume(uo2TargetSolid, uraniumDioxideMaterial, "UO2TargetLogical");
+	uo2TargetLogical->SetVisAttributes(new G4VisAttributes(G4Colour(0.10, 0.10, 0.10)));
+	new G4PVPlacement(nullptr, G4ThreeVector(0.0, 0.0, 0.001587 * mm), uo2TargetLogical,
+		"UO2TargetPhys", targetHolderLogical, false, 0);
+
+	new G4PVPlacement(nullptr, G4ThreeVector(0.0, 0.0, -0.001587 * mm), targetHolderLogical,"TargetHolderPhys", motherVolume, false, 0);
 }
